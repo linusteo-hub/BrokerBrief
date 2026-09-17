@@ -14,7 +14,10 @@ If a feed fails, we flag it and lower confidence — we never invent values.
 """
 
 import pandas as pd
+from datetime import datetime, timezone
 from typing import Optional
+
+from modules.provenance import MANUAL_ENTRY_MAX_AGE, Provenance, QualityTier, parse_as_of
 
 
 def assemble_market_data(
@@ -46,7 +49,7 @@ def assemble_market_data(
         "portwatch_available": False,
         "congestion_signals":  {},
         "bunker_prices":       {"Singapore": {}, "Fujairah": {}},
-        "data_provenance":     {},   # source labels for every input
+        "provenance":          {},   # Dict[str, Optional[Provenance]] — one entry per input
     }
 
     # ── EIA (LIVE) ───────────────────────────────────────────────────────────
@@ -58,24 +61,24 @@ def assemble_market_data(
             market_data["brent_pct_change"] = spot["pct_change"]
             market_data["brent_price"]      = spot["current_value"]
             market_data["brent_date"]       = spot["latest_date"]
-            market_data["data_provenance"]["Brent spot"] = "LIVE — EIA API"
+            market_data["provenance"]["Brent spot"] = spot["provenance"]
 
         fcast = eia_data.get("forecast", {})
         if fcast.get("success"):
             market_data["forecast_available"] = True
             market_data["forecast_rows"]      = fcast["forecast_rows"]
-            market_data["data_provenance"]["Brent forecast"] = "LIVE — EIA STEO API"
+            market_data["provenance"]["Brent forecast"] = fcast["provenance"]
 
     if not market_data["brent_available"]:
-        market_data["data_provenance"]["Brent spot"] = "MISSING — EIA unavailable or no key"
+        market_data["provenance"]["Brent spot"] = None
 
     # ── Portwatch (LIVE) ──────────────────────────────────────────────────────
     if portwatch_data and portwatch_data.get("success"):
         market_data["portwatch_available"] = True
         market_data["congestion_signals"]  = portwatch_data["congestion_signals"]
-        market_data["data_provenance"]["Port congestion"] = "LIVE — IMF Portwatch"
+        market_data["provenance"]["Port congestion"] = portwatch_data["provenance"]
     else:
-        market_data["data_provenance"]["Port congestion"] = "MISSING — Portwatch unavailable"
+        market_data["provenance"]["Port congestion"] = None
 
     # ── Bunker prices (MANUAL CSV) ────────────────────────────────────────────
     if df is not None and not df.empty and "signal_type" in df.columns:
@@ -94,23 +97,39 @@ def assemble_market_data(
                 continue
             market_data["bunker_prices"][port]["VLSFO"]      = current
             market_data["bunker_prices"][port]["VLSFO_prev"] = previous
-            market_data["data_provenance"][f"{port} VLSFO"]  = "MANUAL — CSV data"
+            market_data["provenance"][f"{port} VLSFO"] = Provenance(
+                source_name=str(row.get("source_name") or "CSV manual entry"),
+                source_url=row.get("source_url"),
+                as_of=parse_as_of(row.get("updated_at")),
+                retrieved_at=datetime.now(timezone.utc),
+                licence="Internal — analyst-entered",
+                quality_tier=QualityTier.MANUAL_ENTRY,
+                max_age=MANUAL_ENTRY_MAX_AGE,
+            )
 
     # ── Overrides & simulation flags ─────────────────────────────────────────
     if fujairah_price_override is not None:
         market_data["bunker_prices"]["Fujairah"]["VLSFO"] = fujairah_price_override
-        market_data["data_provenance"]["Fujairah VLSFO"] = "USER-PROVIDED"
+        now = datetime.now(timezone.utc)
+        market_data["provenance"]["Fujairah VLSFO"] = Provenance(
+            source_name="User override",
+            source_url=None,
+            as_of=now,
+            retrieved_at=now,
+            licence="n/a",
+            quality_tier=QualityTier.USER_OVERRIDE,
+            max_age=None,
+        )
 
     if simulate_fujairah_missing:
         market_data["bunker_prices"]["Fujairah"].pop("VLSFO", None)
         market_data["bunker_prices"]["Fujairah"].pop("VLSFO_prev", None)
-        market_data["data_provenance"]["Fujairah VLSFO"] = "MISSING — price unavailable"
+        market_data["provenance"]["Fujairah VLSFO"] = None
 
     # Flag any missing prices in provenance
     if "VLSFO" not in market_data["bunker_prices"]["Singapore"]:
-        market_data["data_provenance"]["Singapore VLSFO"] = "MISSING — no price data"
+        market_data["provenance"]["Singapore VLSFO"] = None
     if "VLSFO" not in market_data["bunker_prices"]["Fujairah"]:
-        market_data["data_provenance"].setdefault(
-            "Fujairah VLSFO", "MISSING — no price data")
+        market_data["provenance"].setdefault("Fujairah VLSFO", None)
 
     return market_data

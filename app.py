@@ -31,6 +31,7 @@ from modules.decision.constraint_engine import (
 from modules.decision.evaluation_engine import score_options, WEIGHT_SETS
 from modules.decision.confidence_model import compute_confidence
 from modules.decision.market_data import assemble_market_data
+from modules.provenance import Freshness, Provenance
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -74,6 +75,8 @@ html,body,[data-testid="stAppViewContainer"]{background:var(--black)!important;f
 .manual-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:rgba(240,165,0,.1);color:var(--amber);border:1px solid var(--amber-dim);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;}
 .missing-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:rgba(255,107,107,.1);color:var(--red);border:1px solid rgba(255,107,107,.35);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;}
 .user-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:rgba(88,166,255,.1);color:var(--blue);border:1px solid rgba(88,166,255,.35);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;}
+.stale-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:rgba(255,107,107,.22);color:var(--red);border:1px solid var(--red);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;font-weight:600;}
+.unknown-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:var(--surface2);color:var(--muted);border:1px solid var(--bdr);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;}
 .rec-card{background:var(--surface2);border:1px solid var(--amber-dim);border-left:3px solid var(--amber);border-radius:8px;padding:1.75rem 2rem;margin-bottom:1.25rem;}
 .rec-label{font-family:var(--font-mono);font-size:.62rem;color:var(--amber);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.5rem;}
 .rec-title{font-family:var(--font-head);font-weight:600;font-size:1.3rem;color:var(--text);margin-bottom:.4rem;}
@@ -189,14 +192,22 @@ eia_data       = st.session_state["eia_data"]
 portwatch_data = st.session_state["portwatch_data"]
 
 
-def _badge_for(provenance: str) -> str:
-    if provenance.startswith("LIVE"):
-        return f'<span class="live-badge">{provenance}</span>'
-    if provenance.startswith("MANUAL"):
-        return f'<span class="manual-badge">{provenance}</span>'
-    if provenance.startswith("USER"):
-        return f'<span class="user-badge">{provenance}</span>'
-    return f'<span class="missing-badge">{provenance}</span>'
+def _badge_for(prov: "Provenance | None") -> str:
+    if prov is None:
+        return '<span class="missing-badge">MISSING</span>'
+    label = prov.quality_tier.value.replace("_", " ")
+    fresh = prov.freshness()
+    if fresh is Freshness.STALE:
+        age_str = f"as of {prov.as_of:%Y-%m-%d}" if prov.as_of else "age unknown"
+        return f'<span class="stale-badge">{label} — STALE ({age_str})</span>'
+    if fresh is Freshness.UNKNOWN:
+        return f'<span class="unknown-badge">{label} — freshness unknown</span>'
+    css_class = {
+        "LIVE_API": "live-badge",
+        "MANUAL_ENTRY": "manual-badge",
+        "USER_OVERRIDE": "user-badge",
+    }[prov.quality_tier.value]
+    return f'<span class="{css_class}">{label}</span>'
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -474,7 +485,7 @@ elif "Bunkering" in page:
 
             # 9 — DATA SOURCES
             st.markdown('<div class="info-card"><div class="info-card-title">9 · Data Sources</div>', unsafe_allow_html=True)
-            for source, prov in market_data["data_provenance"].items():
+            for source, prov in market_data["provenance"].items():
                 st.markdown(f'<div class="provenance-row">{source} {_badge_for(prov)}</div>', unsafe_allow_html=True)
             st.markdown('<div class="data-note">No source, no certainty. Missing data lowers confidence but does not remove physically feasible options. The final commercial decision remains with you — BrokerBrief cannot observe supplier relationships, internal budgets, charterparty obligations, or company risk appetite.</div></div>', unsafe_allow_html=True)
 
