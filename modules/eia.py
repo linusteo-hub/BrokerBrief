@@ -7,7 +7,31 @@ No API key = returns success:False gracefully. App falls back to sample data.
 import requests
 from datetime import date
 
+from modules.provenance import (
+    EIA_FORECAST_MAX_AGE,
+    EIA_SPOT_MAX_AGE,
+    QualityTier,
+    SourceInfo,
+    parse_as_of,
+    stamp,
+)
+
 EIA_BASE = "https://api.eia.gov/v2"
+
+EIA_SPOT = SourceInfo(
+    name="EIA",
+    url="https://www.eia.gov/opendata/",
+    licence="U.S. Government Work (public domain)",
+    quality_tier=QualityTier.LIVE_API,
+    max_age=EIA_SPOT_MAX_AGE,
+)
+EIA_FORECAST = SourceInfo(
+    name="EIA STEO",
+    url="https://www.eia.gov/steo/",
+    licence="U.S. Government Work (public domain)",
+    quality_tier=QualityTier.LIVE_API,
+    max_age=EIA_FORECAST_MAX_AGE,
+)
 
 
 def fetch_brent_spot(api_key: str) -> dict:
@@ -43,6 +67,7 @@ def fetch_brent_spot(api_key: str) -> dict:
             "updated_at":     rows[0]["period"],
             "confidence":     0.95,
             "raw_rows":       rows,
+            "provenance":     stamp(EIA_SPOT, as_of=parse_as_of(rows[0]["period"])),
         }
     except Exception as e:
         return {"success": False, "error": str(e)}
@@ -78,6 +103,10 @@ def fetch_brent_forecast(api_key: str) -> dict:
             "source_url":    "https://www.eia.gov/steo/",
             "updated_at":    date.today().isoformat(),
             "confidence":    0.80,
+            # No publication-vintage field is exposed by this endpoint — forecast_rows
+            # carries the forecasted (forward-looking) month, not an observation date,
+            # so as_of is deliberately None here rather than derived from it.
+            "provenance":    stamp(EIA_FORECAST, as_of=None),
         }
     except Exception as e:
         return {"success": False, "error": str(e)}

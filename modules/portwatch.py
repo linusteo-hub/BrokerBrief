@@ -8,12 +8,22 @@ import requests
 from datetime import date, timedelta
 from collections import defaultdict
 
+from modules.provenance import PORTWATCH_MAX_AGE, QualityTier, SourceInfo, parse_as_of, stamp
+
 PORTWATCH_URL = (
     "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/"
     "ArcGIS/rest/services/Daily_Ports_Data/FeatureServer/0/query"
 )
 
 TARGET_PORTS = ["Singapore", "Rotterdam", "Fujairah", "Port Hedland", "Houston"]
+
+PORTWATCH = SourceInfo(
+    name="IMF Portwatch",
+    url="https://portwatch.imf.org",
+    licence="IMF Open Data Terms",
+    quality_tier=QualityTier.LIVE_API,
+    max_age=PORTWATCH_MAX_AGE,
+)
 
 
 def fetch_port_activity() -> dict:
@@ -44,6 +54,9 @@ def fetch_port_activity() -> dict:
             }
             for f in features
         ]
+        parsed_dates = [d for d in (parse_as_of(r["date"]) for r in rows) if d is not None]
+        latest_as_of = max(parsed_dates) if parsed_dates else None
+
         return {
             "success":            True,
             "ports":              rows,
@@ -52,6 +65,9 @@ def fetch_port_activity() -> dict:
             "source_url":         "https://portwatch.imf.org",
             "updated_at":         date.today().isoformat(),
             "confidence":         0.80,
+            # Rows are ordered `portname, date DESC` (grouped per port, not globally
+            # sorted) — as_of must be an explicit max() over all rows, not rows[0].
+            "provenance":         stamp(PORTWATCH, as_of=latest_as_of),
         }
     except Exception as e:
         return {"success": False, "error": str(e)}
