@@ -17,10 +17,16 @@ PORTWATCH_URL = (
 
 TARGET_PORTS = ["Singapore", "Rotterdam", "Fujairah", "Port Hedland", "Houston"]
 
+# IMF terms (https://www.imf.org/en/about/copyright-and-terms) allow reuse and
+# publication with this credit; commercial reuse and automated bulk download
+# need IMF permission. Show the credit wherever PortWatch data is displayed.
+PORTWATCH_CREDIT_TEXT = "International Monetary Fund, PortWatch, https://portwatch.imf.org"
+PORTWATCH_CREDIT = f"Source: {PORTWATCH_CREDIT_TEXT}"
+
 PORTWATCH = SourceInfo(
     name="IMF Portwatch",
     url="https://portwatch.imf.org",
-    licence="IMF Open Data Terms",
+    licence="IMF copyright and terms (reuse with credit; commercial reuse needs permission)",
     quality_tier=QualityTier.LIVE_API,
     max_age=PORTWATCH_MAX_AGE,
 )
