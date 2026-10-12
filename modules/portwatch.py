@@ -17,6 +17,14 @@ PORTWATCH_URL = (
 
 TARGET_PORTS = ["Singapore", "Rotterdam", "Fujairah", "Port Hedland", "Houston"]
 
+# The app's port name -> PortWatch's `portname`, where they differ. This is the
+# only place the mapping lives. PortWatch names the port "Houston (US-TX)"
+# (portid port481); querying plain "Houston" returned no rows, so Houston was
+# silently missing. Checked against PortWatch_ports_database on 12-10-2026: the
+# other target ports match exactly.
+PORTWATCH_NAMES = {"Houston": "Houston (US-TX)"}
+APP_NAMES = {pw: app for app, pw in PORTWATCH_NAMES.items()}
+
 PORTWATCH = SourceInfo(
     name="IMF Portwatch",
     url="https://portwatch.imf.org",
@@ -28,7 +36,7 @@ PORTWATCH = SourceInfo(
 
 def fetch_port_activity() -> dict:
     cutoff = (date.today() - timedelta(days=14)).strftime("%Y-%m-%d")
-    port_list = ", ".join(f"'{p}'" for p in TARGET_PORTS)
+    port_list = ", ".join(f"'{PORTWATCH_NAMES.get(p, p)}'" for p in TARGET_PORTS)
     params = {
         "where":             f"portname IN ({port_list}) AND date >= DATE '{cutoff}'",
         "outFields":         "portname,date,portcalls,portcalls_tanker,portcalls_dry_bulk",
@@ -46,7 +54,7 @@ def fetch_port_activity() -> dict:
 
         rows = [
             {
-                "portname":           f["attributes"].get("portname"),
+                "portname":           APP_NAMES.get(f["attributes"].get("portname"), f["attributes"].get("portname")),
                 "date":               f["attributes"].get("date"),
                 "portcalls":          f["attributes"].get("portcalls"),
                 "portcalls_tanker":   f["attributes"].get("portcalls_tanker"),

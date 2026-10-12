@@ -73,5 +73,28 @@ class FetchPortActivityTests(unittest.TestCase):
         self.assertEqual(set(result["congestion_reasons"]), set(portwatch.TARGET_PORTS) - {"Singapore"})
 
 
+class HoustonNameTests(unittest.TestCase):
+    def _fetch(self, features):
+        response = mock.Mock(**{"json.return_value": {"features": features}, "raise_for_status.return_value": None})
+        with mock.patch.object(portwatch.requests, "get", return_value=response) as get:
+            return portwatch.fetch_port_activity(), get.call_args.kwargs["params"]["where"]
+
+    def test_query_uses_portwatch_name_for_houston(self):
+        _, where = self._fetch([])
+        self.assertIn("'Houston (US-TX)'", where)
+        self.assertNotIn("'Houston'", where)
+        self.assertIn("'Singapore'", where)
+
+    def test_houston_rows_come_back_under_the_app_name(self):
+        features = [{"attributes": row("Houston (US-TX)", d, n)} for d, n in (("2026-10-02", 24), ("2026-09-20", 20))]
+        result, _ = self._fetch(features)
+        self.assertEqual(result["congestion_signals"]["Houston"], "Rising")
+        self.assertNotIn("Houston (US-TX)", result["congestion_signals"])
+        self.assertEqual({r["portname"] for r in result["ports"]}, {"Houston"})
+
+    def test_mapping_is_the_only_rename(self):
+        self.assertEqual(portwatch.PORTWATCH_NAMES, {"Houston": "Houston (US-TX)"})
+
+
 if __name__ == "__main__":
     unittest.main()
