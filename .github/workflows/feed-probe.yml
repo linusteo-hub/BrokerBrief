@@ -1,0 +1,20 @@
+# Probe the morning brief's RSS feeds from a GitHub Actions runner.
+# Runs only on pushes to ci/feed-probe. Prints metadata only (status, final
+# URL, content type, bytes, item count), never item text. No secrets.
+name: Feed probe
+
+on:
+  push:
+    branches: [ci/feed-probe]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe feeds
+        run: python3 .github/scripts/feed_probe.py
