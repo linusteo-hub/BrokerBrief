@@ -38,6 +38,7 @@ class AllowedSource:
     credit: str             # credit line to print under Sources
     quality_tier: str       # LIVE_API for data; NEWS_EXCERPT for feeds
     max_age: Optional[timedelta]  # staleness threshold for this source's data
+    fetch_urls: tuple = ()  # URL prefixes our code may request for this source
     notes: str = ""
 
 
@@ -55,6 +56,7 @@ ALLOWLIST: dict[str, AllowedSource] = {
         quality_tier="LIVE_API",
         # Daily values released weekly, so the newest value can be ~9 days old.
         max_age=timedelta(days=10),
+        fetch_urls=("https://api.eia.gov/v2/petroleum/pri/spt/data/",),
         notes=("EIA's spot prices come from Refinitiv (LSEG). EIA puts no restriction "
                "on these tables and FRED tags them public domain, citation requested."),
     ),
@@ -73,6 +75,8 @@ ALLOWLIST: dict[str, AllowedSource] = {
         quality_tier="LIVE_API",
         # Weekly batches lagging 8–10 days; 14 days allows one late batch.
         max_age=timedelta(days=14),
+        fetch_urls=("https://services9.arcgis.com/weJ1QsnbMYJlCHdG/ArcGIS/rest/services/Daily_Ports_Data/FeatureServer/0/query",
+                    "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/ArcGIS/rest/services/Daily_Chokepoints_Data/FeatureServer/0/query"),
         notes="Physical activity (transits, port calls), not freight rates. "
               "Keep queries small and once per run (no bulk download).",
     ),
@@ -88,6 +92,7 @@ ALLOWLIST: dict[str, AllowedSource] = {
         credit="gCaptain (https://gcaptain.com)",
         quality_tier="NEWS_EXCERPT",
         max_age=None,
+        fetch_urls=("https://gcaptain.com/feed/",),
         notes="Carries Reuters and Bloomberg wire stories: headline and link only.",
     ),
     "splash247": AllowedSource(
@@ -102,6 +107,7 @@ ALLOWLIST: dict[str, AllowedSource] = {
         credit="Splash247 (https://splash247.com)",
         quality_tier="NEWS_EXCERPT",
         max_age=None,
+        fetch_urls=("https://splash247.com/feed/",),
         notes="Blocked one fetcher with HTTP 403; test from GitHub Actions before Phase 3.",
     ),
     "maritime_executive": AllowedSource(
@@ -116,6 +122,7 @@ ALLOWLIST: dict[str, AllowedSource] = {
         credit="The Maritime Executive (https://maritime-executive.com)",
         quality_tier="NEWS_EXCERPT",
         max_age=None,
+        fetch_urls=("https://maritime-executive.com/articles.rss",),
         notes="Atom feed with many press releases.",
     ),
 }
@@ -160,6 +167,18 @@ def mentions_banned_source(text: str) -> Optional[str]:
     """Return the first banned-source mention in `text`, or None."""
     match = BANNED_NAME_PATTERN.search(text or "")
     return match.group(0) if match else None
+
+
+def require_allowed_url(url: str) -> AllowedSource:
+    """Every HTTP request the brief makes passes through this. A URL that is not
+    one of an allowlisted source's `fetch_urls` raises SourceNotAllowed — it is
+    never caught by the fetchers, so the run fails loudly."""
+    for source in ALLOWLIST.values():
+        for prefix in source.fetch_urls:
+            # Exact URL, or the prefix followed by a query string only.
+            if url == prefix or url.startswith(prefix + "?"):
+                return source
+    raise SourceNotAllowed(f"refusing to fetch {url!r}: not an allowlisted URL")
 
 
 def require_allowed(source_id: str, *, numeric: bool = False) -> AllowedSource:
