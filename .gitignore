@@ -1,2 +1,6 @@
 __pycache__/
 *.pyc
+.env
+calibration.yaml
+.venv/
+.DS_Store
