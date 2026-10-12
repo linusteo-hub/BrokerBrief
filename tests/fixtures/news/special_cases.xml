@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-made edge cases for the news fetcher. All text written for BrokerBrief tests; not real stories. -->
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+<title>gCaptain</title>
+<link>https://gcaptain.com</link>
+<item>
+  <title>Port strike talks resume on the US Gulf Coast</title>
+  <link>https://gcaptain.com/test-reuters-no-author/</link>
+  <pubDate>Mon, 12 Oct 2026 09:00:00 +0000</pubDate>
+  <description><![CDATA[<p>HOUSTON, Oct 12 (Reuters) &#8211; Talks between dockworkers and employers resumed on Monday. Both sides said progress was possible.</p>]]></description>
+</item>
+<item>
+  <title>Bloomberg: Shipowners weigh new route options around Africa</title>
+  <link>https://gcaptain.com/test-bloomberg-in-title/</link>
+  <dc:creator><![CDATA[Staff Writer]]></dc:creator>
+  <pubDate>Mon, 12 Oct 2026 08:30:00 +0000</pubDate>
+  <description><![CDATA[<p>Owners are weighing longer routes as insurance costs climb. Charterers are watching closely.</p>]]></description>
+</item>
+<item>
+  <title>Insurers review war-risk cover for the region</title>
+  <link>https://gcaptain.com/test-reuters-credit-field/</link>
+  <source url="https://www.reuters.com">Reuters</source>
+  <pubDate>Mon, 12 Oct 2026 08:00:00 +0000</pubDate>
+  <description><![CDATA[<p>Underwriters are reviewing cover for ships calling in the area. Premiums have moved sharply this month.</p>]]></description>
+</item>
+<item>
+  <title>Owners report firmer sentiment in the tanker market</title>
+  <link>https://gcaptain.com/test-mixed-digits/</link>
+  <dc:creator><![CDATA[Jane Example]]></dc:creator>
+  <pubDate>Mon, 12 Oct 2026 07:00:00 +0000</pubDate>
+  <description><![CDATA[<p>By Jane Example and Sam Writer, London &#8211; Owners say sentiment has improved across the tanker market. Average earnings reached $45,000 a day last week. Brokers expect activity to stay brisk into the winter.</p>]]></description>
+</item>
+<item>
+  <title>Port operator publishes quarterly volumes</title>
+  <link>https://gcaptain.com/test-all-digits/</link>
+  <dc:creator><![CDATA[Jane Example]]></dc:creator>
+  <pubDate>Mon, 12 Oct 2026 06:00:00 +0000</pubDate>
+  <description><![CDATA[<p>Volumes rose 12% to 3.4m TEU in Q3. Throughput hit 1.1m TEU in September.</p>]]></description>
+</item>
+<item>
+  <title>Capesize rates jump 25% in a week</title>
+  <link>https://gcaptain.com/test-freight-headline-digits/</link>
+  <dc:creator><![CDATA[Jane Example]]></dc:creator>
+  <pubDate>Mon, 12 Oct 2026 05:00:00 +0000</pubDate>
+  <description><![CDATA[<p>Rates for the largest bulkers rose sharply on strong iron ore demand from China.</p>]]></description>
+</item>
+<item>
+  <title>Capesize rates climb on strong Atlantic iron ore demand</title>
+  <link>https://gcaptain.com/test-freight-direction/</link>
+  <dc:creator><![CDATA[Jane Example]]></dc:creator>
+  <pubDate>Sun, 11 Oct 2026 05:00:00 +0000</pubDate>
+  <description><![CDATA[<p>Rates for the largest bulkers firmed through the week as Brazilian iron ore cargoes increased. Owners were reluctant to fix forward.</p>]]></description>
+</item>
+<item>
+  <title>Story with no publication date</title>
+  <link>https://gcaptain.com/test-no-date/</link>
+  <description><![CDATA[<p>This item has no date and should be dropped.</p>]]></description>
+</item>
+<item>
+  <title>An old story outside the window</title>
+  <link>https://gcaptain.com/test-old/</link>
+  <pubDate>Mon, 28 Sep 2026 06:00:00 +0000</pubDate>
+  <description><![CDATA[<p>This item is two weeks old and should be skipped silently.</p>]]></description>
+</item>
+</channel>
+</rss>
