@@ -74,3 +74,8 @@ def test_morning_brief_never_imports_decision_engine():
     pattern = re.compile(r"^\s*(from|import)\s+modules\.decision|from\s+modules\s+import\s+decision", re.M)
     offenders = [p.name for p in package.glob("*.py") if pattern.search(p.read_text())]
     assert offenders == []
+
+
+def test_brief_uses_the_apps_eia_staleness_limit():
+    from modules.provenance import EIA_SPOT_MAX_AGE
+    assert require_allowed("eia_spot").max_age is EIA_SPOT_MAX_AGE

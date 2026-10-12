@@ -20,6 +20,8 @@ from dataclasses import dataclass
 from datetime import timedelta
 from typing import Optional
 
+from modules.provenance import EIA_SPOT_MAX_AGE
+
 
 class SourceNotAllowed(Exception):
     """Raised when the payload builder is handed a source it may not use."""
@@ -55,7 +57,8 @@ ALLOWLIST: dict[str, AllowedSource] = {
         credit="Source: U.S. Energy Information Administration, spot prices",
         quality_tier="LIVE_API",
         # Daily values released weekly, so the newest value can be ~9 days old.
-        max_age=timedelta(days=10),
+        # One limit for the app and the brief (provenance.EIA_SPOT_MAX_AGE).
+        max_age=EIA_SPOT_MAX_AGE,
         fetch_urls=("https://api.eia.gov/v2/petroleum/pri/spt/data/",),
         notes=("EIA's spot prices come from Refinitiv (LSEG). EIA puts no restriction "
                "on these tables and FRED tags them public domain, citation requested."),
