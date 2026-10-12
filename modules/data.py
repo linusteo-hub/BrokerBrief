@@ -9,9 +9,9 @@ attributed to a real source or reach Market Intelligence / the morning brief.
 """
 
 import pandas as pd
-from datetime import date
+from datetime import date, datetime, timezone
 
-from modules.provenance import SAMPLE_LABEL
+from modules.provenance import MANUAL_ENTRY_MAX_AGE, SAMPLE_LABEL, Provenance, QualityTier
 
 REQUIRED_COLUMNS = [
     "date", "signal_type", "market_segment", "route_or_port",
@@ -104,6 +104,78 @@ def real_rows(df: pd.DataFrame) -> pd.DataFrame:
     if df is None or df.empty:
         return pd.DataFrame(columns=REQUIRED_COLUMNS)
     return df[~is_sample(df)]
+
+
+# ── Fixed demo inputs for the decision engine ────────────────────────────────
+# While demo data is active, the Bunkering Strategy engine uses these instead of
+# the live EIA and PortWatch results, so the README scenarios give the same
+# result on every run, with or without an EIA key or network. All invented,
+# all labelled SAMPLE. Brent is deliberately flat (+0.25%, inside the ±1% band)
+# and congestion Stable at both ports, so the demo carries no market tilt.
+DEMO_BRENT_CURRENT  = 80.20
+DEMO_BRENT_PREVIOUS = 80.00
+DEMO_BRENT_PCT      = 0.25   # pre-computed: (80.20 − 80.00) / 80.00 × 100
+DEMO_CONGESTION     = {"Singapore": "Stable", "Fujairah": "Stable"}
+
+
+def _demo_provenance() -> Provenance:
+    # as_of is "now", so demo values always read as current: their age never
+    # changes the confidence score from one day to the next.
+    now = datetime.now(timezone.utc)
+    return Provenance(
+        source_name=SAMPLE_LABEL, source_url=None, as_of=now, retrieved_at=now,
+        licence=SAMPLE_LABEL, quality_tier=QualityTier.MANUAL_ENTRY,
+        max_age=MANUAL_ENTRY_MAX_AGE,
+    )
+
+
+def demo_eia_data() -> dict:
+    """Same shape as modules.eia.fetch_all(), with fixed invented values."""
+    today = date.today().isoformat()
+    this_month = date.today().strftime("%Y-%m")
+    return {
+        "spot": {
+            "success": True,
+            "current_value": DEMO_BRENT_CURRENT,
+            "previous_value": DEMO_BRENT_PREVIOUS,
+            "pct_change": DEMO_BRENT_PCT,
+            "direction": "Flat",
+            "latest_date": today,
+            "unit": "USD/bbl",
+            "source_name": SAMPLE_LABEL, "source_url": None,
+            "updated_at": today, "confidence": None,
+            "provenance": _demo_provenance(),
+        },
+        "forecast": {
+            "success": True,
+            "nearest_month": this_month,
+            "nearest_value": DEMO_BRENT_CURRENT,
+            "forecast_rows": [{"month": this_month, "forecast": DEMO_BRENT_CURRENT, "unit": "USD/bbl"}],
+            "source_name": SAMPLE_LABEL, "source_url": None,
+            "updated_at": today, "confidence": None,
+            "provenance": _demo_provenance(),
+        },
+    }
+
+
+def demo_portwatch_data() -> dict:
+    """Same shape as modules.portwatch.fetch_port_activity(), with fixed invented signals."""
+    return {
+        "success": True,
+        "ports": [],
+        "congestion_signals": dict(DEMO_CONGESTION),
+        "source_name": SAMPLE_LABEL, "source_url": None,
+        "updated_at": date.today().isoformat(), "confidence": None,
+        "provenance": _demo_provenance(),
+    }
+
+
+def engine_inputs(df: pd.DataFrame, eia_data, portwatch_data) -> tuple:
+    """The EIA and PortWatch inputs the decision engine should use.
+    Demo data active → fixed demo inputs; otherwise the live results unchanged."""
+    if is_sample(df).any():
+        return demo_eia_data(), demo_portwatch_data()
+    return eia_data, portwatch_data
 
 
 def load_data(source: str = "none", file_obj=None) -> pd.DataFrame:

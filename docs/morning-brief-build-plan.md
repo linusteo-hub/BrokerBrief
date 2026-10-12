@@ -184,3 +184,7 @@ System prompt:
 - Delete files, or run state-changing commands without my confirmation.
 
 Start with Step 0.
+
+## Parked decisions
+
+- Confidence model: a missing price on a feasible option drops confidence by only 6 points (Scenario 3 stays High at 85). Options: raise the penalty, or cap confidence at Medium when any feasible option lacks a price. Decide after the morning brief.

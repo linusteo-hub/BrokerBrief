@@ -56,7 +56,7 @@ There is **no AI in the decision pipeline**. The commercial logic is rules-based
 |-------|---------|
 | `LIVE` | EIA Brent spot + forecast (API) · IMF Portwatch congestion (API) |
 | `MANUAL` | Bunker/freight rows from a CSV you upload |
-| `SAMPLE` | Demo data with invented values, loaded only on request; drives Bunkering Strategy only, never Market Intelligence |
+| `SAMPLE` | Demo data with invented values, loaded only on request: bunker prices, plus fixed Brent, forecast and congestion that replace the live feeds in demo mode. Drives Bunkering Strategy only, never Market Intelligence |
 | `USER-PROVIDED` | Scenario inputs |
 | `MISSING` | Flagged openly — never invented |
 
@@ -75,13 +75,13 @@ Optional: paste a free [EIA API key](https://www.eia.gov/opendata/) in the sideb
 
 ## Demo scenarios (built in)
 
-| | Setup | Expected behaviour |
-|--|-------|-------------------|
-| **1** | Fuel 900 MT, both ports reachable | All options ranked; High confidence |
-| **2** | Fuel 280 MT, Fujairah 8 days away | Fujairah removed — Rule F1 with explicit fuel shortfall shown |
-| **3** | Fujairah price simulated missing | Fujairah retained (physically feasible), confidence drops to Medium, gap shown |
+| | Setup | Result |
+|--|-------|--------|
+| **1** | Fuel 900 MT, both ports reachable | All three options feasible; Full bunker — Fujairah ranks first (74.1); High confidence (91.0) |
+| **2** | Fuel 280 MT, Fujairah 8 days away | Fujairah removed — Rule F1 with explicit fuel shortfall shown; Full bunker — Singapore ranks first (66.3); High confidence (91.0) |
+| **3** | Fujairah price simulated missing | Fujairah retained (physically feasible) with the price gap shown; Full bunker — Singapore ranks first (69.0); confidence falls to 85.0, still High |
 
-Load them from the "📌 Load a demo scenario" expander on the Bunkering Strategy page. Picking a scenario also loads the demo data (invented bunker prices, shown with a "DEMO DATA ACTIVE" banner), replacing any uploaded CSV. The demo data never reaches Market Intelligence. Without demo or uploaded prices, both ports score neutral at reduced confidence. The confidence levels in the table assume a working EIA key (live Brent); without one, Scenarios 1 and 2 show Medium rather than High.
+Load them from the "📌 Load a demo scenario" expander on the Bunkering Strategy page. Picking a scenario also loads the demo data (invented bunker prices, shown with a "DEMO DATA ACTIVE" banner), replacing any uploaded CSV. The demo data never reaches Market Intelligence. In demo mode, Brent, the EIA forecast and port congestion are fixed SAMPLE values too (Brent flat, congestion Stable at both ports) in place of the live feeds, so these results are identical on every run, with or without an EIA key. `tests/test_demo_mode.py` checks them. Without demo or uploaded prices, both ports score neutral at reduced confidence.
 
 ## Project structure
 

@@ -12,7 +12,7 @@ import streamlit as st
 import pandas as pd
 from datetime import date
 
-from modules.data import load_data, REQUIRED_COLUMNS, is_sample, real_rows
+from modules.data import load_data, REQUIRED_COLUMNS, engine_inputs, is_sample, real_rows
 from modules.signals import compute_signals, SignalResult
 from modules.brief import generate_brief
 from modules.report import generate_email, generate_linkedin
@@ -216,7 +216,8 @@ portwatch_data = st.session_state["portwatch_data"]
 if is_sample(df).any():
     st.warning(
         "**DEMO DATA ACTIVE — invented values, not real market data.** "
-        "They feed the Bunkering Strategy page only; Market Intelligence ignores them. "
+        "They feed the Bunkering Strategy page only, together with fixed demo Brent, forecast "
+        "and congestion values in place of the live feeds; Market Intelligence ignores them. "
         "Clear them from the sidebar."
     )
 
@@ -359,8 +360,11 @@ elif "Bunkering" in page:
             risk_profile         = RiskProfile(risk),
         )
 
+        # With demo data active, Brent, the forecast and congestion are fixed
+        # SAMPLE values too, so demo results never depend on live feeds.
+        engine_eia, engine_portwatch = engine_inputs(df, eia_data, portwatch_data)
         market_data = assemble_market_data(
-            df, eia_data, portwatch_data,
+            df, engine_eia, engine_portwatch,
             simulate_fujairah_missing=sim_fuj_missing,
         )
 
