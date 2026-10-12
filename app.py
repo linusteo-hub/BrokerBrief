@@ -12,7 +12,7 @@ import streamlit as st
 import pandas as pd
 from datetime import date
 
-from modules.data import load_data, REQUIRED_COLUMNS
+from modules.data import load_data, REQUIRED_COLUMNS, is_sample, real_rows
 from modules.signals import compute_signals, SignalResult
 from modules.brief import generate_brief
 from modules.report import generate_email, generate_linkedin
@@ -31,7 +31,7 @@ from modules.decision.constraint_engine import (
 from modules.decision.evaluation_engine import score_options, WEIGHT_SETS
 from modules.decision.confidence_model import compute_confidence
 from modules.decision.market_data import assemble_market_data
-from modules.provenance import Freshness, Provenance
+from modules.provenance import Freshness, Provenance, SAMPLE_LABEL
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -139,14 +139,27 @@ hr{border-color:var(--bdr)!important;}
 
 # ── Session state ─────────────────────────────────────────────────────────────
 _defaults = {
-    "df": None, "data_source": "sample", "eia_key": "", "eia_data": None,
+    "df": None, "data_source": "none", "eia_key": "", "eia_data": None,
     "portwatch_data": None, "decision_result": None, "nav": "home",
 }
 for k, v in _defaults.items():
     if k not in st.session_state:
         st.session_state[k] = v
+# Start with no market rows: demo data loads only on request.
 if st.session_state["df"] is None:
+    st.session_state["df"] = load_data(source="none")
+
+
+def _load_demo_data():
     st.session_state["df"] = load_data(source="sample")
+    st.session_state["data_source"] = "sample"
+    st.session_state["decision_result"] = None
+
+
+def _clear_demo_data():
+    st.session_state["df"] = load_data(source="none")
+    st.session_state["data_source"] = "none"
+    st.session_state["decision_result"] = None
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
@@ -175,6 +188,13 @@ with st.sidebar:
         st.session_state["portwatch_data"] = None
         st.rerun()
 
+    if is_sample(st.session_state["df"]).any():
+        st.button("✕  Clear demo data", on_click=_clear_demo_data)
+    else:
+        st.button("Load demo data (invented values)", on_click=_load_demo_data, key="demo_sidebar",
+                  help="Invented bunker, freight and congestion rows for trying the "
+                       "Bunkering Strategy page. Never used in Market Intelligence.")
+
     st.markdown("---")
     st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:0.65rem;color:#8B949E;">Date: {date.today().strftime("%d %b %Y")}</div>', unsafe_allow_html=True)
     st.markdown('<div style="font-family:JetBrains Mono,monospace;font-size:0.6rem;color:#6B7480;line-height:1.6;margin-top:.75rem;">BrokerBrief v0.3<br>No source, no certainty.<br>The decision belongs to you.</div>', unsafe_allow_html=True)
@@ -191,10 +211,21 @@ df             = st.session_state["df"]
 eia_data       = st.session_state["eia_data"]
 portwatch_data = st.session_state["portwatch_data"]
 
+# Persistent on every page while any demo row is loaded (including demo rows
+# re-uploaded as a CSV, hence checking the rows rather than data_source).
+if is_sample(df).any():
+    st.warning(
+        "**DEMO DATA ACTIVE — invented values, not real market data.** "
+        "They feed the Bunkering Strategy page only; Market Intelligence ignores them. "
+        "Clear them from the sidebar."
+    )
+
 
 def _badge_for(prov: "Provenance | None") -> str:
     if prov is None:
         return '<span class="missing-badge">MISSING</span>'
+    if prov.source_name == SAMPLE_LABEL:
+        return f'<span class="stale-badge">{SAMPLE_LABEL}</span>'
     label = prov.quality_tier.value.replace("_", " ")
     fresh = prov.freshness()
     if fresh is Freshness.STALE:
@@ -251,6 +282,7 @@ elif "Bunkering" in page:
 
     # ── Preset demo scenarios ────────────────────────────────────────────────
     with st.expander("📌 Load a demo scenario", expanded=False):
+        st.caption("Picking a scenario also loads demo data (invented values), replacing any uploaded CSV.")
         c1, c2, c3 = st.columns(3)
         preset = None
         with c1:
@@ -263,6 +295,11 @@ elif "Bunkering" in page:
             if st.button("Scenario 3\nFujairah price missing"):
                 preset = dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=True)
         if preset:
+            # The documented scenario results rely on demo prices, so picking a
+            # scenario loads demo data (and its banner) if it isn't loaded yet.
+            # This replaces any uploaded CSV, as the button's help text says.
+            if not is_sample(st.session_state["df"]).any():
+                _load_demo_data()
             st.session_state["preset"] = preset
             st.session_state["decision_result"] = None
             st.rerun()
@@ -494,7 +531,15 @@ elif "Bunkering" in page:
 # PAGE: MARKET INTELLIGENCE (repositioned dashboard)
 # ════════════════════════════════════════════════════════════════════════════
 elif "Market Intelligence" in page:
-    signals: SignalResult = compute_signals(df)
+    # Demo rows are invented: Market Intelligence must never be generated from
+    # them, so everything on this page works from real rows only.
+    mi_df = real_rows(df)
+    signals: SignalResult = compute_signals(mi_df)
+    has_freight    = (mi_df["signal_type"] == "freight").any()
+    has_bunker     = (mi_df["signal_type"] == "bunker").any()
+    has_congestion = (mi_df["signal_type"] == "congestion").any()
+    used_types     = ["freight", "bunker", "congestion", "news"]
+    brief_sources  = set(mi_df.loc[mi_df["signal_type"].isin(used_types), "source_name"].dropna().astype(str))
     if portwatch_data and portwatch_data.get("success"):
         cong_signals = portwatch_data["congestion_signals"]
         if cong_signals:
@@ -502,7 +547,14 @@ elif "Market Intelligence" in page:
             for v in cong_signals.values():
                 counts[v] = counts.get(v, 0) + 1
             signals.congestion_direction = max(counts, key=counts.get)
-            signals.sufficient = True
+            has_congestion = True
+            brief_sources.add(portwatch_data["source_name"])
+    brief_sources = sorted(brief_sources)
+    # The template brief speaks to freight and bunkers, so it needs real rows for both.
+    brief_ready = bool(has_freight and has_bunker)
+    missing_parts = [name for name, ok in (("freight", has_freight), ("bunker", has_bunker)) if not ok]
+    missing_msg = (f"No real {' or '.join(missing_parts)} data loaded, so no brief is generated. "
+                   "Demo data is never used here.")
 
     st.markdown('<div class="page-title">Market Intelligence</div>', unsafe_allow_html=True)
     st.markdown('<div class="page-subtitle">Supporting evidence layer — informs every decision module</div>', unsafe_allow_html=True)
@@ -511,25 +563,33 @@ elif "Market Intelligence" in page:
         ["📋 Today's Brief", "📡 Signal Engine", "⛽ Bunker Spread Watch", "📄 Reports"])
 
     with tab_brief:
-        if not signals.sufficient:
-            st.error("⚠️ Insufficient sourced data. See Data Input page.")
+        dir_color = {"Up": "dir-up", "Down": "dir-down", "Flat": "dir-flat",
+                     "Rising": "dir-rising", "Easing": "dir-easing", "Stable": "dir-stable"}
+        def _pill(label, value):
+            return (f'<div class="stat-pill"><div class="stat-pill-label">{label}</div>'
+                    f'<div class="stat-pill-value {dir_color.get(value,"")}">{value}</div></div>')
+        pills = (_pill("Freight", signals.freight_direction if has_freight else "MISSING")
+                 + _pill("Bunkers", signals.bunker_direction if has_bunker else "MISSING")
+                 + _pill("Congestion", signals.congestion_direction if has_congestion else "MISSING"))
+        brent_pill = ""
+        if eia_data and eia_data.get("spot", {}).get("success"):
+            spot = eia_data["spot"]
+            brent_pill = (f'<div class="stat-pill"><div class="stat-pill-label">Brent Crude</div>'
+                          f'<div class="stat-pill-value {dir_color.get(spot["direction"],"")}">${spot["current_value"]:.2f}/bbl</div></div>')
+        if not brief_ready:
+            st.markdown(f"""
+            <div class="brief-card">
+                <div class="brief-card-label">Main Headline <span class="missing-badge">MISSING</span></div>
+                <div class="brief-card-value">{missing_msg}</div>
+                <div class="stat-pill-row">{pills}{brent_pill}</div>
+            </div>
+            """, unsafe_allow_html=True)
         else:
             brief = generate_brief(signals)
             tone_css = {"Bullish": "tone-bullish", "Cautiously Bullish": "tone-cautious",
                         "Mixed": "tone-mixed", "Bearish": "tone-bearish",
                         "Neutral": "tone-neutral", "Soft Demand / Mixed": "tone-soft"}.get(signals.market_tone, "tone-mixed")
             st.markdown(f'<span class="tone-badge {tone_css}">Market Tone: {signals.market_tone}</span>', unsafe_allow_html=True)
-            dir_color = {"Up": "dir-up", "Down": "dir-down", "Flat": "dir-flat",
-                         "Rising": "dir-rising", "Easing": "dir-easing", "Stable": "dir-stable"}
-            def _pill(label, value):
-                return (f'<div class="stat-pill"><div class="stat-pill-label">{label}</div>'
-                        f'<div class="stat-pill-value {dir_color.get(value,"")}">{value}</div></div>')
-            pills = _pill("Freight", signals.freight_direction) + _pill("Bunkers", signals.bunker_direction) + _pill("Congestion", signals.congestion_direction)
-            brent_pill = ""
-            if eia_data and eia_data.get("spot", {}).get("success"):
-                spot = eia_data["spot"]
-                brent_pill = (f'<div class="stat-pill"><div class="stat-pill-label">Brent Crude</div>'
-                              f'<div class="stat-pill-value {dir_color.get(spot["direction"],"")}">${spot["current_value"]:.2f}/bbl</div></div>')
             st.markdown(f"""
             <div class="brief-card">
                 <div class="brief-card-label">Main Headline</div>
@@ -554,15 +614,17 @@ elif "Market Intelligence" in page:
                       .format({"Pct Change": "{:+.2f}%", "Confidence": "{:.0%}"})
                       .hide(axis="index"))
             st.dataframe(styled, use_container_width=True, height=420)
+        else:
+            st.warning("MISSING — no real freight, bunker or congestion rows loaded. Demo data is never shown here.")
         if portwatch_data and portwatch_data.get("success"):
             st.markdown("**Live Portwatch Congestion Signals**")
             for port, sig in portwatch_data["congestion_signals"].items():
                 st.markdown(f"- **{port}**: {sig}")
 
     with tab_bunker:
-        bunker_data = compute_bunker_spreads(df)
+        bunker_data = compute_bunker_spreads(mi_df)
         if not bunker_data["available"]:
-            st.warning("No bunker rows in current dataset.")
+            st.warning("MISSING — no real bunker price rows loaded. Demo data is never shown here.")
         else:
             for fuel_type, info in bunker_data["by_fuel"].items():
                 spread = info["spread"]
@@ -576,7 +638,9 @@ elif "Market Intelligence" in page:
                 """, unsafe_allow_html=True)
 
     with tab_reports:
-        if signals.sufficient:
+        if not brief_ready:
+            st.warning(f"MISSING — {missing_msg}")
+        else:
             brief = generate_brief(signals)
             r1, r2, r3 = st.tabs(["✉️ Email", "📄 PDF", "💼 LinkedIn"])
             with r1:
@@ -585,7 +649,7 @@ elif "Market Intelligence" in page:
                 st.download_button("⬇ Download .txt", email_text.encode(), f"brokerbrief_email_{date.today()}.txt", "text/plain")
             with r2:
                 if st.button("Generate PDF"):
-                    pdf_bytes = generate_pdf_bytes(signals, brief)
+                    pdf_bytes = generate_pdf_bytes(signals, brief, brief_sources)
                     st.download_button("📄 Download PDF", pdf_bytes, f"brokerbrief_{date.today()}.pdf", "application/pdf")
             with r3:
                 linkedin_text = generate_linkedin(signals, brief)
@@ -598,7 +662,7 @@ elif "Market Intelligence" in page:
 # ════════════════════════════════════════════════════════════════════════════
 elif "Data Input" in page:
     st.markdown('<div class="page-title">Data Input</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Upload a CSV or use the built-in sample dataset</div>', unsafe_allow_html=True)
+    st.markdown('<div class="page-subtitle">Upload a CSV, or load demo data (invented values) for the Bunkering Strategy page</div>', unsafe_allow_html=True)
 
     col_a, col_b = st.columns([3, 1])
     with col_a:
@@ -606,10 +670,8 @@ elif "Data Input" in page:
                                      help="Must include: " + ", ".join(REQUIRED_COLUMNS))
     with col_b:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("Use Sample Data"):
-            st.session_state["df"] = load_data(source="sample")
-            st.session_state["data_source"] = "sample"
-            st.success("Sample dataset loaded.")
+        if st.button("Load demo data (invented values)", on_click=_load_demo_data, key="demo_page"):
+            st.success("Demo data loaded — invented values, used by Bunkering Strategy only.")
 
     if uploaded is not None:
         try:
@@ -629,6 +691,8 @@ elif "Data Input" in page:
     st.dataframe(st.session_state["df"], use_container_width=True)
 
     st.markdown("**Validation Report**")
+    if st.session_state["df"].empty:
+        st.info("No market rows loaded.")
     for field in ["source_name", "source_url", "updated_at", "confidence"]:
         df_display = st.session_state["df"]
         if field in df_display.columns:

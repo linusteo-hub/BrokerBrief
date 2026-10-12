@@ -1,11 +1,17 @@
 """
 modules/data.py
-Handles sample data generation and CSV loading.
+Handles demo data generation and CSV loading.
 Core rule: every row must carry source_name, source_url, updated_at, confidence.
+
+The demo rows below are INVENTED values for exercising the Bunkering Strategy
+page. They are labelled SAMPLE_LABEL, carry no source URL, and must never be
+attributed to a real source or reach Market Intelligence / the morning brief.
 """
 
 import pandas as pd
-from datetime import date, timedelta
+from datetime import date
+
+from modules.provenance import SAMPLE_LABEL
 
 REQUIRED_COLUMNS = [
     "date", "signal_type", "market_segment", "route_or_port",
@@ -15,92 +21,94 @@ REQUIRED_COLUMNS = [
 
 def _build_sample_data() -> pd.DataFrame:
     today = date.today().isoformat()
-    yesterday = (date.today() - timedelta(days=1)).isoformat()
     rows = [
         # FREIGHT
         {"date": today, "signal_type": "freight", "market_segment": "Capesize",
-         "route_or_port": "C5 – W Australia / China (iron ore)",
+         "route_or_port": "W Australia / China (iron ore)",
          "current_value": 9.42, "previous_value": 9.10, "unit": "USD/MT",
-         "source_name": "Baltic Exchange", "source_url": "https://www.balticexchange.com",
+         "source_name": SAMPLE_LABEL, "source_url": None,
          "updated_at": today, "confidence": 0.92,
-         "notes": "Iron ore export volumes from Port Hedland remain elevated."},
+         "notes": "Invented demo value."},
         {"date": today, "signal_type": "freight", "market_segment": "Panamax",
-         "route_or_port": "P2A – Skaw/Gibraltar / Far East",
+         "route_or_port": "Continent / Far East",
          "current_value": 13850, "previous_value": 13200, "unit": "USD/day",
-         "source_name": "Baltic Exchange", "source_url": "https://www.balticexchange.com",
+         "source_name": SAMPLE_LABEL, "source_url": None,
          "updated_at": today, "confidence": 0.90,
-         "notes": "Grain fixture activity firming from US Gulf."},
+         "notes": "Invented demo value."},
         {"date": today, "signal_type": "freight", "market_segment": "VLCC",
-         "route_or_port": "TD3C – Middle East Gulf / China",
+         "route_or_port": "Middle East Gulf / China",
          "current_value": 42500, "previous_value": 44100, "unit": "USD/day",
-         "source_name": "Baltic Exchange", "source_url": "https://www.balticexchange.com",
+         "source_name": SAMPLE_LABEL, "source_url": None,
          "updated_at": today, "confidence": 0.88,
-         "notes": "VLCC softness persists amid weak Chinese crude demand signal."},
+         "notes": "Invented demo value."},
         # BUNKER
         {"date": today, "signal_type": "bunker", "market_segment": "VLSFO",
          "route_or_port": "Singapore", "current_value": 615, "previous_value": 632,
-         "unit": "USD/MT", "source_name": "Ship & Bunker",
-         "source_url": "https://shipandbunker.com", "updated_at": today,
-         "confidence": 0.95, "notes": "Singapore VLSFO easing on soft crude."},
+         "unit": "USD/MT", "source_name": SAMPLE_LABEL,
+         "source_url": None, "updated_at": today,
+         "confidence": 0.95, "notes": "Invented demo value."},
         {"date": today, "signal_type": "bunker", "market_segment": "VLSFO",
          "route_or_port": "Rotterdam", "current_value": 647, "previous_value": 658,
-         "unit": "USD/MT", "source_name": "Ship & Bunker",
-         "source_url": "https://shipandbunker.com", "updated_at": today,
-         "confidence": 0.93, "notes": "European VLSFO tracking Brent softness."},
+         "unit": "USD/MT", "source_name": SAMPLE_LABEL,
+         "source_url": None, "updated_at": today,
+         "confidence": 0.93, "notes": "Invented demo value."},
         {"date": today, "signal_type": "bunker", "market_segment": "VLSFO",
          "route_or_port": "Fujairah", "current_value": 598, "previous_value": 612,
-         "unit": "USD/MT", "source_name": "Ship & Bunker",
-         "source_url": "https://shipandbunker.com", "updated_at": today,
-         "confidence": 0.92, "notes": "Fujairah VLSFO softening with regional supply length."},
+         "unit": "USD/MT", "source_name": SAMPLE_LABEL,
+         "source_url": None, "updated_at": today,
+         "confidence": 0.92, "notes": "Invented demo value."},
         {"date": today, "signal_type": "bunker", "market_segment": "MGO",
          "route_or_port": "Singapore", "current_value": 855, "previous_value": 870,
-         "unit": "USD/MT", "source_name": "Ship & Bunker",
-         "source_url": "https://shipandbunker.com", "updated_at": today,
-         "confidence": 0.94, "notes": "MGO demand firm in ECA-regulated coastal trades."},
+         "unit": "USD/MT", "source_name": SAMPLE_LABEL,
+         "source_url": None, "updated_at": today,
+         "confidence": 0.94, "notes": "Invented demo value."},
         {"date": today, "signal_type": "bunker", "market_segment": "MGO",
          "route_or_port": "Fujairah", "current_value": 872, "previous_value": 868,
-         "unit": "USD/MT", "source_name": "Ship & Bunker",
-         "source_url": "https://shipandbunker.com", "updated_at": today,
-         "confidence": 0.88, "notes": "Fujairah MGO steady."},
+         "unit": "USD/MT", "source_name": SAMPLE_LABEL,
+         "source_url": None, "updated_at": today,
+         "confidence": 0.88, "notes": "Invented demo value."},
         {"date": today, "signal_type": "bunker", "market_segment": "IFO380",
          "route_or_port": "Singapore", "current_value": 482, "previous_value": 495,
-         "unit": "USD/MT", "source_name": "Ship & Bunker",
-         "source_url": "https://shipandbunker.com", "updated_at": today,
-         "confidence": 0.90, "notes": "IFO380 demand limited outside non-scrubber fleet."},
+         "unit": "USD/MT", "source_name": SAMPLE_LABEL,
+         "source_url": None, "updated_at": today,
+         "confidence": 0.90, "notes": "Invented demo value."},
         {"date": today, "signal_type": "bunker", "market_segment": "IFO380",
          "route_or_port": "Houston", "current_value": 498, "previous_value": 492,
-         "unit": "USD/MT", "source_name": "Ship & Bunker",
-         "source_url": "https://shipandbunker.com", "updated_at": today,
-         "confidence": 0.87, "notes": "Houston IFO380 slight uptick."},
+         "unit": "USD/MT", "source_name": SAMPLE_LABEL,
+         "source_url": None, "updated_at": today,
+         "confidence": 0.87, "notes": "Invented demo value."},
         # CONGESTION
         {"date": today, "signal_type": "congestion", "market_segment": "Bulk",
          "route_or_port": "Port Hedland", "current_value": 18, "previous_value": 17,
-         "unit": "vessels at anchor", "source_name": "IMF Portwatch",
-         "source_url": "https://portwatch.imf.org", "updated_at": today,
-         "confidence": 0.80, "notes": "Iron ore export queue manageable."},
+         "unit": "vessels at anchor", "source_name": SAMPLE_LABEL,
+         "source_url": None, "updated_at": today,
+         "confidence": 0.80, "notes": "Invented demo value."},
         {"date": today, "signal_type": "congestion", "market_segment": "Container",
          "route_or_port": "Singapore", "current_value": 52, "previous_value": 49,
-         "unit": "vessels at anchor", "source_name": "IMF Portwatch",
-         "source_url": "https://portwatch.imf.org", "updated_at": today,
-         "confidence": 0.85, "notes": "Anchorage demand rising ahead of Chinese export peak."},
-        # NEWS
-        {"date": today, "signal_type": "news", "market_segment": "Macro",
-         "route_or_port": "Global", "current_value": None, "previous_value": None,
-         "unit": "n/a", "source_name": "Lloyd's List",
-         "source_url": "https://lloydslist.com", "updated_at": yesterday,
-         "confidence": 0.82,
-         "notes": "Red Sea diversion routes adding 8–12 days on Asia–Europe legs. War risk premiums steady."},
-        {"date": today, "signal_type": "news", "market_segment": "Regulatory",
-         "route_or_port": "Global", "current_value": None, "previous_value": None,
-         "unit": "n/a", "source_name": "IMO",
-         "source_url": "https://www.imo.org", "updated_at": yesterday,
-         "confidence": 0.88,
-         "notes": "CII annual ratings release approaching. Owners with D/E-rated vessels reviewing operational speed."},
+         "unit": "vessels at anchor", "source_name": SAMPLE_LABEL,
+         "source_url": None, "updated_at": today,
+         "confidence": 0.85, "notes": "Invented demo value."},
     ]
     return pd.DataFrame(rows, columns=REQUIRED_COLUMNS)
 
 
-def load_data(source: str = "sample", file_obj=None) -> pd.DataFrame:
+def is_sample(df: pd.DataFrame) -> pd.Series:
+    """True for each demo row (invented values)."""
+    if df is None or "source_name" not in df.columns:
+        return pd.Series(dtype=bool)
+    return df["source_name"].astype(str) == SAMPLE_LABEL
+
+
+def real_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """The rows that are not demo data. Market Intelligence uses only these."""
+    if df is None or df.empty:
+        return pd.DataFrame(columns=REQUIRED_COLUMNS)
+    return df[~is_sample(df)]
+
+
+def load_data(source: str = "none", file_obj=None) -> pd.DataFrame:
+    if source == "none":
+        return pd.DataFrame(columns=REQUIRED_COLUMNS)
     if source == "sample":
         return _build_sample_data()
     if source == "csv" and file_obj is not None:

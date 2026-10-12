@@ -17,7 +17,7 @@ import pandas as pd
 from datetime import datetime, timezone
 from typing import Optional
 
-from modules.provenance import MANUAL_ENTRY_MAX_AGE, Provenance, QualityTier, parse_as_of
+from modules.provenance import MANUAL_ENTRY_MAX_AGE, SAMPLE_LABEL, Provenance, QualityTier, parse_as_of
 
 
 def assemble_market_data(
@@ -102,7 +102,10 @@ def assemble_market_data(
                 source_url=row.get("source_url"),
                 as_of=parse_as_of(row.get("updated_at")),
                 retrieved_at=datetime.now(timezone.utc),
-                licence="Internal — analyst-entered",
+                # Label only: demo rows are invented, so they must not be recorded
+                # as analyst-entered. Values and tier are unchanged; scoring unaffected.
+                licence=(SAMPLE_LABEL if row.get("source_name") == SAMPLE_LABEL
+                         else "Internal — analyst-entered"),
                 quality_tier=QualityTier.MANUAL_ENTRY,
                 max_age=MANUAL_ENTRY_MAX_AGE,
             )

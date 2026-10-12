@@ -55,7 +55,8 @@ There is **no AI in the decision pipeline**. The commercial logic is rules-based
 | Label | Meaning |
 |-------|---------|
 | `LIVE` | EIA Brent spot + forecast (API) · IMF Portwatch congestion (API) |
-| `MANUAL` | Bunker/freight prices from curated CSV |
+| `MANUAL` | Bunker/freight rows from a CSV you upload |
+| `SAMPLE` | Demo data with invented values, loaded only on request; drives Bunkering Strategy only, never Market Intelligence |
 | `USER-PROVIDED` | Scenario inputs |
 | `MISSING` | Flagged openly — never invented |
 
@@ -80,7 +81,7 @@ Optional: paste a free [EIA API key](https://www.eia.gov/opendata/) in the sideb
 | **2** | Fuel 280 MT, Fujairah 8 days away | Fujairah removed — Rule F1 with explicit fuel shortfall shown |
 | **3** | Fujairah price simulated missing | Fujairah retained (physically feasible), confidence drops to Medium, gap shown |
 
-Load them from the "📌 Load a demo scenario" expander on the Bunkering Strategy page.
+Load them from the "📌 Load a demo scenario" expander on the Bunkering Strategy page. Picking a scenario also loads the demo data (invented bunker prices, shown with a "DEMO DATA ACTIVE" banner), replacing any uploaded CSV. The demo data never reaches Market Intelligence. Without demo or uploaded prices, both ports score neutral at reduced confidence. The confidence levels in the table assume a working EIA key (live Brent); without one, Scenarios 1 and 2 show Medium rather than High.
 
 ## Project structure
 
@@ -102,7 +103,7 @@ modules/
 
 - [ ] Supplier Quote Evaluation module
 - [ ] Port Selection Analysis module
-- [ ] Live bunker price feed (currently manual CSV)
+- [ ] Live bunker price feed (none yet: CSV upload or invented demo data only)
 - [ ] Port database (draft limits, berth data, stem sizes, bunkering windows)
 - [ ] Scoring weight validation via expert interviews
 

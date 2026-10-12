@@ -15,6 +15,12 @@ from enum import Enum
 from typing import Optional, Protocol
 
 
+# Source name and licence label for invented demo rows (modules/data.py).
+# Anything carrying this label is not real data and must never reach
+# Market Intelligence or the morning brief.
+SAMPLE_LABEL = "SAMPLE — not real data"
+
+
 class QualityTier(str, Enum):
     LIVE_API = "LIVE_API"  # fetched live from an authoritative API/feed
     MANUAL_ENTRY = "MANUAL_ENTRY"  # analyst-entered CSV/sample row

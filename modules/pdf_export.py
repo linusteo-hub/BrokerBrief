@@ -68,7 +68,9 @@ def _stat_box(c, x, y, label, value, box_w=40*mm):
     c.drawString(x + 2*mm, y - 11*mm, value)
 
 
-def generate_pdf_bytes(signals: SignalResult, brief: dict) -> bytes:
+def generate_pdf_bytes(signals: SignalResult, brief: dict, sources: list[str]) -> bytes:
+    """`sources` lists the source names behind the signals actually used in
+    this brief, so the footer credits only those — never a hard-coded list."""
     buf = BytesIO()
     width, height = A4
     c = canvas.Canvas(buf, pagesize=A4)
@@ -131,7 +133,7 @@ def generate_pdf_bytes(signals: SignalResult, brief: dict) -> bytes:
     c.setStrokeColor(FOG); c.line(margin, y, width-margin, y)
     y -= 5*mm
     y = _body_text(c, margin, y,
-        "Freight: Baltic Exchange · Bunkers: Ship & Bunker · Congestion: IMF Portwatch · Crude: EIA",
+        "Sources: " + (" · ".join(sources) if sources else "none recorded"),
         size=7, colour=MID, max_width=cw)
     y -= 3*mm
     _body_text(c, margin, y,

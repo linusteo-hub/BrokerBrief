@@ -35,11 +35,14 @@ Report the file and line if you find one, but never print the key itself.
 
 ## 4. Licensed-source scan
 
-Search the morning-brief module, `tests/fixtures/`, and the brief archive folder (generated payloads and briefs). Look case-insensitively for: Baltic Exchange, BDI, FBX, Freightos, Worldscale, Clarksons, ClarkSea, Lloyd's List, Platts, Argus, ICE Gasoil.
+Search the **whole repo**: every tracked file (`git ls-files`) plus every staged file (`git diff --cached --name-only`), including the brief archive folder (generated payloads and briefs). Gitignored files such as `calibration.yaml` and `.env` are not scanned, because they never reach the public repo. Look case-insensitively for: Baltic Exchange, BDI, FBX, Freightos, Worldscale, Clarksons, ClarkSea, Lloyd's List, Platts, Argus, ICE Gasoil. Match BDI, FBX and Argus as whole words, so ordinary words that happen to contain those letters don't count as hits.
 
-Two places are allowed to contain these names:
+Only these places are allowed to contain these names:
 - the allowlist/denylist definition file;
-- test fixtures that deliberately test that a banned source is rejected.
+- test fixtures that deliberately test that a banned source is rejected;
+- `docs/`;
+- `CLAUDE.md`;
+- this file (`.claude/skills/verify/SKILL.md`), which has to list the names to search for them.
 
 Also confirm the morning-brief module has no import from `modules.decision`.
 
