@@ -56,19 +56,21 @@ def parse_rows(rows: list) -> list[tuple[date, float]]:
     return sorted(observations)
 
 
-def build_price_figure(series: PriceSeries, rows: list, today: date) -> tuple[Optional[dict], Optional[str]]:
-    """Return (figure, None) or (None, reason it was excluded)."""
+def build_price_figure(series: PriceSeries, rows: list, today: date) -> tuple[Optional[dict], Optional[dict]]:
+    """Return (figure, None) or (None, {"code", "reason"} for the exclusion)."""
     source = require_allowed(SOURCE_ID, numeric=True)
     observations = parse_rows(rows)
     if not observations:
-        return None, "EIA returned no usable values"
+        return None, {"code": "no_data", "reason": "EIA returned no usable values"}
 
     as_of, value = observations[-1]
     fmt = money(series.unit, series.decimals)
-    problem = (check_staleness(as_of, today, source.max_age)
-               or check_range(value, series.low, series.high, fmt(value)))
-    if problem:
-        return None, problem
+    stale = check_staleness(as_of, today, source.max_age)
+    if stale:
+        return None, {"code": "stale", "reason": stale}
+    out_of_range = check_range(value, series.low, series.high, fmt(value))
+    if out_of_range:
+        return None, {"code": "out_of_range", "reason": out_of_range}
 
     changes = []
     if len(observations) >= 2:
@@ -97,18 +99,21 @@ def fetch_prices(api_key: Optional[str], today: date, get: Callable = guarded_ge
     recorded-response stand-in in tests.
     """
     if not api_key:
-        return {"items": [], "excluded": [], "error": "no EIA API key configured (set EIA_API_KEY)"}
+        error = "no EIA API key configured (set EIA_API_KEY)"
+        return {"items": [], "excluded": [{"id": s.key, "code": "feed_failed", "reason": error} for s in SERIES],
+                "error": error}
 
     start = (today - timedelta(days=LOOKBACK_DAYS)).isoformat()
     items, excluded = [], []
     for series in SERIES:
         result = fetch_spot_series(api_key, series.series_id, start, get=get)
         if not result.get("success"):
-            excluded.append({"id": series.key, "reason": f"EIA request failed: {result.get('error')}"})
+            excluded.append({"id": series.key, "code": "feed_failed",
+                             "reason": f"EIA request failed: {result.get('error')}"})
             continue
         figure, problem = build_price_figure(series, result["rows"], today)
         if figure:
             items.append(figure)
         else:
-            excluded.append({"id": series.key, "reason": problem})
+            excluded.append({"id": series.key, **problem})
     return {"items": items, "excluded": excluded, "error": None}

@@ -102,6 +102,8 @@ def _empty_results():
     return dict(prices={"items": [], "excluded": [], "error": None},
                 activity={"items": [], "excluded": [], "error": None},
                 news={"sections": {"freight": [], "sale_and_purchase": [], "events": []},
+                      "counts": {s: {"fetched": 0, "kept": 0, "dropped": {}}
+                                 for s in ("freight", "sale_and_purchase", "events")},
                       "dropped": [], "feed_errors": {}})
 
 
@@ -139,6 +141,52 @@ def test_final_gate_refuses_banned_name_anywhere():
     next(i for i, fig in iter_items(payload) if not fig)["headline"] = banned_text
     with pytest.raises(SourceNotAllowed, match="banned source"):
         final_gate(payload)
+
+
+# ── Section counts ───────────────────────────────────────────────────────────
+
+def _leaves(payload):
+    for key, section in payload["sections"].items():
+        for sub_key, sub in section.get("subsections", {key: section}).items():
+            yield sub_key, sub
+
+
+def test_every_section_reports_counts_that_add_up():
+    payload = build()
+    for key, leaf in _leaves(payload):
+        counts = leaf["counts"]
+        if leaf["status"] == "not_covered":
+            assert counts is None
+            continue
+        assert counts["kept"] == len(leaf["items"]), key
+        assert counts["fetched"] == counts["kept"] + sum(counts["dropped"].values()), key
+    freight = payload["sections"]["freight"]["counts"]
+    subs = payload["sections"]["freight"]["subsections"]
+    assert freight["kept"] == subs["rate_direction"]["counts"]["kept"] + subs["activity"]["counts"]["kept"]
+
+
+def test_news_counts_by_reason():
+    """special_cases.xml has one digit-bearing freight headline, two Reuters and
+    one Bloomberg wire item; banned_news_feed.xml has two banned-source items."""
+    payload = build(**{"splash247.com": ("banned_news_feed.xml",)})
+    sections = payload["sections"]
+    freight = sections["freight"]["subsections"]["rate_direction"]["counts"]
+    assert freight["dropped"]["digit_in_freight_headline"] == 1
+    banned = sum(sections[s]["counts"]["dropped"]["banned_source"] for s in ("sale_and_purchase", "events")) \
+        + freight["dropped"]["banned_source"]
+    assert banned == 2
+    events = sections["events"]["counts"]
+    assert events["wire_headline_only"] == 3
+    assert events["dropped"]["other"] == sum(events["other_detail"].values())
+    assert set(events["other_detail"]) <= {"missing_headline_or_link", "no_date", "outside_window",
+                                           "duplicate", "over_limit"}
+
+
+def test_data_counts_by_reason():
+    payload = build(now=datetime(2026, 10, 30, tzinfo=timezone.utc), key=None)
+    assert payload["sections"]["prices"]["counts"] == {"fetched": 2, "kept": 0, "dropped": {"feed_failed": 2}}
+    activity = payload["sections"]["freight"]["subsections"]["activity"]["counts"]
+    assert activity == {"fetched": 11, "kept": 0, "dropped": {"stale": 11}}
 
 
 def test_payload_has_no_digits_in_any_news_excerpt():

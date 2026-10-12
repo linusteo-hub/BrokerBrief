@@ -60,6 +60,11 @@
       "status": "ok",
       "reason": null,
       "cadence": "latest available (EIA releases weekly)",
+      "counts": {
+        "fetched": 2,
+        "kept": 2,
+        "dropped": {}
+      },
       "items": [
         {
           "id": "brent_spot",
@@ -142,12 +147,22 @@
       "status": "ok",
       "reason": null,
       "cadence": "weekly",
+      "counts": {
+        "fetched": 13,
+        "kept": 12,
+        "dropped": {
+          "banned_source": 0,
+          "digit_in_freight_headline": 1,
+          "other": 0
+        }
+      },
       "subsections": {
         "container_rates": {
           "title": "Container freight rates",
           "status": "not_covered",
           "reason": "No container freight index can be republished: Drewry's terms forbid republishing the WCI, the SCFI has no reuse terms, and the other indices are licensed.",
           "cadence": "weekly",
+          "counts": null,
           "items": []
         },
         "rate_direction": {
@@ -155,6 +170,17 @@
           "status": "ok",
           "reason": null,
           "cadence": "weekly",
+          "counts": {
+            "fetched": 2,
+            "kept": 1,
+            "dropped": {
+              "banned_source": 0,
+              "digit_in_freight_headline": 1,
+              "other": 0
+            },
+            "other_detail": {},
+            "wire_headline_only": 0
+          },
           "items": [
             {
               "id": "cfc1c2cab9ac",
@@ -180,6 +206,11 @@
           "status": "ok",
           "reason": null,
           "cadence": "weekly",
+          "counts": {
+            "fetched": 11,
+            "kept": 11,
+            "dropped": {}
+          },
           "items": [
             {
               "id": "transits_chokepoint1",
@@ -476,6 +507,17 @@
       "status": "ok",
       "reason": null,
       "cadence": "weekly",
+      "counts": {
+        "fetched": 2,
+        "kept": 2,
+        "dropped": {
+          "banned_source": 0,
+          "digit_in_freight_headline": 0,
+          "other": 0
+        },
+        "other_detail": {},
+        "wire_headline_only": 0
+      },
       "items": [
         {
           "id": "86fc4834bcf6",
@@ -518,6 +560,21 @@
       "status": "ok",
       "reason": null,
       "cadence": "daily",
+      "counts": {
+        "fetched": 17,
+        "kept": 8,
+        "dropped": {
+          "banned_source": 0,
+          "digit_in_freight_headline": 0,
+          "other": 9
+        },
+        "other_detail": {
+          "no_date": 1,
+          "outside_window": 1,
+          "over_limit": 7
+        },
+        "wire_headline_only": 3
+      },
       "items": [
         {
           "id": "38ec41e21301",
@@ -665,12 +722,14 @@
         "source_id": "gcaptain",
         "id": "3e7814968a0d",
         "link": "https://gcaptain.com/test-freight-headline-digits/",
+        "code": "digit_in_freight_headline",
         "reason": "freight headline quotes figures"
       },
       {
         "source_id": "gcaptain",
         "id": "a60b757b6019",
         "link": "https://gcaptain.com/test-no-date/",
+        "code": "no_date",
         "reason": "no publication date"
       }
     ],

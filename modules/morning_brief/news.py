@@ -69,6 +69,20 @@ SEGMENTS = (
 )
 
 
+# Why an item was dropped: code -> plain-English reason. Counts group these
+# into banned_source, digit_in_freight_headline and "other" (everything else).
+DROP_REASONS = {
+    "banned_source": "names a banned source",
+    "digit_in_freight_headline": "freight headline quotes figures",
+    "missing_headline_or_link": "missing headline or https link",
+    "no_date": "no publication date",
+    "outside_window": "outside the time window",
+    "duplicate": "same story as an earlier item",
+    "over_limit": "section already full",
+}
+MAIN_DROP_CODES = ("banned_source", "digit_in_freight_headline")
+
+
 class FeedError(Exception):
     pass
 
@@ -209,24 +223,24 @@ def is_duplicate(a: str, b: str) -> bool:
 # ── Building items ───────────────────────────────────────────────────────────
 
 def build_item(entry: dict, source_id: str, now: datetime) -> tuple[Optional[dict], Optional[str]]:
-    """-> (item, None) or (None, reason it was dropped)."""
+    """-> (item, None) or (None, drop code — a key of DROP_REASONS)."""
     source = require_allowed(source_id)
     title = strip_html(entry.get("title", ""))
     link = entry.get("link", "").strip()
     if not title or not link.startswith("https://"):
-        return None, "missing headline or https link"
+        return None, "missing_headline_or_link"
     excerpt = strip_html(entry.get("excerpt_html", ""))
     if mentions_banned_source(title) or mentions_banned_source(excerpt):
-        return None, "names a banned source"
+        return None, "banned_source"
     published = entry.get("published")
     if published is None:
-        return None, "no publication date"
+        return None, "no_date"
 
     section, segment = classify(title, entry.get("categories", []))
     if now - published > WINDOWS[section] or published - now > timedelta(hours=1):
-        return None, "outside the time window"
+        return None, "outside_window"
     if section == "freight" and re.search(r"\d", title):
-        return None, "freight headline quotes figures"
+        return None, "digit_in_freight_headline"
 
     agency = wire_agency(entry, excerpt)
     byline = BYLINE.match(excerpt)
@@ -253,28 +267,61 @@ def build_item(entry: dict, source_id: str, now: datetime) -> tuple[Optional[dic
     }, None
 
 
-def select_items(items: list[dict]) -> dict:
+def select_items(items: list[dict]) -> tuple[dict, list]:
     """Deduplicate across feeds (keeping the earliest report), then keep the
-    newest LIMITS[section] per section."""
+    newest LIMITS[section] per section. -> (by_section, [(item, drop code)])."""
     kept: list[dict] = []
+    dropped: list[tuple[dict, str]] = []
     for item in sorted(items, key=lambda i: i["published"]):
         original = next((k for k in kept if k["link"] == item["link"]
                          or is_duplicate(k["headline"], item["headline"])), None)
         if original:
             if item["publisher"] not in original["also_reported_by"] + [original["publisher"]]:
                 original["also_reported_by"].append(item["publisher"])
+            dropped.append((item, "duplicate"))
         else:
             kept.append(item)
     by_section = {section: [] for section in LIMITS}
     for item in sorted(kept, key=lambda i: i["published"], reverse=True):
         if len(by_section[item["section"]]) < LIMITS[item["section"]]:
             by_section[item["section"]].append(item)
-    return by_section
+        else:
+            dropped.append((item, "over_limit"))
+    return by_section, dropped
+
+
+def section_counts(fetched: dict, by_section: dict, drops: list) -> dict:
+    """Per section: fetched = kept + sum(dropped). Wire items are kept
+    (headline and link only), so they are reported separately, not as drops.
+
+    `fetched` maps section -> number of feed entries classified into it;
+    `drops` is a list of (section, code)."""
+    counts = {}
+    for section in LIMITS:
+        codes = [code for sec, code in drops if sec == section]
+        other = {code: codes.count(code) for code in DROP_REASONS
+                 if code not in MAIN_DROP_CODES and codes.count(code)}
+        kept = by_section[section]
+        counts[section] = {
+            "fetched": fetched.get(section, 0),
+            "kept": len(kept),
+            "dropped": {
+                "banned_source": codes.count("banned_source"),
+                "digit_in_freight_headline": codes.count("digit_in_freight_headline"),
+                "other": sum(other.values()),
+            },
+            "other_detail": other,
+            "wire_headline_only": sum(1 for item in kept if item["wire_agency"]),
+        }
+    return counts
 
 
 def fetch_news(now: datetime, get: Callable = guarded_get) -> dict:
-    """Returns {"sections": {section: [items]}, "dropped": [...], "feed_errors": {source_id: reason}}."""
+    """Returns {"sections": {section: [items]}, "counts": {section: {...}},
+    "dropped": [...], "feed_errors": {source_id: reason}}."""
     items, dropped, feed_errors = [], [], {}
+    fetched: dict[str, int] = {}
+    drops: list[tuple[str, str]] = []   # (section, code), for counts
     for source_id in FEEDS:
         source = require_allowed(source_id)
         try:
@@ -288,16 +335,25 @@ def fetch_news(now: datetime, get: Callable = guarded_get) -> dict:
             feed_errors[source_id] = "feed contained no items"
             continue
         for entry in entries:
-            item, reason = build_item(entry, source_id, now)
+            # Classified up front (headline only) so drops are counted per section.
+            section = classify(strip_html(entry.get("title", "")), entry.get("categories", []))[0]
+            fetched[section] = fetched.get(section, 0) + 1
+            item, code = build_item(entry, source_id, now)
             if item:
                 items.append(item)
-            elif reason != "outside the time window":
+                continue
+            drops.append((section, code))
+            if code != "outside_window":        # routine; counted but not listed
                 link = entry.get("link", "")
                 dropped.append({
                     "source_id": source_id,
                     "id": hashlib.sha1(link.encode()).hexdigest()[:12],
                     # A banned item's URL slug can carry the banned name; keep only its hash.
-                    "link": None if reason == "names a banned source" else link,
-                    "reason": reason,
+                    "link": None if code == "banned_source" else link,
+                    "code": code,
+                    "reason": DROP_REASONS[code],
                 })
-    return {"sections": select_items(items), "dropped": dropped, "feed_errors": feed_errors}
+    by_section, selection_drops = select_items(items)
+    drops += [(item["section"], code) for item, code in selection_drops]
+    return {"sections": by_section, "counts": section_counts(fetched, by_section, drops),
+            "dropped": dropped, "feed_errors": feed_errors}

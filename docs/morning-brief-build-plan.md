@@ -259,6 +259,21 @@ Claude's defaults — please confirm or change:
 13. **Brief date** is the Singapore (UTC+8) date.
 14. **Fixtures:** recorded EIA and PortWatch responses are committed as-is (public domain / IMF with credit). News feeds are committed **sanitised**: structure, headlines, links, authors, dates and categories kept, excerpt text replaced, because the raw feeds would republish publisher text (Splash247's feed on 12-10-2026 named banned sources three times).
 
+### Phase 1 review decisions (Linus, 12/10/2026)
+
+- **Units:** keep EIA's source units (USD/bbl, USD/gal). Any future USD/mt figure must be labelled as a BrokerBrief calculation, with the density assumption stated.
+- **Confirmed:** sanitised news fixtures (decision 14); dropping banned-source items whole (decision 10); dropping freight headlines containing any digit (decision 10).
+- **Phase 2 number rule:** verbatim headlines from allowlisted general-news sources may contain digits. Freight headlines with any digit are still dropped. Summaries never contain digits.
+- **New payload requirement:** every section reports counts: fetched, kept, and dropped by reason (see "Section counts" below).
+- **Hotfix for main before Phase 2** (branch `hotfix/main-fixes` from `main`): EIA key redaction, `pytest.ini`, one EIA staleness threshold of 10 days shared by the app and the brief with the Live Data caption corrected. Houston and port-name mismatches are reported first, not fixed. `main` is merged into `feature/morning-brief` only after Linus confirms the hotfix is on `main`.
+
+### Section counts (added 12/10/2026)
+
+Every section (and Freight's subsections) carries `counts`; `fetched = kept + sum(dropped)` always holds, and a test checks it.
+- News sections: `dropped` = `banned_source`, `digit_in_freight_headline`, `other`, with `other_detail` (outside the time window, duplicate, over the section limit, no date, no link). Wire items are **kept** as headline and link only, so they are reported as `wire_headline_only`, not as drops.
+- Data sections (Prices, activity): `dropped` by `feed_failed`, `no_data`, `stale`, `out_of_range`, `incomplete`. A failed feed or missing key counts every series/location it covers.
+- `container_rates` (`not_covered`) has `counts: null`. Freight's top level sums its subsections.
+
 ### Findings outside the brief (not changed; for Linus)
 
 - **Houston missing from Market Intelligence:** `TARGET_PORTS` in `modules/portwatch.py` uses "Houston", but PortWatch's name is "Houston (US-TX)" (portid `port481`), so the app silently gets no Houston rows. This also feeds the decision engine's congestion inputs, so it was left for you to decide.

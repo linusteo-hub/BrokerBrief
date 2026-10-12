@@ -35,10 +35,31 @@ CONTAINER_RATES_NOT_COVERED = (
 )
 
 
-def _section(title: str, cadence: str, items: list, failure: Optional[str]) -> dict:
+def _section(title: str, cadence: str, items: list, failure: Optional[str], counts: Optional[dict]) -> dict:
     if items:
-        return {"title": title, "status": "ok", "reason": None, "cadence": cadence, "items": items}
-    return {"title": title, "status": "missing", "reason": failure, "cadence": cadence, "items": []}
+        return {"title": title, "status": "ok", "reason": None, "cadence": cadence, "counts": counts,
+                "items": items}
+    return {"title": title, "status": "missing", "reason": failure, "cadence": cadence, "counts": counts,
+            "items": []}
+
+
+def figure_counts(result: dict) -> dict:
+    """Counts for a data section: every requested series/location ends up
+    either kept or excluded with a code, so fetched = kept + dropped."""
+    codes = [e["code"] for e in result.get("excluded", [])]
+    dropped = {code: codes.count(code) for code in sorted(set(codes))}
+    return {"fetched": len(result["items"]) + len(codes), "kept": len(result["items"]), "dropped": dropped}
+
+
+def _sum_counts(parts: list) -> dict:
+    """Aggregate leaf counts (for Freight's top level)."""
+    total = {"fetched": 0, "kept": 0, "dropped": {}}
+    for part in parts:
+        total["fetched"] += part["fetched"]
+        total["kept"] += part["kept"]
+        for code, n in part["dropped"].items():
+            total["dropped"][code] = total["dropped"].get(code, 0) + n
+    return total
 
 
 def _failure_reason(result: dict, empty_reason: str) -> str:
@@ -61,11 +82,12 @@ def build_payload(*, now: datetime, prices: dict, activity: dict, news: dict) ->
     freight_news = news_sections["freight"]
     subsections = {
         "container_rates": {"title": "Container freight rates", "status": "not_covered",
-                            "reason": CONTAINER_RATES_NOT_COVERED, "cadence": "weekly", "items": []},
+                            "reason": CONTAINER_RATES_NOT_COVERED, "cadence": "weekly", "counts": None,
+                            "items": []},
         "rate_direction": _section("Freight rate direction (from news, no figures)", "weekly", freight_news,
-                                   _news_failure(news, "freight-rate")),
+                                   _news_failure(news, "freight-rate"), news["counts"]["freight"]),
         "activity": _section("Ship activity (transits and port calls, not rates)", "weekly", activity["items"],
-                             _failure_reason(activity, "PortWatch returned no figures")),
+                             _failure_reason(activity, "PortWatch returned no figures"), figure_counts(activity)),
     }
     covered = [s for s in subsections.values() if s["status"] != "not_covered"]
     freight_ok = any(s["status"] == "ok" for s in covered)
@@ -74,17 +96,18 @@ def build_payload(*, now: datetime, prices: dict, activity: dict, news: dict) ->
         "status": "ok" if freight_ok else "missing",
         "reason": None if freight_ok else "no freight subsection has verified content today",
         "cadence": "weekly",
+        "counts": _sum_counts([s["counts"] for s in covered]),
         "subsections": subsections,
     }
 
     sections = {
         "prices": _section("Prices", "latest available (EIA releases weekly)", prices["items"],
-                           _failure_reason(prices, "EIA returned no figures")),
+                           _failure_reason(prices, "EIA returned no figures"), figure_counts(prices)),
         "freight": freight,
         "sale_and_purchase": _section("Sale & Purchase", "weekly", news_sections["sale_and_purchase"],
-                                      _news_failure(news, "sale and purchase")),
+                                      _news_failure(news, "sale and purchase"), news["counts"]["sale_and_purchase"]),
         "events": _section("Events and why they matter", "daily", news_sections["events"],
-                           _news_failure(news, "event")),
+                           _news_failure(news, "event"), news["counts"]["events"]),
     }
 
     payload = {

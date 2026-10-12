@@ -44,13 +44,20 @@ def main(argv=None) -> int:
         print(text)
 
     print(f"Morning brief payload for {payload['brief_date_display']}:", file=sys.stderr)
+    def counts_text(counts):
+        if not counts:
+            return ""
+        dropped = ", ".join(f"{k} {v}" for k, v in counts["dropped"].items() if v) or "none"
+        wire = f"; {counts['wire_headline_only']} wire (headline only)" if counts.get("wire_headline_only") else ""
+        return f"  [fetched {counts['fetched']}, kept {counts['kept']}; dropped: {dropped}{wire}]"
+
     for key, section in payload["sections"].items():
-        line = f"  {key:<18} {section['status']}"
+        line = f"  {key:<18} {section['status']}{counts_text(section['counts'])}"
         if section["reason"]:
             line += f" — {section['reason']}"
         print(line, file=sys.stderr)
         for sub_key, sub in section.get("subsections", {}).items():
-            print(f"    {sub_key:<16} {sub['status']} ({len(sub['items'])} items)", file=sys.stderr)
+            print(f"    {sub_key:<16} {sub['status']}{counts_text(sub['counts'])}", file=sys.stderr)
     return 0
 
 

@@ -62,7 +62,7 @@ def test_location_with_missing_day_is_excluded_not_compared():
             if not (r["portid"] == "chokepoint1" and r["date"] == "2026-10-01")]
     figures, excluded = weekly_figures(rows, CHOKEPOINTS, "n_total", "transits", "transits", TODAY)
     assert "transits_chokepoint1" not in {f["id"] for f in figures}
-    assert excluded == [{"id": "transits_chokepoint1",
+    assert excluded == [{"id": "transits_chokepoint1", "code": "incomplete",
                          "reason": "Suez Canal: 1 of 14 days missing, so the weeks cannot be compared"}]
 
 

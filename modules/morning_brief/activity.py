@@ -72,12 +72,13 @@ def weekly_figures(rows: list, locations: dict, field: str, noun: str, prefix: s
 
     all_days = [d for series in by_location.values() for d in series]
     if not all_days:
-        return [], [{"id": f"{prefix}_{pid}", "reason": "PortWatch returned no usable rows"} for pid in locations]
+        return [], [{"id": f"{prefix}_{pid}", "code": "no_data", "reason": "PortWatch returned no usable rows"}
+                    for pid in locations]
 
     latest = max(all_days)
     stale = check_staleness(latest, today, source.max_age)
     if stale:
-        return [], [{"id": f"{prefix}_{pid}", "reason": stale} for pid in locations]
+        return [], [{"id": f"{prefix}_{pid}", "code": "stale", "reason": stale} for pid in locations]
 
     this_week = [latest - timedelta(days=i) for i in range(WINDOW)]
     last_week = [latest - timedelta(days=WINDOW + i) for i in range(WINDOW)]
@@ -88,14 +89,14 @@ def weekly_figures(rows: list, locations: dict, field: str, noun: str, prefix: s
         figure_id = f"{prefix}_{pid}"
         missing = [d for d in this_week + last_week if d not in series]
         if missing:
-            excluded.append({"id": figure_id, "reason": f"{name}: {len(missing)} of 14 days missing, "
-                                                        "so the weeks cannot be compared"})
+            excluded.append({"id": figure_id, "code": "incomplete",
+                             "reason": f"{name}: {len(missing)} of 14 days missing, so the weeks cannot be compared"})
             continue
         total = sum(series[d] for d in this_week)
         previous = sum(series[d] for d in last_week)
         problem = check_range(total, *WEEKLY_RANGE, fmt(total))
         if problem:
-            excluded.append({"id": figure_id, "reason": f"{name}: {problem}"})
+            excluded.append({"id": figure_id, "code": "out_of_range", "reason": f"{name}: {problem}"})
             continue
         change = make_change(total, previous, fmt, decimals=0, basis="previous 7 days",
                              compared_with=f"7 days to {fmt_date(last_week[0])}")
@@ -115,7 +116,9 @@ def fetch_activity(today: date, get: Callable = guarded_get) -> dict:
     for layer, locations, field, noun, prefix in LAYERS:
         result = fetch_daily_rows(layer, list(locations), start, ["date", "portid", "portname", field], get=get)
         if not result["success"]:
-            errors.append(f"PortWatch {layer} request failed: {result['error']}")
+            error = f"PortWatch {layer} request failed: {result['error']}"
+            errors.append(error)
+            excluded += [{"id": f"{prefix}_{pid}", "code": "feed_failed", "reason": error} for pid in locations]
             continue
         figures, dropped = weekly_figures(result["rows"], locations, field, noun, prefix, today)
         items += figures
