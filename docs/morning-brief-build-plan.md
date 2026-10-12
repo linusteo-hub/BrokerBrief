@@ -328,4 +328,5 @@ Start with Step 0.
 ## Parked decisions
 
 - Confidence model: a missing price on a feasible option drops confidence by only 6 points (Scenario 3 stays High at 85). Options: raise the penalty, or cap confidence at Medium when any feasible option lacks a price. Decide after the morning brief.
+- Freshness in confidence scoring (Linus, 12/10/2026): the confidence model does not read `Provenance.freshness()` or the `max_age` limits, so stale inputs can count as fresh. More precisely (checked 12-10-2026 in `compute_data_quality`): Brent has its own age rule (≤1 day no deduction, 2–3 days −5, older −15), which ignores the shared 10-day `EIA_SPOT_MAX_AGE` and, with EIA's weekly release, will usually deduct 15; PortWatch congestion and the CSV bunker prices have no age check at all. (Commit `9f270f2` on main says "confidence scoring does not read freshness"; that is true of `Provenance.freshness()` only.) Decide alongside the missing-price rule above, after the trial.
 - Brief cadence: daily or weekly. EIA prices are released weekly and PortWatch lags 8–10 days, so a daily brief may repeat figures. Decide after the personal trial.
