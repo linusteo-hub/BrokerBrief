@@ -15,6 +15,12 @@ PORTWATCH_URL = (
     "ArcGIS/rest/services/Daily_Ports_Data/FeatureServer/0/query"
 )
 
+CHOKEPOINTS_URL = (
+    "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/"
+    "ArcGIS/rest/services/Daily_Chokepoints_Data/FeatureServer/0/query"
+)
+LAYER_URLS = {"ports": PORTWATCH_URL, "chokepoints": CHOKEPOINTS_URL}
+
 TARGET_PORTS = ["Singapore", "Rotterdam", "Fujairah", "Port Hedland", "Houston"]
 
 # IMF terms (https://www.imf.org/en/about/copyright-and-terms) allow reuse and
@@ -78,6 +84,36 @@ def fetch_port_activity() -> dict:
             "provenance":         stamp(PORTWATCH, as_of=latest_as_of),
         }
     except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def fetch_daily_rows(layer: str, portids: list, start: str, fields: list, get=requests.get) -> dict:
+    """Raw daily rows from one PortWatch layer ("ports" or "chokepoints") for the
+    given portids from `start` (YYYY-MM-DD). Returns {"success": True, "rows":
+    [attribute dicts]} or {"success": False, "error": ...}.
+
+    ArcGIS reports query errors with HTTP 200 and an "error" body, and silently
+    truncates large results (exceededTransferLimit); both count as failures.
+    `get` is injectable; only network and response-shape errors are caught."""
+    id_list = ", ".join(f"'{p}'" for p in portids)
+    params = {
+        "where":             f"portid IN ({id_list}) AND date >= DATE '{start}'",
+        "outFields":         ",".join(fields),
+        "orderByFields":     "portid,date DESC",
+        "returnGeometry":    "false",
+        "resultRecordCount": 2000,
+        "f":                 "json",
+    }
+    try:
+        response = get(LAYER_URLS[layer], params=params, timeout=20)
+        response.raise_for_status()
+        body = response.json()
+        if "error" in body:
+            raise ValueError(f"ArcGIS error: {body['error'].get('message')}")
+        if body.get("exceededTransferLimit"):
+            raise ValueError("ArcGIS truncated the result (exceededTransferLimit)")
+        return {"success": True, "rows": [f["attributes"] for f in body["features"]]}
+    except (requests.RequestException, ValueError, KeyError, TypeError) as e:
         return {"success": False, "error": str(e)}
 
 

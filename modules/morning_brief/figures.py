@@ -39,8 +39,9 @@ def money(unit: str, decimals: int) -> Formatter:
 
 
 def count(noun: str) -> Formatter:
-    """Formatter for counts, e.g. '312 transits'."""
-    return lambda v: f"{v:,.0f} {noun}"
+    """Formatter for counts, e.g. '312 transits', '1 transit'. `noun` is plural."""
+    singular = noun[:-1] if noun.endswith("s") else noun
+    return lambda v: f"{v:,.0f} {singular if round(v) == 1 else noun}"
 
 
 def make_change(current: float, previous: float, fmt: Formatter, *, decimals: int,
