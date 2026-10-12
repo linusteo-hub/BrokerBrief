@@ -745,4 +745,4 @@ elif "Live Data" in page:
         err = portwatch_data.get("error", "Unknown error") if portwatch_data else "Not fetched"
         st.error(f"❌ Portwatch: {err}")
 
-    st.markdown('<div class="data-note">Live data is cached per session. Click "↺ Refresh Live Data" in the sidebar to force a fresh fetch. EIA updates daily. Portwatch updates weekly on Tuesdays.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="data-note">Live data is cached per session. Click "↺ Refresh Live Data" in the sidebar to force a fresh fetch. EIA publishes its daily spot prices in a weekly release, so the latest value can be up to about 9 days old; it is marked stale after 10 days. IMF PortWatch publishes in weekly batches about 8–10 days behind.</div>', unsafe_allow_html=True)

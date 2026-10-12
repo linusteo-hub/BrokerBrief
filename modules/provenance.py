@@ -136,13 +136,17 @@ def stamp(source: Source, *, as_of: Optional[datetime], retrieved_at: Optional[d
     )
 
 
-# ── Assumed publication cadence — UNVERIFIED ─────────────────────────────────
-# Every max_age below is a guess based on what each source's own marketing page
-# or the app's existing UI copy claims, NOT on that source's actual documented
-# update SLA. Each must be checked against the source's real docs before this
-# is relied on for anything beyond a demo. Do not treat these numbers as facts.
-EIA_SPOT_MAX_AGE = timedelta(hours=36)  # assumes EIA daily spot series posts once/24h;
-# not checked against EIA API docs
+# ── Publication cadence and staleness limits ─────────────────────────────────
+# EIA_SPOT_MAX_AGE was checked against EIA's spot-price table (Phase 0 source
+# audit, 12-10-2026, docs/morning-brief-build-plan.md): daily values are
+# released weekly (e.g. release 07-10-2026 held data to 06-10), so the newest
+# value can be ~9 days old. It is the single EIA spot limit for both the app
+# and the morning brief (Linus, 12-10-2026).
+EIA_SPOT_MAX_AGE = timedelta(days=10)
+
+# The limits below are still UNVERIFIED guesses based on marketing pages or the
+# app's old UI copy, not on each source's documented update schedule. Check
+# them against the source's real docs before relying on them beyond a demo.
 EIA_FORECAST_MAX_AGE = timedelta(days=35)  # assumes STEO forecast is republished ~monthly;
 # not checked. EIA forecast currently has no as_of at
 # all (see modules/eia.py), so this max_age is presently
