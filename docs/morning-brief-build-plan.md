@@ -1,4 +1,4 @@
-Status (12/10/2026): Step 0 complete — ~/Projects/BrokerBrief is the working copy; Streamlit deploys from main. Next: Step 1.
+Status (12/10/2026): Step 0, Step 1 and Phase 0 complete. Work continues on branch `feature/morning-brief`. Next: Phase 1. Phase 0 results and decisions (below) supersede the candidate-source notes where they conflict.
 
 # BrokerBrief Morning Brief — Claude Code build prompt
 
@@ -148,6 +148,70 @@ I haven't yet read each site's terms of use. Phase 0 must do that.
 - **Phase 4 — Trial.** Help me set up a review log (errors, missing sections, corrections) and agree pass criteria before any rollout.
 - **Phase 5 — Email.** Not now.
 
+## Phase 0 results — source audit (12 October 2026)
+
+Terms pages were read on 12 October 2026. Baltic Exchange, Worldscale and the licensed sources were not re-researched (already verified above). The five RSS feeds were checked live the same day.
+
+### 1. Prices
+
+| Source | Terms (page read) | Update frequency | Access | Reliability |
+|---|---|---|---|---|
+| EIA Brent spot (`RBRTE`) | [EIA copyright and reuse](https://www.eia.gov/about/copyrights_reuse.php): public domain; credit "Source: U.S. Energy Information Administration (<publication date>)". **Caveat:** the spot prices come from **Refinitiv, an LSEG business** ([definitions](https://www.eia.gov/dnav/pet/TblDefs/pet_pri_spt_tbldef2.asp)). EIA's policy says privately licensed material "may be protected", but EIA puts no restriction on these tables, and [FRED](https://fred.stlouisfed.org/series/DCOILBRENTEU) tags the series "Public Domain: Citation Requested". | Daily values, **released weekly** (release 07-10-2026 held data to 06-10; next release 15-10, moved for Columbus Day). [Table](https://www.eia.gov/dnav/pet/pet_pri_spt_s1_d.htm) | API v2 with key (already in `modules/eia.py`) | High; lag up to about 9 days |
+| EIA NY Harbor ULSD (`EER_EPD2DXL0_PF4_Y35NY_DPG`) | Same as Brent | Same | Same | Same |
+
+Series IDs were read from EIA's own table. Confirm the exact API v2 route against EIA's documentation in Phase 1.
+
+### 2. Freight — containers (numbers)
+
+| Source | Terms | Update frequency | Access | Reliability |
+|---|---|---|---|---|
+| Drewry WCI | [Drewry terms](https://www.drewry.co.uk/terms): "User may not copy, reproduce, republish, distribute…"; downloads for "personal, internal use" only; commercial use needs a licence. The WCI page grants nothing extra. | Weekly, Thursdays (latest 08-10-2026) | HTML page, no API | High as data; **republishing prohibited** |
+| SCFI | No reuse terms found; "All Rights Reserved" ([en.sse.net.cn](https://en.sse.net.cn/)). English index page asks for username and password. Publisher changed to Shanghai Shipping Exchange Institute (Prep.) on 18-06-2026 ([notice](https://www.sse.net.cn/announcement/business)). | Weekly, Fridays (secondary sources) | Login-walled | Unknown |
+
+### 3. Freight — physical activity
+
+| Source | Terms | Update frequency | Access | Reliability |
+|---|---|---|---|---|
+| IMF PortWatch | Dataset licence field points to the [IMF terms](https://www.imf.org/en/about/copyright-and-terms): reuse and publication allowed with credit "Source: International Monetary Fund, PortWatch, <link>". **Commercial reuse needs permission**; **automated bulk download prohibited** without permission. | Weekly batches; on 12-10-2026 latest data was 02-10 (ports) and 04-10 (chokepoints), a lag of about 8–10 days | ArcGIS FeatureServer (already in `modules/portwatch.py`), no key | Good; AIS draft fields are crew-entered and can be wrong |
+
+### 4. News feeds
+
+| Source | Terms | Frequency | Access | Reliability | Verdict |
+|---|---|---|---|---|---|
+| gCaptain | No terms of use published; only [privacy policy](https://gcaptain.com/about/privacy-policy/) and [editorial standards](https://gcaptain.com/editorial-standards/). Default copyright. Carries Reuters and Bloomberg wires. | Many per day | RSS | Good | Conditional GO |
+| Splash247 | `/terms-of-service/` and `/legal-agreement/` exist but are **empty** (last edited 2014). © Splash Maritime Group, all rights reserved. | Many per day | RSS | Fair: 403 to one fetcher, one timeout | Conditional GO |
+| Hellenic Shipping News | [Disclaimer](https://www.hellenicshippingnews.com/disclaimer/): "STRICTLY PROHIBITS the republication, the reproduction, total, partial or at paraphrase… without previous written authorisation" | Many per day | RSS | Blocks bots (403) | **NO-GO** |
+| The Loadstar | [Licensing and copyright](https://theloadstar.com/licencing-and-copyright): RSS only "to create links back"; free use max 2 articles/week, 150 words; use in "operating artificial intelligence systems… or ingestion into large language models" not permitted | Many per day | RSS | Good | **NO-GO** |
+| The Maritime Executive | No terms page; footer "All rights reserved" ([privacy policy](https://maritime-executive.com/privacy-policy)) | Many per day | Atom | Good; many press releases | Conditional GO |
+
+### 5. GDELT (optional)
+
+| Terms | Frequency | Access | Reliability |
+|---|---|---|---|
+| [gdeltproject.org/about.html](https://www.gdeltproject.org/about.html): "unlimited and unrestricted use… academic, commercial, or governmental"; may "redistribute, rehost, republish"; must cite the GDELT Project and link to gdeltproject.org | Near real-time; last 3 months searchable ([DOC 2.0](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/)) | `api.gdeltproject.org/api/v2/doc/doc`, no key | **Poor on 12-10-2026:** every request, including the first, returned HTTP 429 "limit requests to one every 5 seconds" |
+
+### Go/no-go
+
+| Section | Verdict |
+|---|---|
+| 1. Prices | **GO** — EIA, latest available with as-of date |
+| 2. Freight: container numbers | **NO-GO** → `not_covered` |
+| 2. Freight: dry bulk, tanker and container direction | **Conditional GO** — from news, words only, no figures |
+| 2. Freight: physical activity | **GO** — PortWatch, weekly, labelled as activity not rates |
+| 3. S&P | **Conditional GO, weekly** — thin (mainly Splash247) now that Hellenic Shipping News is out |
+| 4. Events | **Conditional GO** — gCaptain, Splash247, Maritime Executive |
+| GDELT | GO on terms; **deferred** for reliability |
+
+### Decisions (Linus, 12 October 2026)
+
+1. Hellenic Shipping News and The Loadstar are dropped entirely for v1.
+2. gCaptain, Splash247 and The Maritime Executive are conditional GO: headline, link and our own no-digit summary. **Wire items** (feed author Reuters or Bloomberg) are headline and link only. This is enforced in code from the feed's author field, not left to the model. Linus is emailing these three publishers and Drewry for permission separately.
+3. Prices are "latest available, with as-of date" (replaces "prices daily"). Staleness threshold about 10 days for EIA; PortWatch threshold set to suit its 8–10 day lag.
+4. Container numbers are `not_covered`; container rate **direction** from news is included, as for dry bulk and tankers.
+5. Add the IMF PortWatch credit line ("Source: International Monetary Fund, PortWatch, <link>") to the existing Market Intelligence page as well. (To do; not yet implemented.)
+6. Daily vs weekly brief is parked until after the personal trial (see Parked decisions).
+7. Phase 3: before the first scheduled run, test that the Splash247 feed works from a GitHub Actions runner (it blocked one fetcher with 403).
+
 ## Runtime prompt v1 (for the writer in Phase 2; refine once Phase 0 is done)
 
 System prompt:
@@ -188,3 +252,4 @@ Start with Step 0.
 ## Parked decisions
 
 - Confidence model: a missing price on a feasible option drops confidence by only 6 points (Scenario 3 stays High at 85). Options: raise the penalty, or cap confidence at Medium when any feasible option lacks a price. Decide after the morning brief.
+- Brief cadence: daily or weekly. EIA prices are released weekly and PortWatch lags 8–10 days, so a daily brief may repeat figures. Decide after the personal trial.
