@@ -68,7 +68,8 @@ ALLOWLIST: dict[str, AllowedSource] = {
                 "automated bulk download need IMF permission",
         redistributable=True,
         kind="data",
-        credit="Source: International Monetary Fund, PortWatch, https://portwatch.imf.org",
+        credit=("BrokerBrief calculations based on data from International Monetary Fund, "
+                "PortWatch, https://portwatch.imf.org"),
         quality_tier="LIVE_API",
         # Weekly batches lagging 8–10 days; 14 days allows one late batch.
         max_age=timedelta(days=14),

@@ -174,6 +174,11 @@ Series IDs were read from EIA's own table. Confirm the exact API v2 route agains
 |---|---|---|---|---|
 | IMF PortWatch | Dataset licence field points to the [IMF terms](https://www.imf.org/en/about/copyright-and-terms): reuse and publication allowed with credit "Source: International Monetary Fund, PortWatch, <link>". **Commercial reuse needs permission**; **automated bulk download prohibited** without permission. | Weekly batches; on 12-10-2026 latest data was 02-10 (ports) and 04-10 (chokepoints), a lag of about 8–10 days | ArcGIS FeatureServer (already in `modules/portwatch.py`), no key | Good; AIS draft fields are crew-entered and can be wrong |
 
+PortWatch credit (Linus, 12/10/2026):
+- Link chosen: `https://portwatch.imf.org`.
+- IMF terms require stating any material transformation alongside the citation. Everything BrokerBrief shows from PortWatch is transformed (Market Intelligence's Rising/Easing/Stable labels and majority "Congestion" pill; the brief's 7-day totals and week-on-week changes), so the credit used everywhere is: "BrokerBrief calculations based on data from International Monetary Fund, PortWatch, https://portwatch.imf.org" (`PORTWATCH_CREDIT` in `modules/portwatch.py`).
+- Commercial reuse requires permission from copyright@imf.org (see Pending permission).
+
 ### 4. News feeds
 
 | Source | Terms | Frequency | Access | Reliability | Verdict |
@@ -211,6 +216,14 @@ Series IDs were read from EIA's own table. Confirm the exact API v2 route agains
 5. Add the IMF PortWatch credit line ("Source: International Monetary Fund, PortWatch, <link>") to the existing Market Intelligence page as well. (To do; not yet implemented.)
 6. Daily vs weekly brief is parked until after the personal trial (see Parked decisions).
 7. Phase 3: before the first scheduled run, test that the Splash247 feed works from a GitHub Actions runner (it blocked one fetcher with 403).
+
+### Pending permission
+
+| Who | What | Status |
+|---|---|---|
+| gCaptain, Splash247, The Maritime Executive | Use of headlines, links and our own summaries in the public brief | Linus emailing (decision 2) |
+| Drewry | Republishing WCI values | Linus emailing (decision 2); `not_covered` until granted |
+| IMF (copyright@imf.org) | Commercial reuse of PortWatch data | **Conditional:** only if BrokerBrief becomes commercial |
 
 ## Runtime prompt v1 (for the writer in Phase 2; refine once Phase 0 is done)
 

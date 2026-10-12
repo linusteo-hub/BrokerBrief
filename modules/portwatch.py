@@ -18,10 +18,12 @@ PORTWATCH_URL = (
 TARGET_PORTS = ["Singapore", "Rotterdam", "Fujairah", "Port Hedland", "Houston"]
 
 # IMF terms (https://www.imf.org/en/about/copyright-and-terms) allow reuse and
-# publication with this credit; commercial reuse and automated bulk download
-# need IMF permission. Show the credit wherever PortWatch data is displayed.
-PORTWATCH_CREDIT_TEXT = "International Monetary Fund, PortWatch, https://portwatch.imf.org"
-PORTWATCH_CREDIT = f"Source: {PORTWATCH_CREDIT_TEXT}"
+# publication with a citation, and require stating any material transformation;
+# commercial reuse and automated bulk download need IMF permission. Everything
+# BrokerBrief shows from PortWatch is derived (direction labels, totals,
+# changes), hence "calculations based on". Show it wherever PortWatch data is.
+PORTWATCH_CREDIT = ("BrokerBrief calculations based on data from International Monetary Fund, "
+                    "PortWatch, https://portwatch.imf.org")
 
 PORTWATCH = SourceInfo(
     name="IMF Portwatch",

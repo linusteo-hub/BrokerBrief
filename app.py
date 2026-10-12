@@ -19,7 +19,7 @@ from modules.report import generate_email, generate_linkedin
 from modules.pdf_export import generate_pdf_bytes
 from modules.bunker import compute_bunker_spreads
 from modules.eia import fetch_all as eia_fetch_all
-from modules.portwatch import PORTWATCH_CREDIT, PORTWATCH_CREDIT_TEXT, fetch_port_activity
+from modules.portwatch import PORTWATCH_CREDIT, fetch_port_activity
 
 from modules.decision.scenario import (
     BunkeringScenario, FuelGrade, RiskProfile, FuelAvailability,
@@ -552,8 +552,8 @@ elif "Market Intelligence" in page:
                 counts[v] = counts.get(v, 0) + 1
             signals.congestion_direction = max(counts, key=counts.get)
             has_congestion = True
-            # The PDF lists source names; for PortWatch that must be the IMF's credit line.
-            brief_sources.add(PORTWATCH_CREDIT_TEXT)
+            # The PDF lists source names; for PortWatch that must be the IMF credit line.
+            brief_sources.add(PORTWATCH_CREDIT)
     brief_sources = sorted(brief_sources)
     # The template brief speaks to freight and bunkers, so it needs real rows for both.
     brief_ready = bool(has_freight and has_bunker)
