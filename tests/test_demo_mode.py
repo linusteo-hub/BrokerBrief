@@ -60,7 +60,8 @@ def _run(n: int, live_eia, live_portwatch):
     options = generate_options(scenario)
     options = run_constraint_engine(options, scenario, market_data["congestion_signals"])
     options = score_options(options, scenario, market_data)
-    return options, compute_confidence(scenario, market_data), market_data
+    scored_ports = {p for o in options if o.is_feasible for p in (o.port, o.top_up_port) if p}
+    return options, compute_confidence(scenario, market_data, scored_ports=scored_ports), market_data
 
 
 def _summary(options, confidence):

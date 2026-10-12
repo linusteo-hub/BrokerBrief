@@ -13,7 +13,7 @@ The confidence score is deterministic — no random values, no opaque models.
 """
 
 from datetime import datetime, date
-from typing import Optional
+from typing import Iterable, Optional
 from modules.decision.scenario import BunkeringScenario, FuelAvailability
 
 
@@ -184,13 +184,34 @@ def compute_scenario_completeness(scenario: BunkeringScenario) -> dict:
 
 # ── Combined Confidence Model ─────────────────────────────────────────────────
 
+# Highest score that still reads as Medium (High starts at 80).
+MEDIUM_CAP = 79.0
+
+
+def unknown_congestion_ports(market_data: dict, ports: Iterable[str]) -> dict:
+    """port -> reason, for each of `ports` whose congestion is Unknown or absent."""
+    signals = market_data.get("congestion_signals", {})
+    reasons = market_data.get("congestion_reasons", {})
+    return {
+        port: reasons.get(port, f"No PortWatch congestion signal for {port}.")
+        for port in sorted(set(ports))
+        if signals.get(port) in (None, "Unknown")
+    }
+
+
 def compute_confidence(
     scenario: BunkeringScenario,
     market_data: dict,
+    *,
+    scored_ports: Iterable[str],
 ) -> dict:
     """
     Combines the three components into a single Decision Confidence score.
     Returns full breakdown for display in the Decision Workspace.
+
+    `scored_ports` are the ports of the options the engine scored. If any has
+    Unknown congestion, confidence is capped at Medium and the reason is shown.
+    Required (no default) so a caller cannot silently skip the cap.
     """
     dq = compute_data_quality(market_data)
     sa = compute_signal_agreement(market_data)
@@ -207,8 +228,21 @@ def compute_confidence(
     # Collect all confidence-reducing factors
     all_reductions = dq["factors"] + sa["factors"] + sc["factors"]
 
+    # Cap at Medium when congestion is unknown at any port the engine scored.
+    unknown = unknown_congestion_ports(market_data, scored_ports)
+    uncapped = combined
+    cap_reason = None
+    if unknown:
+        detail = " ".join(unknown.values())
+        cap_reason = (f"Congestion unknown at {', '.join(unknown)}: {detail} "
+                      "Confidence is capped at Medium.")
+        combined = min(combined, MEDIUM_CAP)
+        all_reductions = [cap_reason] + all_reductions
+
     return {
         "overall":               combined,
+        "uncapped_overall":      uncapped,
+        "cap_reason":            cap_reason,
         "data_quality":          dq,
         "signal_agreement":      sa,
         "scenario_completeness": sc,

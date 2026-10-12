@@ -118,6 +118,7 @@ html,body,[data-testid="stAppViewContainer"]{background:var(--black)!important;f
 .stat-pill-value{font-family:var(--font-mono);font-weight:500;font-size:.95rem;color:var(--text);}
 .dir-up{color:var(--red)!important;} .dir-down{color:var(--green)!important;} .dir-flat{color:var(--blue)!important;}
 .dir-rising{color:var(--amber)!important;} .dir-easing{color:var(--green)!important;} .dir-stable{color:var(--blue)!important;}
+.dir-unknown{color:var(--muted)!important;}
 .report-block{background:var(--surface);border:1px solid var(--bdr);border-radius:8px;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:.76rem;color:var(--text);white-space:pre-wrap;line-height:1.7;}
 h1,h2,h3,h4{font-family:var(--font-head)!important;color:var(--text)!important;}
 p,li,span,label{color:var(--text);}
@@ -371,7 +372,9 @@ elif "Bunkering" in page:
         options = generate_options(scenario)
         options = run_constraint_engine(options, scenario, market_data["congestion_signals"])
         options = score_options(options, scenario, market_data)
-        confidence = compute_confidence(scenario, market_data)
+        # Ports of the options the engine scored (feasible ones, incl. top-up ports).
+        scored_ports = {p for o in options if o.is_feasible for p in (o.port, o.top_up_port) if p}
+        confidence = compute_confidence(scenario, market_data, scored_ports=scored_ports)
 
         st.session_state["decision_result"] = {
             "scenario": scenario, "options": options,
@@ -486,6 +489,8 @@ elif "Bunkering" in page:
             # 6 — DECISION CONFIDENCE
             st.markdown('<div class="info-card"><div class="info-card-title">6 · Decision Confidence</div>', unsafe_allow_html=True)
             st.markdown(f'<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:1.8rem;color:#E6EDF3;">{confidence["overall"]:.0f}% <span style="font-size:.9rem;color:#8B949E;">({confidence["label"]})</span></div>', unsafe_allow_html=True)
+            if confidence.get("cap_reason"):
+                st.markdown(f'<div class="warn-strip">⚠ Capped at Medium (would be {confidence["uncapped_overall"]:.0f}%). {confidence["cap_reason"]}</div>', unsafe_allow_html=True)
             for label, comp in [("Data Quality (40%)", "data_quality"),
                                  ("Signal Agreement (30%)", "signal_agreement"),
                                  ("Scenario Completeness (30%)", "scenario_completeness")]:
@@ -544,13 +549,20 @@ elif "Market Intelligence" in page:
     has_congestion = (mi_df["signal_type"] == "congestion").any()
     used_types     = ["freight", "bunker", "congestion", "news"]
     brief_sources  = set(mi_df.loc[mi_df["signal_type"].isin(used_types), "source_name"].dropna().astype(str))
+    unknown_congestion = {}   # port -> reason, shown wherever congestion is shown
     if portwatch_data and portwatch_data.get("success"):
         cong_signals = portwatch_data["congestion_signals"]
+        cong_reasons = portwatch_data.get("congestion_reasons", {})
+        unknown_congestion = {p: cong_reasons.get(p, "No reason recorded.")
+                              for p, v in cong_signals.items() if v == "Unknown"}
         if cong_signals:
+            # Majority of the KNOWN signals; "Unknown" if no port has one.
             counts = {"Rising": 0, "Stable": 0, "Easing": 0}
             for v in cong_signals.values():
-                counts[v] = counts.get(v, 0) + 1
-            signals.congestion_direction = max(counts, key=counts.get)
+                if v in counts:
+                    counts[v] += 1
+            signals.congestion_direction = (max(counts, key=counts.get) if any(counts.values())
+                                            else "Unknown")
             has_congestion = True
             # The PDF lists source names; for PortWatch that must be the IMF credit line.
             brief_sources.add(PORTWATCH_CREDIT)
@@ -569,7 +581,8 @@ elif "Market Intelligence" in page:
 
     with tab_brief:
         dir_color = {"Up": "dir-up", "Down": "dir-down", "Flat": "dir-flat",
-                     "Rising": "dir-rising", "Easing": "dir-easing", "Stable": "dir-stable"}
+                     "Rising": "dir-rising", "Easing": "dir-easing", "Stable": "dir-stable",
+                     "Unknown": "dir-unknown"}
         def _pill(label, value):
             return (f'<div class="stat-pill"><div class="stat-pill-label">{label}</div>'
                     f'<div class="stat-pill-value {dir_color.get(value,"")}">{value}</div></div>')
@@ -611,6 +624,9 @@ elif "Market Intelligence" in page:
             """, unsafe_allow_html=True)
             if portwatch_data and portwatch_data.get("success"):
                 st.caption(PORTWATCH_CREDIT)
+        if unknown_congestion:
+            st.caption("Congestion unknown (not counted in the Congestion pill): "
+                       + " ".join(f"{p}: {r}" for p, r in unknown_congestion.items()))
 
     with tab_signals:
         if signals.signal_table:
@@ -628,7 +644,10 @@ elif "Market Intelligence" in page:
         if portwatch_data and portwatch_data.get("success"):
             st.markdown("**Live Portwatch Congestion Signals**")
             for port, sig in portwatch_data["congestion_signals"].items():
-                st.markdown(f"- **{port}**: {sig}")
+                if sig == "Unknown":
+                    st.markdown(f"- **{port}**: Unknown — {unknown_congestion.get(port, 'No reason recorded.')}")
+                else:
+                    st.markdown(f"- **{port}**: {sig}")
             st.caption(PORTWATCH_CREDIT)
 
     with tab_bunker:
@@ -742,9 +761,11 @@ elif "Live Data" in page:
     st.markdown("### IMF Portwatch API")
     if portwatch_data and portwatch_data.get("success"):
         st.success(f"✅ Connected — {len(portwatch_data['ports'])} port activity rows fetched")
+        reasons = portwatch_data.get("congestion_reasons", {})
         for port, sig in portwatch_data["congestion_signals"].items():
             colour = {"Rising": "🔴", "Stable": "🔵", "Easing": "🟢"}.get(sig, "⚪")
-            st.markdown(f"{colour} **{port}**: {sig}")
+            text = f"Unknown — {reasons.get(port, 'No reason recorded.')}" if sig == "Unknown" else sig
+            st.markdown(f"{colour} **{port}**: {text}")
         with st.expander("Show raw port data"):
             st.dataframe(pd.DataFrame(portwatch_data["ports"]), use_container_width=True)
         st.caption(PORTWATCH_CREDIT)
