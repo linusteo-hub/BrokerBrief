@@ -9,6 +9,7 @@ import requests
 from datetime import date
 
 from modules.provenance import (
+    utc_today,
     EIA_FORECAST_MAX_AGE,
     EIA_SPOT_MAX_AGE,
     QualityTier,
@@ -111,7 +112,7 @@ def fetch_brent_spot(api_key: str) -> dict:
 
 def fetch_brent_forecast(api_key: str) -> dict:
     # Dynamic start date — always current month
-    start = date.today().strftime("%Y-%m")
+    start = utc_today().strftime("%Y-%m")
     url = (
         f"{EIA_BASE}/steo/data/"
         f"?api_key={api_key}"
@@ -137,7 +138,7 @@ def fetch_brent_forecast(api_key: str) -> dict:
             "forecast_rows": forecast_rows,
             "source_name":   "EIA STEO",
             "source_url":    "https://www.eia.gov/steo/",
-            "updated_at":    date.today().isoformat(),
+            "updated_at":    utc_today().isoformat(),
             "confidence":    0.80,
             # No publication-vintage field is exposed by this endpoint — forecast_rows
             # carries the forecasted (forward-looking) month, not an observation date,

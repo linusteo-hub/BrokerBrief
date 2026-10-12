@@ -8,7 +8,9 @@ import requests
 from datetime import date, datetime, timedelta, timezone
 from collections import defaultdict
 
-from modules.provenance import PORTWATCH_MAX_AGE, QualityTier, SourceInfo, parse_as_of, stamp
+from modules.provenance import (
+    PORTWATCH_MAX_AGE, QualityTier, SourceInfo, parse_as_of, stamp, utc_date, utc_today,
+)
 
 PORTWATCH_URL = (
     "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/"
@@ -49,7 +51,7 @@ PORTWATCH = SourceInfo(
 
 
 def fetch_port_activity() -> dict:
-    cutoff = (date.today() - timedelta(days=14)).strftime("%Y-%m-%d")
+    cutoff = (utc_today() - timedelta(days=14)).strftime("%Y-%m-%d")
     port_list = ", ".join(f"'{PORTWATCH_NAMES.get(p, p)}'" for p in TARGET_PORTS)
     params = {
         "where":             f"portname IN ({port_list}) AND date >= DATE '{cutoff}'",
@@ -88,7 +90,7 @@ def fetch_port_activity() -> dict:
             "congestion_reasons": reasons,
             "source_name":        "IMF Portwatch",
             "source_url":         "https://portwatch.imf.org",
-            "updated_at":         date.today().isoformat(),
+            "updated_at":         utc_today().isoformat(),
             "confidence":         0.80,
             # Rows are ordered `portname, date DESC` (grouped per port, not globally
             # sorted) — as_of must be an explicit max() over all rows, not rows[0].
@@ -158,7 +160,7 @@ def _compute_congestion(rows: list, ports: list) -> tuple[dict, dict]:
         previous = sorted_rows[-1]["portcalls"]
         if previous == 0:
             signals[port] = "Unknown"
-            earliest = parse_as_of(sorted_rows[-1]["date"])
+            earliest = utc_date(sorted_rows[-1]["date"])
             day = f"{earliest.day} {earliest.strftime('%B %Y')}" if earliest else "unknown date"
             reasons[port] = (f"{port} had zero port calls on its earliest day in the window "
                              f"({day}), so there is no baseline to compare against.")

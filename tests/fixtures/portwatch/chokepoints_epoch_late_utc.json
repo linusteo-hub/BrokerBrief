@@ -1,0 +1,1355 @@
+{
+"objectIdFieldName": "ObjectId",
+"uniqueIdField": {
+"name": "ObjectId",
+"isSystemMaintained": true
+},
+"globalIdFieldName": "",
+"features": [
+{
+"attributes": {
+"date": 1791156600000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 46
+}
+},
+{
+"attributes": {
+"date": 1791070200000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 46
+}
+},
+{
+"attributes": {
+"date": 1790983800000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 42
+}
+},
+{
+"attributes": {
+"date": 1790897400000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 55
+}
+},
+{
+"attributes": {
+"date": 1790811000000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 45
+}
+},
+{
+"attributes": {
+"date": 1790724600000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 40
+}
+},
+{
+"attributes": {
+"date": 1790638200000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 28
+}
+},
+{
+"attributes": {
+"date": 1790551800000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 37
+}
+},
+{
+"attributes": {
+"date": 1790465400000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 48
+}
+},
+{
+"attributes": {
+"date": 1790379000000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 37
+}
+},
+{
+"attributes": {
+"date": 1790292600000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 41
+}
+},
+{
+"attributes": {
+"date": 1790206200000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 32
+}
+},
+{
+"attributes": {
+"date": 1790119800000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 47
+}
+},
+{
+"attributes": {
+"date": 1790033400000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 38
+}
+},
+{
+"attributes": {
+"date": 1789947000000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 42
+}
+},
+{
+"attributes": {
+"date": 1789860600000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 43
+}
+},
+{
+"attributes": {
+"date": 1789774200000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 51
+}
+},
+{
+"attributes": {
+"date": 1789687800000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 37
+}
+},
+{
+"attributes": {
+"date": 1789601400000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 37
+}
+},
+{
+"attributes": {
+"date": 1789515000000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 32
+}
+},
+{
+"attributes": {
+"date": 1789428600000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 51
+}
+},
+{
+"attributes": {
+"date": 1789342200000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 21
+}
+},
+{
+"attributes": {
+"date": 1789255800000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 40
+}
+},
+{
+"attributes": {
+"date": 1789169400000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 48
+}
+},
+{
+"attributes": {
+"date": 1789083000000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 37
+}
+},
+{
+"attributes": {
+"date": 1788996600000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 37
+}
+},
+{
+"attributes": {
+"date": 1788910200000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 43
+}
+},
+{
+"attributes": {
+"date": 1788823800000,
+"portid": "chokepoint1",
+"portname": "Suez Canal",
+"n_total": 39
+}
+},
+{
+"attributes": {
+"date": 1791156600000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 29
+}
+},
+{
+"attributes": {
+"date": 1791070200000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 26
+}
+},
+{
+"attributes": {
+"date": 1790983800000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 28
+}
+},
+{
+"attributes": {
+"date": 1790897400000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 24
+}
+},
+{
+"attributes": {
+"date": 1790811000000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 25
+}
+},
+{
+"attributes": {
+"date": 1790724600000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 28
+}
+},
+{
+"attributes": {
+"date": 1790638200000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 30
+}
+},
+{
+"attributes": {
+"date": 1790551800000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 30
+}
+},
+{
+"attributes": {
+"date": 1790465400000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 25
+}
+},
+{
+"attributes": {
+"date": 1790379000000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 24
+}
+},
+{
+"attributes": {
+"date": 1790292600000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 26
+}
+},
+{
+"attributes": {
+"date": 1790206200000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 27
+}
+},
+{
+"attributes": {
+"date": 1790119800000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 32
+}
+},
+{
+"attributes": {
+"date": 1790033400000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 25
+}
+},
+{
+"attributes": {
+"date": 1789947000000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 27
+}
+},
+{
+"attributes": {
+"date": 1789860600000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 28
+}
+},
+{
+"attributes": {
+"date": 1789774200000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 27
+}
+},
+{
+"attributes": {
+"date": 1789687800000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 28
+}
+},
+{
+"attributes": {
+"date": 1789601400000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 25
+}
+},
+{
+"attributes": {
+"date": 1789515000000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 25
+}
+},
+{
+"attributes": {
+"date": 1789428600000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 23
+}
+},
+{
+"attributes": {
+"date": 1789342200000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 29
+}
+},
+{
+"attributes": {
+"date": 1789255800000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 29
+}
+},
+{
+"attributes": {
+"date": 1789169400000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 28
+}
+},
+{
+"attributes": {
+"date": 1789083000000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 34
+}
+},
+{
+"attributes": {
+"date": 1788996600000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 31
+}
+},
+{
+"attributes": {
+"date": 1788910200000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 30
+}
+},
+{
+"attributes": {
+"date": 1788823800000,
+"portid": "chokepoint2",
+"portname": "Panama Canal",
+"n_total": 27
+}
+},
+{
+"attributes": {
+"date": 1791156600000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 34
+}
+},
+{
+"attributes": {
+"date": 1791070200000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 30
+}
+},
+{
+"attributes": {
+"date": 1790983800000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 26
+}
+},
+{
+"attributes": {
+"date": 1790897400000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 28
+}
+},
+{
+"attributes": {
+"date": 1790811000000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 22
+}
+},
+{
+"attributes": {
+"date": 1790724600000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 37
+}
+},
+{
+"attributes": {
+"date": 1790638200000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 30
+}
+},
+{
+"attributes": {
+"date": 1790551800000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 27
+}
+},
+{
+"attributes": {
+"date": 1790465400000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 29
+}
+},
+{
+"attributes": {
+"date": 1790379000000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 29
+}
+},
+{
+"attributes": {
+"date": 1790292600000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 31
+}
+},
+{
+"attributes": {
+"date": 1790206200000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 25
+}
+},
+{
+"attributes": {
+"date": 1790119800000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 22
+}
+},
+{
+"attributes": {
+"date": 1790033400000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 27
+}
+},
+{
+"attributes": {
+"date": 1789947000000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 26
+}
+},
+{
+"attributes": {
+"date": 1789860600000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 25
+}
+},
+{
+"attributes": {
+"date": 1789774200000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 27
+}
+},
+{
+"attributes": {
+"date": 1789687800000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 27
+}
+},
+{
+"attributes": {
+"date": 1789601400000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 19
+}
+},
+{
+"attributes": {
+"date": 1789515000000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 24
+}
+},
+{
+"attributes": {
+"date": 1789428600000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 25
+}
+},
+{
+"attributes": {
+"date": 1789342200000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 31
+}
+},
+{
+"attributes": {
+"date": 1789255800000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 20
+}
+},
+{
+"attributes": {
+"date": 1789169400000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 22
+}
+},
+{
+"attributes": {
+"date": 1789083000000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 27
+}
+},
+{
+"attributes": {
+"date": 1788996600000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 35
+}
+},
+{
+"attributes": {
+"date": 1788910200000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 22
+}
+},
+{
+"attributes": {
+"date": 1788823800000,
+"portid": "chokepoint4",
+"portname": "Bab el-Mandeb Strait",
+"n_total": 34
+}
+},
+{
+"attributes": {
+"date": 1791156600000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 209
+}
+},
+{
+"attributes": {
+"date": 1791070200000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 245
+}
+},
+{
+"attributes": {
+"date": 1790983800000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 233
+}
+},
+{
+"attributes": {
+"date": 1790897400000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 240
+}
+},
+{
+"attributes": {
+"date": 1790811000000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 208
+}
+},
+{
+"attributes": {
+"date": 1790724600000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 241
+}
+},
+{
+"attributes": {
+"date": 1790638200000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 208
+}
+},
+{
+"attributes": {
+"date": 1790551800000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 201
+}
+},
+{
+"attributes": {
+"date": 1790465400000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 222
+}
+},
+{
+"attributes": {
+"date": 1790379000000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 211
+}
+},
+{
+"attributes": {
+"date": 1790292600000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 240
+}
+},
+{
+"attributes": {
+"date": 1790206200000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 211
+}
+},
+{
+"attributes": {
+"date": 1790119800000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 220
+}
+},
+{
+"attributes": {
+"date": 1790033400000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 220
+}
+},
+{
+"attributes": {
+"date": 1789947000000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 230
+}
+},
+{
+"attributes": {
+"date": 1789860600000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 217
+}
+},
+{
+"attributes": {
+"date": 1789774200000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 256
+}
+},
+{
+"attributes": {
+"date": 1789687800000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 239
+}
+},
+{
+"attributes": {
+"date": 1789601400000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 208
+}
+},
+{
+"attributes": {
+"date": 1789515000000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 234
+}
+},
+{
+"attributes": {
+"date": 1789428600000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 224
+}
+},
+{
+"attributes": {
+"date": 1789342200000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 215
+}
+},
+{
+"attributes": {
+"date": 1789255800000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 230
+}
+},
+{
+"attributes": {
+"date": 1789169400000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 235
+}
+},
+{
+"attributes": {
+"date": 1789083000000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 195
+}
+},
+{
+"attributes": {
+"date": 1788996600000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 212
+}
+},
+{
+"attributes": {
+"date": 1788910200000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 240
+}
+},
+{
+"attributes": {
+"date": 1788823800000,
+"portid": "chokepoint5",
+"portname": "Malacca Strait",
+"n_total": 244
+}
+},
+{
+"attributes": {
+"date": 1791156600000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 4
+}
+},
+{
+"attributes": {
+"date": 1791070200000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 2
+}
+},
+{
+"attributes": {
+"date": 1790983800000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 4
+}
+},
+{
+"attributes": {
+"date": 1790897400000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 0
+}
+},
+{
+"attributes": {
+"date": 1790811000000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 4
+}
+},
+{
+"attributes": {
+"date": 1790724600000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 1
+}
+},
+{
+"attributes": {
+"date": 1790638200000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 4
+}
+},
+{
+"attributes": {
+"date": 1790551800000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 1
+}
+},
+{
+"attributes": {
+"date": 1790465400000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 4
+}
+},
+{
+"attributes": {
+"date": 1790379000000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 3
+}
+},
+{
+"attributes": {
+"date": 1790292600000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 5
+}
+},
+{
+"attributes": {
+"date": 1790206200000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 4
+}
+},
+{
+"attributes": {
+"date": 1790119800000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 3
+}
+},
+{
+"attributes": {
+"date": 1790033400000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 2
+}
+},
+{
+"attributes": {
+"date": 1789947000000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 1
+}
+},
+{
+"attributes": {
+"date": 1789860600000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 6
+}
+},
+{
+"attributes": {
+"date": 1789774200000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 7
+}
+},
+{
+"attributes": {
+"date": 1789687800000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 3
+}
+},
+{
+"attributes": {
+"date": 1789601400000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 1
+}
+},
+{
+"attributes": {
+"date": 1789515000000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 2
+}
+},
+{
+"attributes": {
+"date": 1789428600000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 2
+}
+},
+{
+"attributes": {
+"date": 1789342200000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 8
+}
+},
+{
+"attributes": {
+"date": 1789255800000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 2
+}
+},
+{
+"attributes": {
+"date": 1789169400000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 8
+}
+},
+{
+"attributes": {
+"date": 1789083000000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 5
+}
+},
+{
+"attributes": {
+"date": 1788996600000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 3
+}
+},
+{
+"attributes": {
+"date": 1788910200000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 6
+}
+},
+{
+"attributes": {
+"date": 1788823800000,
+"portid": "chokepoint6",
+"portname": "Strait of Hormuz",
+"n_total": 5
+}
+},
+{
+"attributes": {
+"date": 1791156600000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 99
+}
+},
+{
+"attributes": {
+"date": 1791070200000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 76
+}
+},
+{
+"attributes": {
+"date": 1790983800000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 99
+}
+},
+{
+"attributes": {
+"date": 1790897400000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 95
+}
+},
+{
+"attributes": {
+"date": 1790811000000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 89
+}
+},
+{
+"attributes": {
+"date": 1790724600000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 65
+}
+},
+{
+"attributes": {
+"date": 1790638200000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 91
+}
+},
+{
+"attributes": {
+"date": 1790551800000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 75
+}
+},
+{
+"attributes": {
+"date": 1790465400000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 91
+}
+},
+{
+"attributes": {
+"date": 1790379000000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 103
+}
+},
+{
+"attributes": {
+"date": 1790292600000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 95
+}
+},
+{
+"attributes": {
+"date": 1790206200000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 91
+}
+},
+{
+"attributes": {
+"date": 1790119800000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 78
+}
+},
+{
+"attributes": {
+"date": 1790033400000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 84
+}
+},
+{
+"attributes": {
+"date": 1789947000000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 85
+}
+},
+{
+"attributes": {
+"date": 1789860600000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 86
+}
+},
+{
+"attributes": {
+"date": 1789774200000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 84
+}
+},
+{
+"attributes": {
+"date": 1789687800000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 86
+}
+},
+{
+"attributes": {
+"date": 1789601400000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 77
+}
+},
+{
+"attributes": {
+"date": 1789515000000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 101
+}
+},
+{
+"attributes": {
+"date": 1789428600000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 101
+}
+},
+{
+"attributes": {
+"date": 1789342200000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 82
+}
+},
+{
+"attributes": {
+"date": 1789255800000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 69
+}
+},
+{
+"attributes": {
+"date": 1789169400000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 82
+}
+},
+{
+"attributes": {
+"date": 1789083000000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 96
+}
+},
+{
+"attributes": {
+"date": 1788996600000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 98
+}
+},
+{
+"attributes": {
+"date": 1788910200000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 87
+}
+},
+{
+"attributes": {
+"date": 1788823800000,
+"portid": "chokepoint7",
+"portname": "Cape of Good Hope",
+"n_total": 120
+}
+}
+],
+"_comment": "chokepoints_ok.json with every date rewritten as epoch milliseconds at 23:30 UTC on the same day (07:30 the next day in Singapore), to catch any local-time date conversion."
+}

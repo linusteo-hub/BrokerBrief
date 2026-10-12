@@ -22,7 +22,7 @@ from modules.morning_brief.checks import check_range, check_staleness
 from modules.morning_brief.figures import count, fmt_date, make_change, make_figure
 from modules.morning_brief.guarded_http import guarded_get
 from modules.portwatch import fetch_daily_rows
-from modules.provenance import parse_as_of
+from modules.provenance import utc_date
 
 SOURCE_ID = "imf_portwatch"
 LOOKBACK_DAYS = 35
@@ -59,14 +59,15 @@ def weekly_figures(rows: list, locations: dict, field: str, noun: str, prefix: s
     by_location: dict[str, dict[date, float]] = {pid: {} for pid in locations}
     for row in rows:
         # `date` is a "YYYY-MM-DD" string today; older layers sent epoch ms.
-        parsed = parse_as_of(row.get("date"))
+        # Always the UTC date (utc_date converts explicitly), so the machine's
+        # time zone or an offset in the source can never move a day.
+        day = utc_date(row.get("date"))
         try:
             pid, value = row["portid"], float(row[field])
         except (KeyError, TypeError, ValueError):
             continue
-        if parsed is None:
+        if day is None:
             continue
-        day = parsed.date()
         if pid in by_location:
             by_location[pid][day] = value
 
