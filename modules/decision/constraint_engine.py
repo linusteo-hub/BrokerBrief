@@ -53,6 +53,8 @@ CONGESTION_WAIT_HOURS = {
     "Stable":  8.0,    # Normal operations → 8h estimate
     "Easing":  4.0,    # Improving → 4h estimate
 }
+# Congestion "Unknown" (or no signal at all): a moderate assumption, stated as such.
+UNKNOWN_CONGESTION_WAIT_HOURS = 8.0
 
 
 def _fuel_safety_check(
@@ -199,9 +201,14 @@ def _schedule_check(
     Returns (is_feasible, rule_id, reason, is_warning, warning_msg).
     """
     port = option.port
-    congestion = congestion_signals.get(port, "Stable")
-    est_wait_hours = CONGESTION_WAIT_HOURS.get(congestion, 8.0)
+    # No signal for the port means Unknown, never Stable. An unknown port gets
+    # the same moderate 8h assumption as before, but it is named as an assumption.
+    congestion = congestion_signals.get(port) or "Unknown"
+    est_wait_hours = CONGESTION_WAIT_HOURS.get(congestion, UNKNOWN_CONGESTION_WAIT_HOURS)
     bunkering_time = PORT_BUNKERING_TIME_HOURS.get(port, 8.0)
+    wait_basis = (f"Congestion at {port} is unknown, so a moderate {est_wait_hours:.0f}h wait is assumed."
+                  if congestion not in CONGESTION_WAIT_HOURS
+                  else f"Waiting time is estimated from congestion signal ({congestion}).")
 
     # Sailing time already included in ETA
     total_port_time_hours = est_wait_hours + bunkering_time
@@ -229,7 +236,7 @@ def _schedule_check(
                     f"Schedule tight at {port}. Estimated port time "
                     f"({total_port_time_hours:.0f}h) exceeds flexibility "
                     f"({scenario.schedule_flexibility_hours:.0f}h). "
-                    f"Waiting time is estimated from congestion signal ({congestion})."
+                    f"{wait_basis}"
                 ),
             )
 
