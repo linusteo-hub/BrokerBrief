@@ -1,4 +1,4 @@
-Status (12/10/2026): Step 0, Step 1 and Phase 0 complete. Work continues on branch `feature/morning-brief`. Next: Phase 1. Phase 0 results and decisions (below) supersede the candidate-source notes where they conflict.
+Status (12/10/2026): Step 0, Step 1, Phase 0 and Phase 1 complete (Phase 1 awaiting Linus's review). Work continues on branch `feature/morning-brief`. Next: Phase 2. Phase 0 and Phase 1 results and decisions (below) supersede the candidate-source notes where they conflict.
 
 # BrokerBrief Morning Brief — Claude Code build prompt
 
@@ -224,6 +224,54 @@ PortWatch credit (Linus, 12/10/2026):
 | gCaptain, Splash247, The Maritime Executive | Use of headlines, links and our own summaries in the public brief | Linus emailing (decision 2) |
 | Drewry | Republishing WCI values | Linus emailing (decision 2); `not_covered` until granted |
 | IMF (copyright@imf.org) | Commercial reuse of PortWatch data | **Conditional:** only if BrokerBrief becomes commercial |
+
+## Phase 1 results — payload (12 October 2026)
+
+Built in `modules/morning_brief/` (no import from `modules/decision/`; a test enforces it). Run: `python -m modules.morning_brief --out <file>`.
+
+| File | Role |
+|---|---|
+| `allowlist.py` | Allowed sources (terms, credit, `redistributable`, staleness limit, permitted fetch URLs), denylist with reasons, banned-name pattern |
+| `guarded_http.py` | The only HTTP path: refuses any URL not in the allowlist's `fetch_urls` (raises, never caught) and does not follow redirects |
+| `prices.py` | EIA Brent (`RBRTE`) and NY Harbor ULSD (`EER_EPD2DXL0_PF4_Y35NY_DPG`) via API v2 route `petroleum/pri/spt/data` (confirmed live 12-10-2026) |
+| `activity.py` | PortWatch chokepoint transits and port calls |
+| `news.py` | gCaptain, Splash247, The Maritime Executive (RSS/Atom title and excerpt only) |
+| `figures.py`, `checks.py` | Display strings, changes, direction; range and staleness checks |
+| `payload.py`, `__main__.py` | Assembly, source tags, final gate, CLI |
+
+### Decisions made in Phase 1 (Linus's additions of 12/10/2026, and Claude's defaults, for review)
+
+Linus (12/10/2026):
+1. Wire items are detected from the author field **and** from "Reuters"/"Bloomberg" in the title, the excerpt's first line, or a source/credit field (supersedes decision 2's "author field" wording). Fixture: a Reuters item with no author.
+2. All HTTP goes through the URL allowlist; a URL outside it fails loudly.
+3. Fetcher tests never touch the network (blocked in `tests/conftest.py`); they use saved fixtures, including empty and malformed responses per fetcher.
+4. Commits stay local on `feature/morning-brief`; full test suite before every commit.
+
+Claude's defaults — please confirm or change:
+5. **Units as published:** USD/bbl and USD/gal (not converted to metric), so our figures match EIA's. Open question for Linus.
+6. **Changes:** prices compared with the previous published day and with about one week earlier; activity as 7-day totals compared with the previous 7 days. `direction` comes from the change *as displayed*: if it rounds to zero it is `flat`.
+7. **Staleness (brief only):** EIA 10 days, PortWatch 14 days. `provenance.py`'s 36-hour EIA limit for the app is unchanged (see findings).
+8. **Ranges:** Brent USD 10–300/bbl; ULSD USD 0.5–10/gal; any location's 7-day transits or port calls 0–10,000.
+9. **PortWatch locations** by portid (names aren't stable): Suez, Panama, Bab el-Mandeb, Malacca, Hormuz, Cape of Good Hope; Singapore, Rotterdam, Fujairah, Port Hedland, Houston. A location missing any of the 14 days is excluded, not compared on unequal weeks. Two small queries per run (IMF prohibits automated *bulk* download).
+10. **News content in the payload:** our own items carry the excerpt with every digit-bearing sentence removed; wire items carry headline and link only. Items whose title or excerpt names a banned source are dropped whole and their link is not recorded (its slug can carry the name). Freight headlines containing digits are dropped (usually index levels). Other headlines are kept verbatim even with digits (e.g. "Saudi Eyes 10 Million Barrels a Day…"); see Phase 2 note below.
+11. **Sections:** S&P needs a deal word and a merchant-ship word in the headline, and includes newbuilding orders and recycling; company takeovers and naval orders go to Events. Freight needs rate wording ("rates", "earnings", "spot market", "fixtures", "time charter"…). Windows: Events 48 hours, Freight and S&P 7 days. Limits: Events 8, Freight 9, S&P 6, newest first. Duplicates (≥60 % title-word overlap or same link) are kept once, earliest report, with the others listed in `also_reported_by`.
+12. **Status:** if feeds work but no story qualifies, the section is `missing` with the reason "no … stories met the rules in the time window".
+13. **Brief date** is the Singapore (UTC+8) date.
+14. **Fixtures:** recorded EIA and PortWatch responses are committed as-is (public domain / IMF with credit). News feeds are committed **sanitised**: structure, headlines, links, authors, dates and categories kept, excerpt text replaced, because the raw feeds would republish publisher text (Splash247's feed on 12-10-2026 named banned sources three times).
+
+### Findings outside the brief (not changed; for Linus)
+
+- **Houston missing from Market Intelligence:** `TARGET_PORTS` in `modules/portwatch.py` uses "Houston", but PortWatch's name is "Houston (US-TX)" (portid `port481`), so the app silently gets no Houston rows. This also feeds the decision engine's congestion inputs, so it was left for you to decide.
+- **Fixed:** EIA error messages quoted the request URL including `api_key=…`, and the Live Data page displayed them. Now redacted (`modules/eia.py`).
+- **Fixed:** plain `pytest -q` (as the verify skill runs it) could not import `modules`; `pytest.ini` now sets the path.
+- `provenance.py`'s `EIA_SPOT_MAX_AGE` is 36 hours, but EIA releases weekly, so the app will often show EIA as stale. The Live Data caption ("EIA updates daily. Portwatch updates weekly on Tuesdays") is also out of date against Phase 0.
+- Events are newest-first across feeds, so a busy feed can crowd out the others (in the fixture payload The Maritime Executive gets no slot). Consider a per-publisher cap after the trial.
+- Feeds are parsed with the standard library's ElementTree; Python 3.14's expat limits entity expansion. `defusedxml` would add belt and braces but needs an install.
+
+### Notes for Phase 2
+
+- The validator's number check must decide how to treat digits inside headlines the brief reproduces verbatim (whitelist exact headline text, or have the model not restate headlines).
+- `tests/fixtures/payload/from_fixtures.json` is a ready payload for writer and validator tests.
 
 ## Runtime prompt v1 (for the writer in Phase 2; refine once Phase 0 is done)
 

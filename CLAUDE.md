@@ -57,7 +57,8 @@ BrokerBrief is my (Linus's) Python/Streamlit maritime decision-support project, 
 
 ## Commands
 
-<!-- Fill in once Step 0 and Phase 1 are done, e.g.: -->
-<!-- Run the app:       streamlit run app.py -->
-<!-- Build the payload: python -m <brief_module>.build_payload -->
-<!-- Run the tests:     pytest -q -->
+- Run the app: `streamlit run app.py`
+- Run the tests: `pytest -q` (no network; fetchers use recorded fixtures in `tests/fixtures/`)
+- Build the morning-brief payload from live sources: `python -m modules.morning_brief --out <file>` (needs `EIA_API_KEY` in `.env` or the environment; without it Prices is marked missing)
+- Regenerate the example payload after a deliberate change: `UPDATE_PAYLOAD_FIXTURE=1 pytest tests/test_morning_brief_payload.py`
+<!-- Morning-brief validator (Phase 2): not built yet. -->
