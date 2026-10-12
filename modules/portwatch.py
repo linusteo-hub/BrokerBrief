@@ -5,7 +5,7 @@ No API key required.
 """
 
 import requests
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from collections import defaultdict
 
 from modules.provenance import PORTWATCH_MAX_AGE, QualityTier, SourceInfo, parse_as_of, stamp
@@ -54,13 +54,16 @@ def fetch_port_activity() -> dict:
             }
             for f in features
         ]
+        signals, reasons = _compute_congestion(rows, TARGET_PORTS)
         parsed_dates = [d for d in (parse_as_of(r["date"]) for r in rows) if d is not None]
         latest_as_of = max(parsed_dates) if parsed_dates else None
 
         return {
             "success":            True,
             "ports":              rows,
-            "congestion_signals": _compute_congestion(rows),
+            # Every target port gets a signal; "Unknown" ones carry a reason.
+            "congestion_signals": signals,
+            "congestion_reasons": reasons,
             "source_name":        "IMF Portwatch",
             "source_url":         "https://portwatch.imf.org",
             "updated_at":         date.today().isoformat(),
@@ -73,25 +76,41 @@ def fetch_port_activity() -> dict:
         return {"success": False, "error": str(e)}
 
 
-def _compute_congestion(rows: list) -> dict:
+def _compute_congestion(rows: list, ports: list) -> tuple[dict, dict]:
+    """-> (signals, reasons). Each port in `ports` gets "Rising", "Easing",
+    "Stable" or "Unknown". Unknown is used when there is nothing to compare —
+    no rows, fewer than 2 days, or zero calls on the earliest day — and every
+    Unknown has a reason in `reasons`. Missing data must never read as Stable."""
     by_port = defaultdict(list)
     for row in rows:
         by_port[row["portname"]].append(row)
 
-    signals = {}
-    for port, port_rows in by_port.items():
+    signals, reasons = {}, {}
+    for port in ports:
+        # Sort on the parsed date: the layer has sent both ISO strings and epoch ms.
+        oldest = datetime.min.replace(tzinfo=timezone.utc)
         sorted_rows = sorted(
-            [r for r in port_rows if r["portcalls"] is not None],
-            key=lambda r: r["date"] or 0, reverse=True,
+            [r for r in by_port.get(port, []) if r["portcalls"] is not None],
+            key=lambda r: parse_as_of(r["date"]) or oldest, reverse=True,
         )
+        if not sorted_rows:
+            signals[port] = "Unknown"
+            reasons[port] = f"No PortWatch rows for {port} in the last 14 days."
+            continue
         if len(sorted_rows) < 2:
-            signals[port] = "Stable"
+            signals[port] = "Unknown"
+            reasons[port] = (f"Only 1 day of PortWatch data for {port} in the last 14 days; "
+                             "at least 2 are needed to compare.")
             continue
         recent   = sorted_rows[0]["portcalls"]
         previous = sorted_rows[-1]["portcalls"]
         if previous == 0:
-            signals[port] = "Stable"
+            signals[port] = "Unknown"
+            earliest = parse_as_of(sorted_rows[-1]["date"])
+            day = f"{earliest.day} {earliest.strftime('%B %Y')}" if earliest else "unknown date"
+            reasons[port] = (f"{port} had zero port calls on its earliest day in the window "
+                             f"({day}), so there is no baseline to compare against.")
             continue
         pct = ((recent - previous) / previous) * 100
         signals[port] = "Rising" if pct > 5 else ("Easing" if pct < -5 else "Stable")
-    return signals
+    return signals, reasons
