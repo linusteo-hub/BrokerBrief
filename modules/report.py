@@ -44,7 +44,7 @@ def generate_linkedin(signals: SignalResult, brief: dict) -> str:
     today_str = date.today().strftime("%d %B %Y")
     freight_emoji = {"Up": "📈", "Down": "📉", "Flat": "➡️"}.get(signals.freight_direction, "➡️")
     bunker_emoji  = {"Up": "🔺", "Down": "🔻", "Flat": "🔹"}.get(signals.bunker_direction, "🔹")
-    cong_emoji    = {"Rising": "⚠️", "Easing": "✅", "Stable": "🔷"}.get(signals.congestion_direction, "🔷")
+    cong_emoji    = {"Rising": "⚠️", "Easing": "✅", "Stable": "🔷", "Unknown": "❔"}.get(signals.congestion_direction, "❔")
     lines = [
         f"Maritime market signals — {today_str}", "",
         f"Market tone: {signals.market_tone}", "",

@@ -14,7 +14,9 @@ It needs to be transparent, deterministic, and easy to improve later.
 from typing import List, Optional, Dict
 from modules.decision.options import BunkeringOption
 from modules.decision.scenario import BunkeringScenario, RiskProfile
-from modules.decision.constraint_engine import CONGESTION_WAIT_HOURS, PORT_BUNKERING_TIME_HOURS
+from modules.decision.constraint_engine import (
+    CONGESTION_WAIT_HOURS, PORT_BUNKERING_TIME_HOURS, UNKNOWN_CONGESTION_WAIT_HOURS,
+)
 
 
 # ── Risk profile weight sets ──────────────────────────────────────────────────
@@ -128,8 +130,9 @@ def _score_operational_risk(
     """
     port = option.port
     congestion_signals = market_data.get("congestion_signals", {})
-    congestion = congestion_signals.get(port, "Stable")
-    est_wait   = CONGESTION_WAIT_HOURS.get(congestion, 8.0)
+    # No signal means Unknown (never Stable), which falls to the last branch.
+    congestion = congestion_signals.get(port) or "Unknown"
+    est_wait   = CONGESTION_WAIT_HOURS.get(congestion, UNKNOWN_CONGESTION_WAIT_HOURS)
 
     if congestion == "Easing":
         score = 85.0
@@ -142,7 +145,8 @@ def _score_operational_risk(
         note  = f"{port} congestion rising — elevated delay risk. Est. wait: {est_wait:.0f}h."
     else:
         score = 55.0
-        note  = f"Congestion data unavailable for {port} — moderate risk assumed."
+        reason = market_data.get("congestion_reasons", {}).get(port, f"No PortWatch congestion signal for {port}.")
+        note  = f"Congestion data unavailable for {port} — moderate risk assumed. {reason}"
 
     # Partial stems carry additional coordination risk
     if option.is_partial:
@@ -162,8 +166,8 @@ def _score_schedule_risk(
     """
     port = option.port
     congestion_signals = market_data.get("congestion_signals", {})
-    congestion = congestion_signals.get(port, "Stable")
-    est_wait   = CONGESTION_WAIT_HOURS.get(congestion, 8.0)
+    congestion = congestion_signals.get(port) or "Unknown"
+    est_wait   = CONGESTION_WAIT_HOURS.get(congestion, UNKNOWN_CONGESTION_WAIT_HOURS)
     bunkering  = PORT_BUNKERING_TIME_HOURS.get(port, 8.0)
     total_time = est_wait + bunkering
     flex       = scenario.schedule_flexibility_hours
@@ -182,6 +186,9 @@ def _score_schedule_risk(
         else:
             score = max(15.0, 40.0 + margin * 2)
             note  = f"Schedule tight — estimated port time exceeds flexibility by {abs(margin):.0f}h."
+
+    if congestion not in CONGESTION_WAIT_HOURS:
+        note += f" Congestion at {port} is unknown; a {est_wait:.0f}h wait is assumed."
 
     if option.is_partial:
         score = max(10.0, score - 15.0)

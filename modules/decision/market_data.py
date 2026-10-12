@@ -48,6 +48,7 @@ def assemble_market_data(
         "forecast_rows":       [],
         "portwatch_available": False,
         "congestion_signals":  {},
+        "congestion_reasons":  {},   # port -> why its signal is "Unknown"
         "bunker_prices":       {"Singapore": {}, "Fujairah": {}},
         "provenance":          {},   # Dict[str, Optional[Provenance]] — one entry per input
     }
@@ -76,6 +77,7 @@ def assemble_market_data(
     if portwatch_data and portwatch_data.get("success"):
         market_data["portwatch_available"] = True
         market_data["congestion_signals"]  = portwatch_data["congestion_signals"]
+        market_data["congestion_reasons"]  = portwatch_data.get("congestion_reasons", {})
         market_data["provenance"]["Port congestion"] = portwatch_data["provenance"]
     else:
         market_data["provenance"]["Port congestion"] = None
