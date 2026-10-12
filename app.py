@@ -371,7 +371,9 @@ elif "Bunkering" in page:
         options = generate_options(scenario)
         options = run_constraint_engine(options, scenario, market_data["congestion_signals"])
         options = score_options(options, scenario, market_data)
-        confidence = compute_confidence(scenario, market_data)
+        # Ports of the options the engine scored (feasible ones, incl. top-up ports).
+        scored_ports = {p for o in options if o.is_feasible for p in (o.port, o.top_up_port) if p}
+        confidence = compute_confidence(scenario, market_data, scored_ports=scored_ports)
 
         st.session_state["decision_result"] = {
             "scenario": scenario, "options": options,
