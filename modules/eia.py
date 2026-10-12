@@ -4,6 +4,7 @@ Fetches live Brent crude spot prices and forward forecasts from EIA API.
 No API key = returns success:False gracefully. App falls back to sample data.
 """
 
+import re
 import requests
 from datetime import date
 
@@ -32,6 +33,11 @@ EIA_FORECAST = SourceInfo(
     quality_tier=QualityTier.LIVE_API,
     max_age=EIA_FORECAST_MAX_AGE,
 )
+
+
+def _redact(message: str) -> str:
+    """Request errors quote the URL, which carries the API key. Never let it out."""
+    return re.sub(r"api_key=[^&\s]+", "api_key=<redacted>", message)
 
 
 def fetch_brent_spot(api_key: str) -> dict:
@@ -70,7 +76,7 @@ def fetch_brent_spot(api_key: str) -> dict:
             "provenance":     stamp(EIA_SPOT, as_of=parse_as_of(rows[0]["period"])),
         }
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        return {"success": False, "error": _redact(str(e))}
 
 
 def fetch_brent_forecast(api_key: str) -> dict:
@@ -109,7 +115,7 @@ def fetch_brent_forecast(api_key: str) -> dict:
             "provenance":    stamp(EIA_FORECAST, as_of=None),
         }
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        return {"success": False, "error": _redact(str(e))}
 
 
 def fetch_all(api_key: str) -> dict:
