@@ -113,5 +113,22 @@ class FreshnessTests(unittest.TestCase):
         self.assertEqual(prov.freshness(now=now), Freshness.FRESH)
 
 
+class EiaSpotLimitTests(unittest.TestCase):
+    """EIA releases daily spot prices weekly, so a value up to ~9 days old is
+    normal: the shared limit is 10 days (app and morning brief)."""
+
+    def test_limit_is_ten_days(self):
+        from modules.provenance import EIA_SPOT_MAX_AGE
+        self.assertEqual(EIA_SPOT_MAX_AGE, timedelta(days=10))
+
+    def test_nine_day_old_eia_value_is_fresh_and_eleven_is_stale(self):
+        from modules.eia import EIA_SPOT
+        from modules.provenance import stamp
+        as_of = datetime(2026, 10, 6, tzinfo=timezone.utc)
+        prov = stamp(EIA_SPOT, as_of=as_of)
+        self.assertEqual(prov.freshness(now=as_of + timedelta(days=9)), Freshness.FRESH)
+        self.assertEqual(prov.freshness(now=as_of + timedelta(days=11)), Freshness.STALE)
+
+
 if __name__ == "__main__":
     unittest.main()
