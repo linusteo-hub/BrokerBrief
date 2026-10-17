@@ -18,7 +18,7 @@ BrokerBrief is my (Linus's) Python/Streamlit maritime decision-support project, 
 
 ## Architecture boundaries
 
-- The decision engine lives in `modules/decision/`: Constraint Engine → Option Generator → Commercial Evaluation → Confidence Model → Decision Workspace. It contains no AI and is fully rules-based. Don't change it unless I ask.
+- The decision engine lives in `modules/decision/`: Option Generator → Constraint Engine → Commercial Evaluation → Confidence Model → Decision Workspace. It contains no AI and is fully rules-based. Don't change it unless I ask.
 - The morning brief lives in its own module and **must never import from `modules/decision/`**. It may read from the ingestion layer (`modules/eia.py`, `modules/portwatch.py`).
 - The brief separates fetching from writing:
   - deterministic code builds a JSON payload;
