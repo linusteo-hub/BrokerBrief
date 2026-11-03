@@ -1,4 +1,8 @@
- ## How BrokerBrief decides
+# BrokerBrief
+
+https://brokerbrief-agyxesfh7xqqqxqqdqnyfx.streamlit.app/
+
+## How BrokerBrief decides
 
 BrokerBrief works like a GPS for a commercial decision. It does not pick for you. It lays out the realistic routes, rules out the ones that cannot work, ranks the rest, and tells you how far to trust the ranking. The final call stays with the professional.
 
@@ -44,7 +48,7 @@ These rules are objective. They are not commercial opinions. An option that brea
 | P1 | Is the required fuel grade available? Unknown keeps the option and lowers confidence. Confirmed unavailable removes it. | Remove or flag |
 | R1 | Is HSFO being taken into a MARPOL Annex VI Emission Control Area? | Remove (illegal) |
 | S1 | Do waiting plus bunkering hours exceed the schedule when there is zero flexibility? | Remove |
-| S2 | Do port hours exceed the available flexibility? | Warn |
+| Tight-schedule warning | Do port hours exceed the available flexibility? | Warn |
 | F3 | Would the vessel depart below its safety reserve? | Warn |
 
 Port time comes from waiting time plus bunkering time. Waiting time is estimated from live congestion: 4 hours when congestion is easing, 8 when stable and 18 when rising. Bunkering time is 8 hours in Singapore and 10 in Fujairah. If congestion is unknown, the system assumes 8 hours of waiting and says so.
@@ -100,7 +104,7 @@ Every value carries seven provenance fields: source, URL, licence, quality tier,
 
 Missing data lowers confidence. It is never filled in, and it never removes an option that is physically feasible.
 
-Licensed market data (Clarksons, Lloyd's List, Platts, Baltic Exchange and others) is never used in the deployed app.
+Licensed market data or paid sources are never used in the deployed app.
 
 ### Built and tested
 
