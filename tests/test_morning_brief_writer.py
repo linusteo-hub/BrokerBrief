@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PAYLOAD = json.loads((FIXTURES / "payload/from_fixtures.json").read_text())
 GOOD = {k: tuple(v) for k, v in json.loads((FIXTURES / "writer/good_summaries.json").read_text()).items()
         if not k.startswith("_")}
-MISC = "38ec41e21301"          # an Events item from Splash247
+MISC = "e8fd72eddcea"          # an Events item from Splash247 ("Tanker war spreads across Gulf")
 
 
 def payload():
@@ -71,33 +71,33 @@ def test_good_summaries_are_published_in_one_call():
     markdown, report = build_brief(payload(), FakeClient(GOOD))
     assert report["published"] and report["writer"]["status"] == "ok"
     assert len(report["writer"]["attempts"]) == 1 and report["writer"]["withheld"] == {}
-    assert "Malaysian shipowner MISC has lined up further LNG carriers" in markdown
-    assert "**Why it matters (our interpretation):** This suggests" in markdown
+    assert "Attacks on tankers have spread across the Gulf" in markdown
+    assert "**Why it matters (our interpretation):** This could raise war-risk insurance costs" in markdown
     # 3,000 input and 900 output tokens at USD 0.10 / 0.50 per million.
     assert report["writer"]["total_cost_usd"] == pytest.approx(0.00075)
 
 
 def test_a_failing_summary_is_retried_once_with_the_reason_and_then_accepted():
-    bad = with_change(MISC, summary="MISC has lined up 5 more LNG carriers.")
+    bad = with_change(MISC, summary="Attacks hit 5 tankers in the Gulf.")
     fixed = {MISC: GOOD[MISC]}
     client = FakeClient(bad, fixed)
     markdown, report = build_brief(payload(), client)
     assert client.sent_ids(1) == [MISC]                        # only the failing item is resent
     assert "contains a digit" in client.requests[1]["messages"][0]["content"]
     assert report["writer"]["status"] == "ok" and MISC in report["writer"]["written"]
-    assert "5 more" not in markdown
+    assert "hit 5 tankers" not in markdown
 
 
 def test_a_summary_that_fails_twice_is_withheld_and_the_item_shows_headline_and_link():
-    bad = with_change(MISC, summary="MISC has lined up two more LNG carriers.")
-    client = FakeClient(bad, {MISC: ("MISC has lined up three more LNG carriers.", GOOD[MISC][1])})
+    bad = with_change(MISC, summary="Attacks hit two tankers in the Gulf.")
+    client = FakeClient(bad, {MISC: ("Attacks hit three tankers in the Gulf.", GOOD[MISC][1])})
     markdown, report = build_brief(payload(), client)
     assert len(client.requests) == 2
     assert report["published"] and report["writer"]["status"] == "partial"
     assert [p["code"] for p in report["writer"]["withheld"][MISC]] == ["number_word"]
-    line = next(l for l in markdown.splitlines() if "MISC lines up five more LNG carriers" in l)
-    assert "lined up" not in line and "[Read the story](" in line
-    assert "This suggests long-term charter demand" not in markdown   # its 'why' is withheld too
+    line = next(l for l in markdown.splitlines() if "Tanker war spreads across Gulf" in l)
+    assert "Attacks" not in line and "[Read the story](" in line
+    assert "This could raise war-risk insurance costs" not in markdown   # its 'why' is withheld too
 
 
 def test_a_why_note_stated_as_fact_is_withheld():
@@ -250,7 +250,7 @@ def test_validate_cli_fails_if_a_must_fail_case_slips_through(tmp_path):
 
 def test_model_trial_reports_pass_rate_and_cost_without_the_network():
     from modules.morning_brief.model_trial import trial
-    bad_then_good = with_change(MISC, summary="MISC has lined up 5 more LNG carriers.")
+    bad_then_good = with_change(MISC, summary="Attacks hit 5 tankers in the Gulf.")
     client = FakeClient(GOOD, bad_then_good, {MISC: GOOD[MISC]})
     result = trial(client, "claude-haiku-5-5", 2, payload())
     assert result["published"] == 2 and result["passes"] and result["withheld"] == 0
@@ -270,7 +270,7 @@ def test_ordinary_feed_content_never_stops_the_brief():
     p = payload()
     items = {i["id"]: i for i in news_items(p)}
     items[MISC]["author"] = "Hans ten Cate"                       # a number word in a name
-    items["e8fd72eddcea"]["author"] = "Staff 2"                   # a digit in a name
+    items["a7906d5c7d2e"]["author"] = "Staff 2"                   # a digit in a name
     items["dc19c507a379"]["headline"] = "Owners rush to order *"  # trailing Markdown character
     items["64fa131aa297"]["headline"] = "Ship <b>names</b> & owners: a [list]"
     p["sections"]["prices"].update(status="missing", items=[],
@@ -323,7 +323,7 @@ def test_refusal_then_success_is_ok_not_unavailable():
 
 
 def test_error_on_the_retry_after_a_partial_success_is_partial_with_the_reason():
-    first = with_change(MISC, summary="MISC has lined up 5 more LNG carriers.")
+    first = with_change(MISC, summary="Attacks hit 5 tankers in the Gulf.")
     _, report = publishes(payload(), FakeClient(first, FakeAPIError(529, "overloaded")))
     writer_report = report["writer"]
     assert writer_report["status"] == "partial" and list(writer_report["withheld"]) == [MISC]

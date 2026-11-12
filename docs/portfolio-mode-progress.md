@@ -191,3 +191,38 @@ Not changed, and why:
 - **Hedge check** accepts "would". A stricter check would withhold many fair sentences. Interpretation stays labelled "our interpretation" on the page.
 - **Ordinals** ("first", "third") are allowed in summaries: they rarely carry figures, and refusing them would withhold most summaries.
 - **Two figures with the same change amount and opposite directions** can mask a flipped word. Every figure line is code-rendered from `direction`, so this needs a renderer bug and a coincidence together.
+
+## Step 3 — Phase 3: automation and publishing (12/11/2026)
+
+### Done
+
+Workflow, archive, alerts, site, failure-test hook and `docs/operations.md`. Details are in the build plan, "Phase 3 results". The schedule is not enabled.
+
+### Verified how
+
+- `pytest -q`: 288 passed. New tests in `tests/test_morning_brief_automation.py` cover:
+  - the archive layout, re-runs and empty-section streaks;
+  - every alert rule;
+  - the site, including escaped HTML and the staleness banner;
+  - the failure hook, end to end;
+  - the workflow file (no schedule; least privilege; the artifact never holds excerpts).
+- Live dry run against the real sources (no workflow, no EIA key, no model): published through the gate, archived, alert decided, site built and checked in a browser at phone width.
+
+### Not verified yet
+
+- **The workflow has not run on GitHub.** `workflow_dispatch` only works once the file is on `main`. The two required manual runs need Decision Batch 2 first: one normal, one with a feed broken on purpose, showing the issue and the empty section.
+- Pages deployment, the `briefs` branch push and the issue commands have therefore not run for real.
+
+### Failure modes of the automation
+
+| Failure | Detection |
+|---|---|
+| A feed fails | Section published as "No verified data today" with the reason; alert after three days running |
+| The gate refuses the brief | Nothing published; alert with the problem codes |
+| Our code crashes | Step fails; alert names the step; the run artifact keeps the output |
+| API key expired, no credit, or model down | Headlines-only brief; alert (when a key is configured) |
+| Scheduled run delayed or dropped | Fallback run at 06:50; a missed day shows on the archive page and as a stale date on the brief page |
+| Workflow disabled after 60 days | Cannot alert from inside GitHub; staleness banner for readers, and the old date |
+| Push to `briefs` conflicts | Retried with rebase four times, then the step fails and alerts |
+| Archive grows | About 19 MB a year before compression; reviewed at 12 months (D7) |
+| Pages deploy fails | The `site` job's own alert step opens or updates the `brief-alert` issue; the page keeps the previous brief, and its staleness banner appears after two days |

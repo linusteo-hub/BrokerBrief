@@ -215,3 +215,14 @@ def test_entity_expansion_feed_is_refused_as_a_broken_feed():
             b'<rss><channel><item><title>&b;</title></item></channel></rss>')
     with pytest.raises(FeedError, match="forbidden XML feature"):
         parse_feed(bomb)
+
+
+def test_deal_words_and_commands_are_told_apart():
+    """Headlines from the live feeds of 12-11-2026 that the first rules misfiled."""
+    from modules.morning_brief.news import classify
+    assert classify("MSC Cruise Ship Ordered Back to Texas with Report of Suspected Homicide", [])[0] == "events"
+    assert classify("Navy ordered to escort tankers", [])[0] == "events"
+    assert classify("Seanergy lines up four more bulkers in $855m fleet push", [])[0] == "sale_and_purchase"
+    assert classify("Chinese shipbuilder wins AHTS order from South American owner", [])[0] == "sale_and_purchase"
+    assert classify("Owner orders six car carriers", [])[0] == "sale_and_purchase"
+    assert classify("Tanker Ablaze Off UAE as More Attacks Rattle Gulf Shipping", [])[0] == "events"

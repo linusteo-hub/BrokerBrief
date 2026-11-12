@@ -191,7 +191,9 @@ def fetch_bunker_sales(today: date, get: Callable = guarded_get) -> dict:
     except (KeyError, TypeError, ValueError) as error:
         return failed(f"MPA bunker sales response was not in the expected format ({type(error).__name__})")
     except Exception as error:     # network, HTTP status, timeout
-        return failed(f"MPA bunker sales request failed: {type(error).__name__}")
+        # data.gov.sg needs no key, so the message is safe to keep; any URL in it
+        # is removed when the brief is rendered.
+        return failed(f"MPA bunker sales request failed: {type(error).__name__}: {str(error)[:200]}")
 
     figures, excluded = build_figures(parse_records(records), today)
     return {"items": figures, "excluded": excluded, "error": None}

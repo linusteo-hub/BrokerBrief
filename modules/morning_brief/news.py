@@ -56,11 +56,16 @@ _NAME = r"[A-Z][\w.'’-]+"
 _MONTH = r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?"
 BYLINE = re.compile(rf"^\s*By\s+({_NAME}(?:\s+(?:and\s+)?{_NAME}){{0,5}}?)\s*(?=[,–—(|-]|\d|{_MONTH}\s)")
 
+# "order" is a deal word only as a noun or as "ordered <ships>": "ordered back
+# to port" or "ordered to leave" is a command, not a newbuilding (a real
+# headline of 12-11-2026 was misfiled this way).
+_COMMAND = r"(?!\s+(back|to|out|off|into|away|home|by)\b)"
 SNP = re.compile(r"\b(sold|sells?|sale|buys?|bought|buyers?|acquires?|acquisition|snap(s|ped)? up|en bloc|"
-                 r"resales?|newbuild(ing)?s?|orders?|ordered|ordering|contracts? for|recycling|"
-                 r"demolition|scrapp(ed|ing))\b", re.IGNORECASE)
+                 rf"resales?|newbuild(ing)?s?|orders?{_COMMAND}|ordered{_COMMAND}|ordering|contracts? for|recycling|"
+                 r"demolition|scrapp(ed|ing)|lines? up|fleet (push|expansion|renewal))\b", re.IGNORECASE)
 SHIP = re.compile(r"\b(vessels?|ships?|carriers?|newbuild(ing)?s?|resales?|en bloc|recycling|demolition|"
-                  r"gas carriers?|lngcs?|lpgcs?|vlgcs?|car carriers?|pctcs?)\b", re.IGNORECASE)
+                  r"gas carriers?|lngcs?|lpgcs?|vlgcs?|car carriers?|pctcs?|ahts|psvs?|osvs?|fpsos?|"
+                  r"tugs?|dredgers?|ro-?ros?)\b", re.IGNORECASE)
 # Rate wording only: bare "freight" also names companies ("… Freight Company").
 FREIGHT = re.compile(r"\b(rates?|freight (market|rates?)|earnings|spot market|fixtures?|time[- ]charter|"
                      r"charter market|tce)\b", re.IGNORECASE)

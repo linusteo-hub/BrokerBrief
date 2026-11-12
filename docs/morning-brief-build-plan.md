@@ -362,6 +362,27 @@ Basis, **estimated, not measured**: input about 1,200 tokens on the fixture payl
 
 **Recommendation: Claude Haiku 5.5**, provisionally. It has **not** yet been run against the gate: there is no API key in this environment. `python -m modules.morning_brief.model_trial --runs 3` compares Haiku 5.5 with Sonnet 5.5 on the fixture payload and names the cheapest that passes every run; it is the first thing to run once the key exists (Decision Batch 2). If Haiku withholds more than an occasional item, switch to Sonnet 5.5; even then the month costs under the USD 5 spend limit.
 
+## Phase 3 results — automation and publishing (12/11/2026; schedule not enabled)
+
+Built: `.github/workflows/morning-brief.yml`, `modules/morning_brief/archive.py`, `alerts.py`, `site.py`, the failure-test hook in `guarded_http.py`, and `docs/operations.md` (what runs when, health, alerts, the 60-day rule, Streamlit sleep, key rotation, archive and retention, failure tests).
+
+- **Workflow:** manual trigger only until Decision Batch 3. Manual runs neither archive nor publish unless asked. Steps: keep-alive call, archive checkout, skip if today's brief exists, build payload, write and check, archive to the `briefs` branch, keep the excerpt-free output as a run artifact, decide the alert, open/update/close the `brief-alert` issue, build and deploy the Pages site. Least-privilege permissions per job.
+- **Schedule (for Batch 3):** 06:15 Singapore time, with a 06:50 fallback that skips if the brief exists. Cron's `timezone: Asia/Singapore` is used (GitHub documents it; Singapore has no daylight saving). Changed from Batch 1's 07:00 fallback, because GitHub names the start of each hour as its busiest time.
+- **Archive (D7):** `briefs/YYYY/MM/DD/` plus `index.json` and `health.json`; a re-run replaces its date. The archived payload has no news excerpts.
+- **Alerts:** a failed step; a refused brief; the model unavailable although a key is configured; any section empty three runs in a row.
+- **Site (D5):** landing page from the README, latest brief, archive table, one page per brief. Markdown rendered with raw HTML off. A staleness banner appears for readers if the brief is more than two days old.
+- **The 60-day rule (D6), corrected:** a disabled workflow cannot run to re-enable itself, so the keep-alive call helps only if calling it on an active workflow resets the clock. GitHub does not document that. Backstops: the daily archive commit, and the reader-facing staleness banner. See `docs/operations.md`.
+- **No scheduled refresh for the Streamlit app** is needed: it fetches on visit with a shared 3-hour cache (Step 1).
+
+### Live dry run in the development environment (12/11/2026, Singapore date 13 November)
+
+Run without the workflow, without an EIA key and without the model, against the real sources:
+- payload built from the live MPA, PortWatch and news feeds, with Prices marked missing ("no EIA API key configured");
+- brief passed the gate on real feed content;
+- archived, the alert decided, and the site built and checked at phone width.
+
+It exposed weak news classification: a cruise ship "ordered back to Texas" was filed as Sale & Purchase, and two real deals as Events. The rules are fixed and pinned by a test using those headlines. **Not yet run as a GitHub workflow:** that needs the workflow on `main` and the secrets (Decision Batch 2).
+
 ## Runtime prompt v1 (superseded 12/11/2026 by `writer.SYSTEM_PROMPT`; kept for the record)
 
 System prompt:

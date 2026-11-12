@@ -849,8 +849,8 @@
       "reason": null,
       "cadence": "weekly",
       "counts": {
-        "fetched": 2,
-        "kept": 2,
+        "fetched": 3,
+        "kept": 3,
         "dropped": {
           "banned_source": 0,
           "digit_in_freight_headline": 0,
@@ -874,6 +874,23 @@
           "published_display": "12 October 2026",
           "section": "sale_and_purchase",
           "segment": "dry_bulk",
+          "also_reported_by": [],
+          "source_tag": "S5"
+        },
+        {
+          "id": "38ec41e21301",
+          "headline": "MISC lines up five more LNG carriers for Petronas",
+          "link": "https://splash247.com/misc-lines-up-five-more-lng-carriers-for-petronas/",
+          "source_id": "splash247",
+          "publisher": "Splash247",
+          "author": "Adis Ajdin",
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item b. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T11:03:37+00:00",
+          "published_display": "12 October 2026",
+          "section": "sale_and_purchase",
+          "segment": null,
           "also_reported_by": [],
           "source_tag": "S5"
         },
@@ -902,38 +919,21 @@
       "reason": null,
       "cadence": "daily",
       "counts": {
-        "fetched": 17,
+        "fetched": 16,
         "kept": 8,
         "dropped": {
           "banned_source": 0,
           "digit_in_freight_headline": 0,
-          "other": 9
+          "other": 8
         },
         "other_detail": {
           "no_date": 1,
           "outside_window": 1,
-          "over_limit": 7
+          "over_limit": 6
         },
         "wire_headline_only": 3
       },
       "items": [
-        {
-          "id": "38ec41e21301",
-          "headline": "MISC lines up five more LNG carriers for Petronas",
-          "link": "https://splash247.com/misc-lines-up-five-more-lng-carriers-for-petronas/",
-          "source_id": "splash247",
-          "publisher": "Splash247",
-          "author": "Adis Ajdin",
-          "wire_agency": null,
-          "summary_allowed": true,
-          "excerpt": "Placeholder excerpt for test item b. It describes the story in general terms. Nothing here is quoted from the publisher …",
-          "published": "2026-10-12T11:03:37+00:00",
-          "published_display": "12 October 2026",
-          "section": "events",
-          "segment": null,
-          "also_reported_by": [],
-          "source_tag": "S5"
-        },
         {
           "id": "aa893b4f28a4",
           "headline": "Port strike talks resume on the US Gulf Coast",
@@ -1013,6 +1013,23 @@
           "summary_allowed": true,
           "excerpt": "Placeholder excerpt for test item e. It describes the story in general terms. Nothing here is quoted from the publisher …",
           "published": "2026-10-12T06:45:00+00:00",
+          "published_display": "12 October 2026",
+          "section": "events",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S5"
+        },
+        {
+          "id": "a7906d5c7d2e",
+          "headline": "Baltic states push for EU-wide ban on Russian grain transit",
+          "link": "https://splash247.com/baltic-states-push-for-eu-wide-ban-on-russian-grain-transit/",
+          "source_id": "splash247",
+          "publisher": "Splash247",
+          "author": "Adis Ajdin",
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item f. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T06:00:00+00:00",
           "published_display": "12 October 2026",
           "section": "events",
           "segment": null,

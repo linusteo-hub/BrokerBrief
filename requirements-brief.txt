@@ -3,3 +3,5 @@
 # out of requirements.txt, which Streamlit Community Cloud installs.
 -r requirements.txt
 anthropic>=1.17,<2
+# Renders the brief page for GitHub Pages; raw HTML in the input is escaped.
+markdown-it-py>=3,<5

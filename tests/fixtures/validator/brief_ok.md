@@ -51,14 +51,13 @@ Not covered: No container freight index can be republished: Drewry's terms forbi
 *Weekly section: deals reported in the past week, up to the brief date.*
 
 - **Yangzijiang Maritime adds kamsarmax bulkers to newbuild spree** (Splash247, by Adis Ajdin, 12 October 2026). A Chinese shipyard group has ordered more kamsarmax bulk carriers (a large Panamax design) for its own fleet. [Read the story](https://splash247.com/yangzijiang-maritime-adds-kamsarmax-bulkers-to-newbuild-spree/) [S5]
+- **MISC lines up five more LNG carriers for Petronas** (Splash247, by Adis Ajdin, 12 October 2026). Malaysian shipowner MISC has lined up further LNG carriers (liquefied natural gas ships) to serve the energy company Petronas. [Read the story](https://splash247.com/misc-lines-up-five-more-lng-carriers-for-petronas/) [S5]
 - **Chinese buyers snap up capesizes** (Splash247, by Hans Thaulow, 12 October 2026). Buyers from China have been acquiring capesize bulk carriers (the largest dry bulk ships) on the second-hand market. [Read the story](https://splash247.com/chinese-buyers-snap-up-capesizes/) [S5]
 
 ## 5. Events and why they matter
 
 *Stories published since the previous brief.*
 
-- **MISC lines up five more LNG carriers for Petronas** (Splash247, by Adis Ajdin, 12 October 2026). Malaysian shipowner MISC has lined up further LNG carriers (liquefied natural gas ships) to serve the energy company Petronas. [Read the story](https://splash247.com/misc-lines-up-five-more-lng-carriers-for-petronas/) [S5]
-  **Why it matters (our interpretation):** This suggests long-term charter demand for gas carriers remains firm in Asia.
 - **Port strike talks resume on the US Gulf Coast** (gCaptain, 12 October 2026). Reuters wire story: headline and link only. [Read the story](https://gcaptain.com/test-reuters-no-author/) [S3]
 - **Bloomberg: Shipowners weigh new route options around Africa** (gCaptain, 12 October 2026). Bloomberg wire story: headline and link only. [Read the story](https://gcaptain.com/test-bloomberg-in-title/) [S3]
 - **Insurers review war-risk cover for the region** (gCaptain, 12 October 2026). Reuters wire story: headline and link only. [Read the story](https://gcaptain.com/test-reuters-credit-field/) [S3]
@@ -66,6 +65,8 @@ Not covered: No container freight index can be republished: Drewry's terms forbi
   **Why it matters (our interpretation):** This could raise war-risk insurance costs and tanker freight on routes through the region.
 - **Chinese shipping investor makes play for asphalt tanker owner Xin Yuan** (Splash247, by Adis Ajdin, 12 October 2026). A Chinese shipping investor has made an approach for Xin Yuan, an owner of asphalt tankers. [Read the story](https://splash247.com/chinese-shipping-investor-makes-play-for-asphalt-tanker-owner-xin-yuan/) [S5]
   **Why it matters (our interpretation):** This may point to consolidation among owners of specialised tankers.
+- **Baltic states push for EU-wide ban on Russian grain transit** (Splash247, by Adis Ajdin, 12 October 2026). Several Baltic countries are pressing for a ban across the European Union on moving Russian grain through their territory. [Read the story](https://splash247.com/baltic-states-push-for-eu-wide-ban-on-russian-grain-transit/) [S5]
+  **Why it matters (our interpretation):** This could shift some grain export routes and the ships that serve them.
 - **BIMCO Adopts Addendum to Support Investments in Retrofit Projects** (The Maritime Executive, 12 October 2026). The shipping association BIMCO has adopted a contract addendum meant to support investment in retrofitting existing ships. [Read the story](https://maritime-executive.com/article/bimco-adopts-addendum-to-support-investments-in-retrofit-projects) [S6]
   **Why it matters (our interpretation):** This could make it easier for owners and charterers to share the cost of efficiency upgrades.
 - **Germany's Navy Rebuilds, Doubling Frigate Order and Adding New Base** (The Maritime Executive, 12 October 2026). Germany's navy is expanding its frigate order and adding a new base. [Read the story](https://maritime-executive.com/article/germany-s-navy-rebuilds-doubling-frigate-order-and-adding-new-base) [S6]
