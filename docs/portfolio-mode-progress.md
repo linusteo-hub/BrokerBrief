@@ -226,3 +226,9 @@ Workflow, archive, alerts, site, failure-test hook and `docs/operations.md`. Det
 | Push to `briefs` conflicts | Retried with rebase four times, then the step fails and alerts |
 | Archive grows | About 19 MB a year before compression; reviewed at 12 months (D7) |
 | Pages deploy fails | The `site` job's own alert step opens or updates the `brief-alert` issue; the page keeps the previous brief, and its staleness banner appears after two days |
+
+## Step 4 — Phase 4: trial set-up (12/11/2026)
+
+- `docs/trial/pass-criteria.md`: ten measurable pass criteria and a restart rule. **Draft, for Linus to approve** in Decision Batch 3.
+- `docs/trial/review-log.md`: daily five-minute review (three figures checked against the sources, two summaries against their articles, misfiled items), weekly checks (licence scan of the `briefs` branch, cost, false alerts), and the failure-test record.
+- Verified: documents only; no code changed.
