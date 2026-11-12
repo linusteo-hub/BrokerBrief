@@ -366,13 +366,30 @@ Basis, **estimated, not measured**: input about 1,200 tokens on the fixture payl
 
 Built: `.github/workflows/morning-brief.yml`, `modules/morning_brief/archive.py`, `alerts.py`, `site.py`, the failure-test hook in `guarded_http.py`, and `docs/operations.md` (what runs when, health, alerts, the 60-day rule, Streamlit sleep, key rotation, archive and retention, failure tests).
 
-- **Workflow:** manual trigger only until Decision Batch 3. Manual runs neither archive nor publish unless asked. Steps: keep-alive call, archive checkout, skip if today's brief exists, build payload, write and check, archive to the `briefs` branch, keep the excerpt-free output as a run artifact, decide the alert, open/update/close the `brief-alert` issue, build and deploy the Pages site. Least-privilege permissions per job.
-- **Schedule (for Batch 3):** 06:15 Singapore time, with a 06:50 fallback that skips if the brief exists. Cron's `timezone: Asia/Singapore` is used (GitHub documents it; Singapore has no daylight saving). Changed from Batch 1's 07:00 fallback, because GitHub names the start of each hour as its busiest time.
+- **Workflow:** manual trigger only until Decision Batch 3. Five jobs, each with only the permissions it needs: keepalive (re-enable workflows), build (read only; holds the API keys; cannot push), archive (push to `briefs`), site (deploy Pages), alert (issues; runs last, whatever happened, and sees every job's result). Manual runs neither archive nor publish unless asked; failure-test runs never do.
+- **Schedule (proposed for Batch 3, not decided):** 06:15 Singapore time, with a 06:50 fallback that skips if the brief exists. This uses cron's `timezone: Asia/Singapore`, which GitHub documents; Singapore has no daylight saving. The fallback differs from D8's 07:00 because GitHub names the start of each hour as its busiest time.
 - **Archive (D7):** `briefs/YYYY/MM/DD/` plus `index.json` and `health.json`; a re-run replaces its date. The archived payload has no news excerpts.
-- **Alerts:** a failed step; a refused brief; the model unavailable although a key is configured; any section empty three runs in a row.
-- **Site (D5):** landing page from the README, latest brief, archive table, one page per brief. Markdown rendered with raw HTML off. A staleness banner appears for readers if the brief is more than two days old.
+- **Alerts:** any failed, cancelled or timed-out job; a refused brief or crashed writer; the model unavailable on a scheduled run (even if the secret was deleted); any section empty on three archived run dates in a row; no brief archived for two days; and every failure test. Manual runs use a separate `brief-alert-test` label.
+- **Site (D5):** landing page from the README, latest brief, archive table, one page per brief. Markdown rendered with raw HTML off. The latest-brief page shows readers a staleness banner once the brief is more than two days old (from 06:00 Singapore time on its date). Needs the Pages source set to "GitHub Actions" (owner setting, Batch 3).
 - **The 60-day rule (D6), corrected:** a disabled workflow cannot run to re-enable itself, so the keep-alive call helps only if calling it on an active workflow resets the clock. GitHub does not document that. Backstops: the daily archive commit, and the reader-facing staleness banner. See `docs/operations.md`.
 - **No scheduled refresh for the Streamlit app** is needed: it fetches on visit with a shared 3-hour cache (Step 1).
+
+### Fixes from the fresh-context review of Phase 3
+
+The first version had two blockers. A failed archive push left its step green, so no alert fired and an open alert could be closed. A failed archive read in the site job deployed an empty site. It also had several ways to fail with no alert (cancellation, timeout, a failed artifact or alert step). The workflow was rebuilt as the five jobs above:
+- the alert job sees every job's result;
+- "branch absent" is told apart from "could not read";
+- the push loop fails the job when every push fails (a test runs the loop under bash);
+- manual runs have their own label;
+- failure tests are never archived or published and always open a test issue;
+- scheduled runs always expect the model;
+- a crashed writer is reported as a crash;
+- a missed day alerts;
+- only the latest-brief page carries the staleness banner;
+- public status words are plain English;
+- banned names are kept out of validation messages.
+
+actionlint 1.7.12 is clean on the workflow, both as committed and with the proposed schedule switched on.
 
 ### Live dry run in the development environment (12/11/2026, Singapore date 13 November)
 

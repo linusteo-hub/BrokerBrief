@@ -252,7 +252,7 @@ def _common_checks(text: str, where: str) -> list:
         problems.append(Problem("number_word", f"contains a number in words ({', '.join(sorted(set(w.lower() for w in words)))})", where))
     banned = mentions_banned_source(text)
     if banned:
-        problems.append(Problem("banned_source", f"names a banned source ({banned})", where))
+        problems.append(Problem("banned_source", "names a banned source (name withheld, so that it is not republished)", where))
     if MARKUP.search(text) or "\n" in text:
         problems.append(Problem("markup", "contains a link, markup or a line break", where))
     if re.search(r"\b(recommend|we advise|you should|investors should|ought to)\b", text, re.I):
@@ -438,7 +438,7 @@ def validate_brief(markdown: str, payload: dict) -> list:
     # Banned names anywhere.
     banned = mentions_banned_source(markdown)
     if banned:
-        problems.append(Problem("banned_source", f"names a banned source ({banned})"))
+        problems.append(Problem("banned_source", "names a banned source (name withheld, so that it is not republished)"))
 
     # Directions: BrokerBrief's own figure statements only. News lines are the
     # publishers' words (a headline may say "rates climb"), not claims about

@@ -213,19 +213,26 @@ Workflow, archive, alerts, site, failure-test hook and `docs/operations.md`. Det
 - **The workflow has not run on GitHub.** `workflow_dispatch` only works once the file is on `main`. The two required manual runs need Decision Batch 2 first: one normal, one with a feed broken on purpose, showing the issue and the empty section.
 - Pages deployment, the `briefs` branch push and the issue commands have therefore not run for real.
 
-### Failure modes of the automation
+### Failure modes of the automation (after the review fixes, Step 3b)
 
 | Failure | Detection |
 |---|---|
-| A feed fails | Section published as "No verified data today" with the reason; alert after three days running |
-| The gate refuses the brief | Nothing published; alert with the problem codes |
-| Our code crashes | Step fails; alert names the step; the run artifact keeps the output |
-| API key expired, no credit, or model down | Headlines-only brief; alert (when a key is configured) |
-| Scheduled run delayed or dropped | Fallback run at 06:50; a missed day shows on the archive page and as a stale date on the brief page |
-| Workflow disabled after 60 days | Cannot alert from inside GitHub; staleness banner for readers, and the old date |
-| Push to `briefs` conflicts | Retried with rebase four times, then the step fails and alerts |
-| Archive grows | About 19 MB a year before compression; reviewed at 12 months (D7) |
-| Pages deploy fails | The `site` job's own alert step opens or updates the `brief-alert` issue; the page keeps the previous brief, and its staleness banner appears after two days |
+| A data feed fails | Section published as "No verified data today" with the reason; alert after three archived run dates in a row |
+| One news feed fails | Other publishers still fill the sections; recorded in `validation.json` `feed_errors` (no alert unless all fail for three runs) |
+| The gate refuses the brief | Nothing published; alert with the problem codes; the fallback run retries |
+| Our code crashes, a job times out or is cancelled | Alert job names the job |
+| API key expired or deleted, no credit, model down | Headlines-only brief; alert on every scheduled run |
+| Both scheduled runs dropped by GitHub | No brief that day; the next run's alert reports the gap ("no brief archived since …") |
+| Workflow disabled after 60 days | Cannot alert from inside GitHub; staleness banner for readers |
+| Push to `briefs` fails four times | Archive job fails; alert |
+| Archive branch cannot be read | Build or site job fails; alert; never an empty site |
+| Pages deploy fails | Site job fails; alert |
+| The alert job itself fails | Run marked failed; GitHub e-mails the owner |
+| Archive grows | About 50 KB a day before compression (about 19 MB a year), plus `index.json` rewritten daily; reviewed at 12 months (D7) |
+
+## Step 3b — Fixes from the fresh-context review of Phase 3 (12/11/2026)
+
+Two blockers and ten should-fix items. All are fixed except the ones listed under "Known limits" in `docs/operations.md`. Details are in the build plan, "Fixes from the fresh-context review of Phase 3". Tests: 288 → 303. actionlint is clean.
 
 ## Step 4 — Phase 4: trial set-up (12/11/2026)
 

@@ -12,35 +12,38 @@ How BrokerBrief runs without anyone, how to tell it is healthy, what each alert 
 
 The Streamlit app needs no scheduled refresh: it fetches EIA and PortWatch itself when visited, shares each result between visitors for 3 hours, and retries a failed fetch after 5 minutes (`app.py`, `LIVE_TTL_SECONDS`, `FAILURE_RETRY_SECONDS`).
 
-### One run of the morning brief, step by step
+### One run of the morning brief
 
-1. **Keep the schedule alive** (see "The 60-day rule").
-2. **Check out the archive** (`briefs` branch) and work out today's Singapore date.
-3. **Skip** if today's brief already exists (this is what makes the fallback run safe).
-4. **Build the payload** (`python -m modules.morning_brief`): EIA prices, MPA bunker sales, IMF PortWatch activity, three news feeds. A feed that fails leaves its section marked "No verified data today" with the reason; it never stops the run.
-5. **Write and check the brief** (`python -m modules.morning_brief.write`). The model writes news summaries only; each is checked, retried once, then withheld if it still fails. The whole brief is then checked; if that fails, nothing is published (exit code 3).
-6. **Archive** to `briefs/YYYY/MM/DD/` with the payload and the validation report.
-7. **Decide on the alert** and open, update or close the issue.
-8. **Build and deploy the site** to GitHub Pages from the archive.
+Five jobs, each holding only the permissions it needs:
 
-Typical run time: one to two minutes. GitHub can delay scheduled runs at busy times, and at the start of each hour most of all, which is why the runs are at :15 and :50. Even a run delayed by more than an hour finishes before 08:00.
+| Job | Permissions | What it does |
+|---|---|---|
+| keepalive | re-enable workflows | Calls GitHub's "enable workflow" API for both scheduled workflows (see "The 60-day rule"). |
+| build | read only | Reads the archive; skips if today's brief already exists (this makes the fallback run safe); builds the payload; writes and checks the brief. Holds the API keys and cannot push. A feed that fails leaves its section marked "No verified data today" with the reason; it never stops the run. If the final checks fail, nothing is published (the gate's exit code 3). |
+| archive | write to the repository | Commits the day to `briefs/YYYY/MM/DD/` on the `briefs` branch. A rejected push is retried four times; if all fail, the job fails. |
+| site | deploy Pages | Builds the site from the archive and deploys it. If the archive cannot be read, the job fails rather than deploying an empty site. |
+| alert | write issues | Runs last, whatever happened, and sees every other job's result. Opens, comments on or closes the alert issue. If this job itself fails, the run shows as failed and GitHub's own failure e-mail goes to the repository owner. |
+
+Run time on GitHub: **not yet measured** (the workflow has not run there). The scheduled times leave about an hour and three-quarters before 08:00 Singapore time. GitHub can delay or drop scheduled runs at busy times, and says the start of each hour is busiest, so the runs are at :15 and :50 and a dropped primary run is covered by the fallback. Nothing can guarantee a time if GitHub drops both.
 
 ## How to tell it is healthy
 
-- **No open issue labelled `brief-alert`.** The workflow opens one whenever something needs you and closes it after the next clean run.
-- **The brief page's "Last updated" date is today** (Singapore date). If the page is more than two days old, readers see a banner saying so, even if nothing could run to report it.
-- **The archive page** (`/brief/archive.html`) lists every run with its status and any empty sections.
-- **The Actions tab** shows each run. A run marked failed always has a matching alert.
+- **No open issue labelled `brief-alert`.** The workflow opens one whenever a scheduled run needs you and closes it after the next clean scheduled run. Manual runs use a separate label, `brief-alert-test`, so a test never closes a real alert.
+- **The brief page's "Last updated" date is today** (Singapore date). If the latest brief is more than two days old (counted from 06:00 Singapore time on its date), the page shows readers a banner saying so, even if nothing could run to report it.
+- **The archive page** (`/brief/archive.html`) lists every archived run with its status and any empty sections. A day with no row had no archived run.
+- **The Actions tab** shows each run. Any failed, cancelled or timed-out job raises an alert from the alert job; if the alert job itself fails, the run is marked failed and GitHub e-mails the owner.
 
 ## What each alert means
 
 | Alert text begins | What happened | What to do |
 |---|---|---|
-| "The run failed at step: …" | Our code crashed or the runner had a problem. Nothing was archived. | Open the run link, read the failing step's log, fix, then run the workflow manually. |
+| "Job "…" failed" or "was cancelled or timed out" | A job crashed, timed out or was cancelled. If it was the build, nothing was archived. If it was the archive job, the push failed. | Open the run link and read that job's log. Fix, then run the workflow manually. |
+| "The writer crashed" | Our code raised an error while writing; nothing was published. | A bug: the error text is in the alert. |
+| "No brief has been archived since …" | Two or more days without an archived brief. | Check the Actions tab for missing or failed runs. |
 | "The publishing gate refused the brief" | The final brief broke a code-level rule (a number not in the payload, an unknown link, a wrong date…). Nothing was published, by design. | A bug in BrokerBrief. The problem codes are in the alert and in `validation.json` (kept as a run artifact). Fix the code; the next run will clear the alert. |
-| "The writer could not use the model" | The API key is missing, wrong or revoked, credit or the spend limit ran out, the API was down, or the model declined. The brief went out with news as headline and link only. | Check the Anthropic Console: key, credit, spend limit. See "Rotate the API key". |
-| "Publishing the site to GitHub Pages failed" | The brief may be archived, but the page was not updated. | Open the run link; usually a temporary Pages problem. Re-run the workflow with "publish" ticked. |
-| "Section `x` has been empty for N days running" | A source has failed or produced nothing for three or more consecutive runs. | Read the reason under that section in the latest brief. A changed feed format or a dead URL needs a code fix; an outage needs nothing. |
+| "The writer could not use the model" | The API key is missing, wrong or revoked; the `ANTHROPIC_API_KEY` secret was deleted; credit or the spend limit ran out; the API was down; or the model declined. The brief went out with news as headline and link only. Scheduled runs always expect the model, so a vanished secret is caught. | Check the secret, then the Anthropic Console: key, credit, spend limit. See "Rotate the API key". |
+| "Job "Publish to GitHub Pages" failed" | The brief was archived, but the page was not updated. | Open the run link; often a temporary Pages problem. Re-run the workflow with "archive" and "publish" ticked. |
+| "Section `x` has been empty on N run dates in a row" | A source has failed or produced nothing on three or more consecutive archived runs. (Run dates, not calendar days: a missed day is caught by the "no brief archived" alert instead.) | Read the reason under that section in the latest brief. A changed feed format or a dead URL needs a code fix; an outage needs nothing. |
 
 One or two empty days are normal (EIA publishes weekly; a feed can have a bad morning) and do not raise an alert.
 
@@ -48,7 +51,7 @@ One or two empty days are normal (EIA publishes weekly; a feed can have a bad mo
 
 GitHub disables scheduled workflows in a public repository when there has been no repository activity for 60 days. GitHub's documentation does not define "activity" (read on 12/11/2026). Three things work against it, none relied on alone:
 
-1. Every run calls GitHub's "enable workflow" API for both scheduled workflows. Widely used keep-alive tools rely on this resetting the clock; GitHub does not document that it does.
+1. Every run's keepalive job calls GitHub's "enable workflow" API for both scheduled workflows. Widely used keep-alive tools rely on this resetting the clock; GitHub does not document that it does.
 2. Every scheduled run commits to the `briefs` branch. Whether a commit made by the workflow's own token counts as activity is also undocumented.
 3. If the schedule stops anyway, nothing inside GitHub can report it, so the brief page's staleness banner tells readers, and you will see the old date.
 
@@ -76,6 +79,21 @@ The EIA key is rotated the same way: the secret is `EIA_API_KEY` in GitHub, and 
 - Retention (Decision Batch 1, D7): everything is kept for 12 months, then reviewed. Nothing is deleted automatically.
 - The archive is public, including any errors during the trial.
 
+## GitHub Pages setting (one-off, owner only)
+
+Publishing from the workflow needs the repository's Pages source set to **GitHub Actions** (Settings → Pages → Build and deployment → Source). Today Pages is built from `main` by GitHub's own builder, which renders the README as the landing page. After the switch, the landing page is the README rendered by BrokerBrief's site builder: same text, but the architecture diagram shows as code rather than a picture. This is part of Decision Batch 3.
+
 ## Failure tests
 
-Run the workflow manually with **break_feed** set to one source. That source's requests fail on purpose (`BROKERBRIEF_BREAK_FEED`, read only by `modules/morning_brief/guarded_http.py`), its section is published as "No verified data today" with the reason "deliberately broken for a failure test", and the rest of the brief is unaffected. Scheduled runs never set it.
+Run the workflow manually with **break_feed** set to one source. That source's requests fail on purpose (`BROKERBRIEF_BREAK_FEED`, read only in `modules/morning_brief/guarded_http.py`). A failure-test run is never archived or published, whatever the other boxes say, and always opens a `brief-alert-test` issue naming the broken source, so the alert path is tested too.
+
+- **A data source** (`eia_spot`, `mpa_bunker_sales`, `imf_portwatch`): its section is shown as "No verified data today" with the reason "… deliberately broken for a failure test". This is the clearest test; use `mpa_bunker_sales`.
+- **One news feed** (`gcaptain`, `splash247`, `maritime_executive`): the news sections still show the other two publishers' stories. The broken feed is recorded in `validation.json` under `feed_errors`. A news section is marked empty only when every feed fails.
+
+Download the run's `brief-output` artifact to see the brief the test produced. Scheduled runs never set the variable, and only someone with write access can start a manual run.
+
+## Known limits
+
+- If both the primary and the fallback runs are dropped by GitHub, that day has no brief; the next day's alert job reports the gap.
+- A refused day is retried by the fallback run. If the cause is a bug, it will be refused again (a second model call, about a fifth of a US cent with Haiku, and a second comment on the alert).
+- The workflow allows one queued run at a time. If three runs were started together, the middle one would be cancelled; the alert job of the run that does go ahead does not see it.

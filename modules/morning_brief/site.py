@@ -7,17 +7,18 @@ Builds the static GitHub Pages site from the archive:
     brief/index.html           the latest published brief
     brief/archive.html         every run date, with its status
     brief/YYYY-MM-DD.html      each published brief
-    .nojekyll                  serve files as they are
 
 Static pages do not sleep (unlike the Streamlit app) and cost nothing.
 
 Safety: Markdown is rendered with raw HTML switched off, so any "<script>"
 that reached a headline or summary is shown as text, never run.
 
-Staleness: every brief page carries the date it was generated. A few lines
-of JavaScript compare it with the reader's clock and show a banner if it is
-more than STALE_AFTER_DAYS old, so a stopped workflow is visible to every
-reader even though nothing can run to report it. Without JavaScript, the
+Staleness: the latest-brief page (brief/index.html) carries its brief date.
+A few lines of JavaScript compare it with the reader's clock and show a
+banner once the brief is more than STALE_AFTER_DAYS old, counted from 06:00
+Singapore time on its date. So a stopped workflow is visible to every reader
+even though nothing inside GitHub can run to report it. Past briefs in the
+archive carry no banner: they are meant to be old. Without JavaScript, the
 "Last updated" line still shows the date.
 
     python -m modules.morning_brief.site --archive <briefs checkout> --readme README.md --out _site
@@ -34,7 +35,7 @@ from markdown_it import MarkdownIt
 
 from modules.morning_brief.archive import day_dir, read_index
 
-STALE_AFTER_DAYS = 2
+STALE_AFTER_DAYS = 2      # days after 06:00 Singapore time on the brief date
 APP_URL = "https://brokerbrief-agyxesfh7xqqqxqqdqnyfx.streamlit.app/"
 TRIAL_BANNER = ("Trial — under review. This brief is produced automatically every morning and is being checked "
                 "for errors during a trial. Treat it as a student project, not as market data.")
@@ -59,13 +60,17 @@ table{border-collapse:collapse}td,th{border:1px solid var(--line);padding:4px 8p
 STALE_JS = """
 <script>
 (function(){var el=document.getElementById('stale');var d=el&&el.getAttribute('data-generated');
-if(!d)return;var age=(Date.now()-Date.parse(d+'T00:00:00+08:00'))/86400000;
-if(age>%(days)d+1){el.style.display='block';}})();
+if(!d)return;var age=(Date.now()-Date.parse(d+'T06:00:00+08:00'))/86400000;
+if(age>%(days)d){el.style.display='block';}})();
 </script>
 """ % {"days": STALE_AFTER_DAYS}
 
 
-def page(title: str, body: str, *, generated: str = "") -> str:
+def page(title: str, body: str, *, depth: int = 0, generated: str = "") -> str:
+    """A full HTML page. `depth` is how many folders below the site root the
+    page sits, for relative links; `generated` (a brief date) adds the
+    staleness banner, and is passed only for the latest-brief page."""
+    up = "../" * depth
     stale = ""
     if generated:
         stale = (f'<div id="stale" class="banner" data-generated="{html.escape(generated)}">'
@@ -74,16 +79,9 @@ def page(title: str, body: str, *, generated: str = "") -> str:
     return ("<!doctype html><html lang=\"en-GB\"><head><meta charset=\"utf-8\">"
             "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
             f"<title>{html.escape(title)}</title><style>{CSS}</style></head><body><main>"
-            f"<nav><a href=\"{_rel('index.html')}\">BrokerBrief</a><a href=\"{_rel('brief/index.html')}\">Latest brief</a>"
-            f"<a href=\"{_rel('brief/archive.html')}\">Archive</a><a href=\"{APP_URL}\">Decision tool</a></nav>"
+            f"<nav><a href=\"{up}index.html\">BrokerBrief</a><a href=\"{up}brief/index.html\">Latest brief</a>"
+            f"<a href=\"{up}brief/archive.html\">Archive</a><a href=\"{APP_URL}\">Decision tool</a></nav>"
             f"{stale}{body}</main>{STALE_JS if generated else ''}</body></html>\n")
-
-
-_DEPTH = {"value": 0}
-
-
-def _rel(path: str) -> str:
-    return "../" * _DEPTH["value"] + path
 
 
 def display_date(iso: str) -> str:
@@ -91,45 +89,47 @@ def display_date(iso: str) -> str:
     return f"{d.day} {d.strftime('%B %Y')}"
 
 
-def brief_page(markdown: str, brief_date: str) -> str:
+def brief_page(markdown: str, brief_date: str, *, latest: bool = False) -> str:
+    """A brief's page (it sits one folder down, in brief/). Only the latest
+    brief carries the staleness banner."""
+    label = "Last updated" if latest else "Brief date"
     body = (f'<div class="banner">{html.escape(TRIAL_BANNER)}</div>'
-            f'<p class="meta">Last updated: {display_date(brief_date)} (Singapore date).</p>'
+            f'<p class="meta">{label}: {display_date(brief_date)} (Singapore date).</p>'
             + MD.render(markdown))
-    return page(f"BrokerBrief Morning Brief, {display_date(brief_date)}", body, generated=brief_date)
+    return page(f"BrokerBrief Morning Brief, {display_date(brief_date)}", body, depth=1,
+                generated=brief_date if latest else "")
 
 
 def build(archive_root: Path, readme: Path, out: Path) -> dict:
     out = Path(out)
     (out / "brief").mkdir(parents=True, exist_ok=True)
-    (out / ".nojekyll").write_text("")
     index = read_index(archive_root)
     published = [e for e in index if e["published"]]
 
-    _DEPTH["value"] = 0
     latest_link = (f'<div class="banner">New: the <a href="brief/index.html">BrokerBrief Morning Brief</a>, '
                    "a daily shipping-markets brief built automatically from public sources (trial).</div>")
     (out / "index.html").write_text(page("BrokerBrief", latest_link + MD.render(Path(readme).read_text(encoding="utf-8"))),
                                     encoding="utf-8")
 
-    _DEPTH["value"] = 1
     for entry in published:
         md = (day_dir(archive_root, entry["date"]) / "brief.md").read_text(encoding="utf-8")
         (out / "brief" / f"{entry['date']}.html").write_text(brief_page(md, entry["date"]), encoding="utf-8")
     if published:
         latest = published[0]
         md = (day_dir(archive_root, latest["date"]) / "brief.md").read_text(encoding="utf-8")
-        (out / "brief" / "index.html").write_text(brief_page(md, latest["date"]), encoding="utf-8")
+        (out / "brief" / "index.html").write_text(brief_page(md, latest["date"], latest=True), encoding="utf-8")
     else:
         (out / "brief" / "index.html").write_text(
-            page("BrokerBrief Morning Brief", "<h1>BrokerBrief Morning Brief</h1><p>No brief has been published yet.</p>"),
+            page("BrokerBrief Morning Brief", "<h1>BrokerBrief Morning Brief</h1><p>No brief has been published yet.</p>",
+                 depth=1),
             encoding="utf-8")
 
     rows = []
     for entry in index:
         empty = sorted(k for k, v in entry.get("sections", {}).items() if v == "missing")
-        status = ("published" if entry["published"] else "not published (refused by the checks)")
-        if entry["published"] and entry.get("writer_status") not in ("ok", None):
-            status += f"; writer: {entry['writer_status']}"
+        status = ("published" if entry["published"] else "not published (stopped by the checks)")
+        if entry["published"]:
+            status += WRITER_STATUS_WORDS.get(entry.get("writer_status"), "")
         link = (f'<a href="{entry["date"]}.html">{display_date(entry["date"])}</a>' if entry["published"]
                 else display_date(entry["date"]))
         rows.append(f"<tr><td>{link}</td><td>{html.escape(status)}</td>"
@@ -138,9 +138,17 @@ def build(archive_root: Path, readme: Path, out: Path) -> dict:
              + "".join(rows) + "</tbody></table>") if rows else "<p>No runs yet.</p>"
     (out / "brief" / "archive.html").write_text(
         page("BrokerBrief Morning Brief archive",
-             "<h1>Archive</h1><p class=\"meta\">Every run, newest first. Each brief's payload and validation "
-             "report are in the repository's <code>briefs</code> branch.</p>" + table), encoding="utf-8")
+             "<h1>Archive</h1><p class=\"meta\">Every archived run, newest first. A date with no row had no "
+             "archived run (the brief page then shows an older date). Each brief's payload and validation "
+             "report are in the repository's <code>briefs</code> branch.</p>" + table, depth=1), encoding="utf-8")
     return {"pages": len(published) + 3, "latest": published[0]["date"] if published else None}
+
+
+WRITER_STATUS_WORDS = {
+    "partial": "; some news summaries were held back by the checks",
+    "no_model": "; news as headlines only (no model configured)",
+    "model_unavailable": "; news as headlines only (model unavailable)",
+}
 
 
 def main(argv=None) -> int:

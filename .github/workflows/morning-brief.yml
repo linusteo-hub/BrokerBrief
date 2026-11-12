@@ -1,23 +1,29 @@
 name: Morning brief
 
 # Fetches, checks, writes, archives and publishes the BrokerBrief Morning
-# Brief, then opens, updates or closes the `brief-alert` issue.
+# Brief, then opens, updates or closes the alert issue.
 # What runs when, how to tell it is healthy and what each alert means:
 # docs/operations.md.
 #
-# SCHEDULE: not enabled yet. Decision Batch 3 adds, under `on:`:
+# Jobs, each with only the permissions it needs:
+#   keepalive  actions: write   re-enable the scheduled workflows (60-day rule)
+#   build      contents: read   fetch, check and write; holds the API keys; cannot push
+#   archive    contents: write  commit the result to the briefs branch
+#   site       pages: write     build and deploy GitHub Pages from the archive
+#   alert      issues: write    sees every other job's result; runs whatever happened
+#
+# SCHEDULE: not enabled. Decision Batch 3 proposes adding, under `on:`:
 #   schedule:
 #     - cron: "15 6 * * *"            # 06:15 Singapore time, primary
 #       timezone: "Asia/Singapore"
-#     - cron: "50 6 * * *"            # 06:50 Singapore time, fallback; skips if today's brief exists
+#     - cron: "50 6 * * *"            # 06:50 fallback; skips if today's brief exists
 #       timezone: "Asia/Singapore"
-# Both are off the hour, which GitHub names as its busiest time for delays.
 
 on:
   workflow_dispatch:
     inputs:
       break_feed:
-        description: "Failure test: make one source fail on purpose"
+        description: "Failure test: make one source fail on purpose (never archived or published)"
         type: choice
         default: none
         options: [none, eia_spot, mpa_bunker_sales, imf_portwatch, gcaptain, splash247, maritime_executive]
@@ -43,61 +49,78 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # Scheduled runs always archive and publish; manual runs only when asked.
-  DO_ARCHIVE: ${{ github.event_name == 'schedule' || inputs.archive }}
-  DO_PUBLISH: ${{ github.event_name == 'schedule' || inputs.publish }}
+  SCHEDULED: ${{ github.event_name == 'schedule' }}
+  # Scheduled runs always archive and publish. Manual runs only when asked,
+  # and never during a failure test, so a deliberately broken run is never public.
+  # (Job-level `if:` cannot read `env`, so the archive and site jobs repeat these.)
+  DO_ARCHIVE: ${{ github.event_name == 'schedule' || (inputs.archive && inputs.break_feed == 'none') }}
+  DO_PUBLISH: ${{ github.event_name == 'schedule' || (inputs.publish && inputs.break_feed == 'none') }}
+  BREAK_FEED: ${{ inputs.break_feed || 'none' }}
+  RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
 jobs:
-  brief:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Keep the schedules alive
+        # Scheduled workflows in a public repository are disabled after 60 days
+        # without repository activity. Whether this call resets that clock is not
+        # documented, so it is one safeguard among three (docs/operations.md).
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh api -X PUT "repos/$GH_REPO/actions/workflows/morning-brief.yml/enable"
+          gh api -X PUT "repos/$GH_REPO/actions/workflows/tests.yml/enable"
+
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
-      contents: write      # push to the briefs branch
-      issues: write        # the brief-alert issue
-      actions: write       # re-enable this workflow (keep-alive)
+      contents: read
     outputs:
-      archived: ${{ steps.archive.outcome == 'success' }}
+      skip: ${{ steps.skip.outputs.skip }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: requirements-brief.txt
+          cache-dependency-path: |
+            requirements.txt
+            requirements-brief.txt
 
       - name: Install
         run: pip install -r requirements-brief.txt
 
-      - name: Keep the schedule alive
-        # Scheduled workflows in a public repository are disabled after 60 days
-        # without repository activity. This call is cheap and harmless; whether
-        # it resets the 60-day clock is not documented, so it is a belt, not the
-        # only braces (see docs/operations.md, "The 60-day rule").
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Read the archive
+        # Exit code 2 from ls-remote means the branch does not exist yet (first
+        # run). Any other failure stops the job: guessing "no archive" would
+        # repeat a finished day or publish an empty site.
         run: |
-          gh api -X PUT "repos/${{ github.repository }}/actions/workflows/morning-brief.yml/enable"
-          gh api -X PUT "repos/${{ github.repository }}/actions/workflows/tests.yml/enable"
-
-      - name: Check out the archive
-        id: checkout_archive
-        run: |
-          if git ls-remote --exit-code --heads origin briefs >/dev/null; then
-            git fetch --depth 50 origin briefs
-            git worktree add archive origin/briefs
-            git -C archive switch -c briefs-work
+          set +e
+          git ls-remote --exit-code --heads origin briefs >/dev/null
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            git fetch --depth 1 origin briefs
+            git worktree add --detach archive FETCH_HEAD
+          elif [ "$code" -eq 2 ]; then
+            mkdir -p archive
           else
-            git worktree add --detach archive
-            git -C archive switch --orphan briefs-work
+            echo "::error::Could not read the briefs branch (git exit code $code)"; exit 1
           fi
-          echo "date=$(TZ=Asia/Singapore date +%F)" >> "$GITHUB_OUTPUT"
 
       - name: Skip if today's brief already exists
         id: skip
         run: |
-          d="${{ steps.checkout_archive.outputs.date }}"
+          d=$(TZ=Asia/Singapore date +%F)
           if [ "${{ inputs.force }}" != "true" ] && [ -f "archive/briefs/${d:0:4}/${d:5:2}/${d:8:2}/brief.md" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"; echo "Brief for $d already exists."
           else
@@ -105,113 +128,120 @@ jobs:
           fi
 
       - name: Build the payload
-        id: payload
         if: steps.skip.outputs.skip != 'true'
         env:
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
-          BROKERBRIEF_BREAK_FEED: ${{ inputs.break_feed }}
+          BROKERBRIEF_BREAK_FEED: ${{ env.BREAK_FEED }}
         run: |
           mkdir -p work
           python -m modules.morning_brief --out work/payload.json
 
       - name: Write and check the brief
-        id: write
         if: steps.skip.outputs.skip != 'true'
         env:
           ANTHROPIC_API_KEY: ${{ inputs.no_model != true && secrets.ANTHROPIC_API_KEY || '' }}
         run: |
-          prev=$(python -c "from modules.morning_brief.archive import latest_payload; import json; d=json.load(open('work/payload.json'))['brief_date']; p=latest_payload('archive', d); print(p or '')")
+          prev=$(python -m modules.morning_brief.archive previous --archive archive --payload work/payload.json)
           set +e
           python -m modules.morning_brief.write --payload work/payload.json --out-dir work/out ${prev:+--previous "$prev"}
           code=$?
           set -e
-          echo "exit=$code" >> "$GITHUB_OUTPUT"
-          # 3 = refused by the gate: not a crash. The alert step reports it.
+          # 3 = refused by the gate: not a crash. validation.json says why, and
+          # the alert job reports it.
           if [ "$code" -ne 0 ] && [ "$code" -ne 3 ]; then exit "$code"; fi
 
-      - name: Archive
-        id: archive
-        if: steps.skip.outputs.skip != 'true' && env.DO_ARCHIVE == 'true' && steps.write.outcome == 'success'
-        run: |
-          python -c "from modules.morning_brief.archive import store; store('archive', 'work/out', {'run_url': '${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'})"
-          cd archive
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add briefs
-          git commit -m "Morning brief for ${{ steps.checkout_archive.outputs.date }}" || echo "nothing to commit"
-          for i in 1 2 3 4; do git push origin HEAD:briefs && break; sleep $((i * 5)); git pull --rebase origin briefs || true; done
-
-      - name: Keep the run's output
+      - name: Keep the output for the next jobs
         if: always() && steps.skip.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: brief-output
-          path: work/out/          # the excerpt-free payload, the brief and the report
+          path: work/out/          # excerpt-free payload, brief and report
           retention-days: 14
           if-no-files-found: ignore
+          overwrite: true
 
-      - name: Decide on the alert
-        id: decide
-        if: always() && steps.skip.outputs.skip != 'true'
-        env:
-          FAILED_STEP: >-
-            ${{ steps.payload.outcome == 'failure' && 'Build the payload' ||
-                steps.write.outcome == 'failure' && 'Write and check the brief' ||
-                steps.archive.outcome == 'failure' && 'Archive' ||
-                steps.checkout_archive.outcome == 'failure' && 'Check out the archive' || '' }}
-        run: |
-          outcome=success; [ -n "$FAILED_STEP" ] && outcome=failure
-          expect=""; [ -n "${{ secrets.ANTHROPIC_API_KEY != '' && 'yes' || '' }}" ] && [ "${{ inputs.no_model }}" != "true" ] && expect="--expect-model"
-          python -m modules.morning_brief.alerts --archive archive --outcome "$outcome" --failed-step "$FAILED_STEP" \
-            --report work/out/validation.json $expect \
-            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" > work/decision.json
-          cat work/decision.json
+  archive:
+    needs: build
+    if: needs.build.result == 'success' && needs.build.outputs.skip != 'true' && (github.event_name == 'schedule' || (inputs.archive && inputs.break_feed == 'none'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        with:
+          name: brief-output
+          path: work/out
 
-      - name: Open, update or close the alert issue
-        if: always() && steps.decide.outcome == 'success'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TEST_RUN: ${{ github.event_name != 'schedule' }}
+      - name: Check out the briefs branch
         run: |
-          action=$(jq -r .action work/decision.json)
-          label=$(jq -r .label work/decision.json)
-          title=$(jq -r .title work/decision.json)
-          [ "$TEST_RUN" = "true" ] && title="$title (manual run)"
-          jq -r .body work/decision.json > work/body.md
-          gh label create "$label" --color B60205 --description "Raised by the morning-brief workflow" --force >/dev/null
-          open=$(gh issue list --label "$label" --state open --json number --jq '.[0].number // empty')
-          if [ "$action" = "alert" ]; then
-            if [ -n "$open" ]; then gh issue comment "$open" --body-file work/body.md
-            else gh issue create --title "$title" --label "$label" --body-file work/body.md; fi
-          elif [ -n "$open" ]; then
-            gh issue comment "$open" --body "Resolved: the run of ${{ steps.checkout_archive.outputs.date }} was clean. ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            gh issue close "$open" --reason completed
+          set +e
+          git ls-remote --exit-code --heads origin briefs >/dev/null
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            git fetch origin briefs
+            git worktree add -B briefs-work archive FETCH_HEAD
+          elif [ "$code" -eq 2 ]; then
+            git worktree add --detach archive
+            git -C archive switch --orphan briefs-work
+          else
+            echo "::error::Could not read the briefs branch (git exit code $code)"; exit 1
           fi
 
+      - name: Archive and push
+        run: |
+          python -m modules.morning_brief.archive store --archive archive --out-dir work/out --run-url "$RUN_URL"
+          brief_date=$(python -c "import json; print(json.load(open('work/out/validation.json'))['brief_date'])")
+          cd archive
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add briefs
+          git commit -m "Morning brief for $brief_date" || echo "Nothing new to commit."
+          # Retry a rejected push after rebasing on the remote. The step fails if
+          # every attempt fails, so the alert job reports it.
+          pushed=""
+          for i in 1 2 3 4; do
+            if git push origin HEAD:briefs; then pushed=yes; break; fi
+            sleep $((i * 5))
+            git pull --rebase origin briefs || git rebase --abort || true
+          done
+          [ -n "$pushed" ] || { echo "::error::Could not push to the briefs branch after 4 attempts"; exit 1; }
+
   site:
-    needs: brief
-    if: always() && needs.brief.result != 'cancelled' && (github.event_name == 'schedule' || inputs.publish)
+    needs: archive
+    if: needs.archive.result == 'success' && (github.event_name == 'schedule' || (inputs.publish && inputs.break_feed == 'none'))
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
       pages: write
       id-token: write
-      issues: write        # alert if publishing fails
     environment:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}brief/
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: requirements-brief.txt
+          cache-dependency-path: |
+            requirements.txt
+            requirements-brief.txt
       - run: pip install -r requirements-brief.txt
       - name: Build the site from the archive
+        # The archive job has just pushed, so the branch must exist: any failure
+        # to read it stops the job rather than deploying an empty site.
         run: |
-          git fetch --depth 1 origin briefs && git worktree add archive origin/briefs || mkdir -p archive
+          git fetch --depth 1 origin briefs
+          git worktree add --detach archive FETCH_HEAD
           python -m modules.morning_brief.site --archive archive --readme README.md --out _site
       - uses: actions/upload-pages-artifact@v4
         with:
@@ -219,13 +249,68 @@ jobs:
       - id: deploy
         uses: actions/deploy-pages@v4
 
-      - name: Alert if publishing failed
-        if: failure()
+  alert:
+    # Runs last, whatever happened, and sees every job's result: a failure,
+    # a cancellation or a timeout anywhere becomes an alert.
+    needs: [keepalive, build, archive, site]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v4
+        continue-on-error: true            # absent if the build never got that far
+        with:
+          name: brief-output
+          path: work/out
+      - name: Read the archive health
+        run: |
+          set +e
+          git ls-remote --exit-code --heads origin briefs >/dev/null
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then git fetch --depth 1 origin briefs && git worktree add --detach archive FETCH_HEAD
+          else mkdir -p archive; fi
+      - name: Decide
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+          HAS_MODEL_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+          NO_MODEL: ${{ inputs.no_model == true }}
+          ARCHIVED: ${{ needs.archive.result == 'success' }}
+        run: |
+          python -m modules.morning_brief.alerts --archive archive --report work/out/validation.json \
+            --jobs-json "$JOB_RESULTS" --run-url "$RUN_URL" --scheduled "$SCHEDULED" \
+            --has-model-key "$HAS_MODEL_KEY" --no-model "$NO_MODEL" --break-feed "$BREAK_FEED" \
+            --archived "$ARCHIVED" > decision.json
+          cat decision.json
+      - name: Open, update or close the alert issue
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          body="Publishing the site to GitHub Pages failed, so the brief page was not updated. The brief itself may have been archived. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          gh label create brief-alert --color B60205 --description "Raised by the morning-brief workflow" --force >/dev/null
-          open=$(gh issue list --label brief-alert --state open --json number --jq '.[0].number // empty')
-          if [ -n "$open" ]; then gh issue comment "$open" --body "$body"
-          else gh issue create --title "Morning brief needs attention" --label brief-alert --body "$body"; fi
+          action=$(jq -r .action decision.json)
+          label=$(jq -r .label decision.json)
+          title=$(jq -r .title decision.json)
+          jq -r .body decision.json > body.md
+          gh label create "$label" --color B60205 --description "Raised by the morning-brief workflow" --force >/dev/null
+          open=$(gh issue list --label "$label" --state open --json number --jq '.[0].number // empty')
+          if [ "$action" = "alert" ]; then
+            if [ -n "$open" ]; then gh issue comment "$open" --body-file body.md
+            else gh issue create --title "$title" --label "$label" --body-file body.md; fi
+          elif [ "$action" = "clear" ] && [ -n "$open" ]; then
+            gh issue comment "$open" --body "Resolved: this run was clean. $RUN_URL"
+            gh issue close "$open" --reason completed
+          fi
+      - name: Fail loudly if the alert could not be raised
+        # If deciding or acting on the alert failed, the run itself must show
+        # as failed, so GitHub's own failure e-mail reaches the owner.
+        if: failure()
+        run: echo "::error::The alert job failed; check this run by hand." && exit 1

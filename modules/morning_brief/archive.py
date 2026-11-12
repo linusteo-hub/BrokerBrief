@@ -14,10 +14,20 @@ Size: about 50 KB a day before git compression, about 19 MB a year.
 
 Re-running a date (the fallback schedule, or a manual re-run) replaces that
 date's folder and its index entry; it never adds a duplicate.
+
+index.json and health.json are rewritten whole each day. Git stores each
+version, so index.json's history grows roughly with the square of the number
+of days (about 0.6 KB per entry); git's delta compression keeps the packed
+size small. Reviewed with everything else at 12 months (D7).
+
+    python -m modules.morning_brief.archive previous --archive <dir> --payload <payload.json>
+    python -m modules.morning_brief.archive store --archive <dir> --out-dir <dir> --run-url <url>
 """
 
+import argparse
 import json
 import shutil
+import sys
 from datetime import date
 from pathlib import Path
 from typing import Optional
@@ -106,3 +116,28 @@ def health(index: list) -> dict:
 def write_json(path: Path, data) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(prog="python -m modules.morning_brief.archive")
+    sub = parser.add_subparsers(dest="command", required=True)
+    prev = sub.add_parser("previous", help="print the previous published payload's path, or nothing")
+    prev.add_argument("--archive", required=True)
+    prev.add_argument("--payload", required=True)
+    put = sub.add_parser("store", help="archive a run's output folder")
+    put.add_argument("--archive", required=True)
+    put.add_argument("--out-dir", required=True)
+    put.add_argument("--run-url", default="")
+    args = parser.parse_args(argv)
+    if args.command == "previous":
+        brief_date = json.loads(Path(args.payload).read_text(encoding="utf-8"))["brief_date"]
+        path = latest_payload(Path(args.archive), brief_date)
+        print(path or "")
+        return 0
+    entry = store(Path(args.archive), Path(args.out_dir), {"run_url": args.run_url} if args.run_url else None)
+    print(json.dumps(entry))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
