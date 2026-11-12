@@ -16,8 +16,14 @@ Alert when:
 - the writer could not use the model on a run that should have used it
   (scheduled runs always should: a deleted or mistyped secret is a failure);
 - a section has been empty on EMPTY_DAYS_ALERT consecutive run dates;
-- no brief has been archived for MISSED_DAYS_ALERT days or more;
+- the archive has no entry for yesterday (both scheduled runs dropped, or
+  failed before archiving), once the archive is older than that;
+- the archive could not be read;
 - a failure test: the broken source is reported, to prove the alert path.
+
+A run that skipped because today's brief already exists (the fallback after
+a good primary run) decides "none": it neither alerts nor clears, so it can
+never reopen or close what the primary run decided.
 """
 
 import argparse
@@ -30,7 +36,6 @@ from typing import Optional
 from modules.morning_brief.archive import HEALTH, read_index
 
 EMPTY_DAYS_ALERT = 3
-MISSED_DAYS_ALERT = 2
 LABEL, TEST_LABEL = "brief-alert", "brief-alert-test"
 TITLE = "Morning brief needs attention"
 SGT = timezone(timedelta(hours=8))
@@ -38,15 +43,24 @@ JOB_NAMES = {"keepalive": "Keep the schedules alive", "build": "Build and write 
              "archive": "Archive to the briefs branch", "site": "Publish to GitHub Pages"}
 
 
-def decide(*, jobs: dict, report: Optional[dict], health: Optional[dict], latest_archived: Optional[str],
+def decide(*, jobs: dict, report: Optional[dict], health: Optional[dict], archive_dates: list,
            today: date, scheduled: bool, has_model_key: bool, no_model: bool, break_feed: str = "none",
-           archived: bool = False, run_url: str = "") -> dict:
+           archived: bool = False, skipped: bool = False, archive_readable: bool = True,
+           run_url: str = "") -> dict:
+    test = not scheduled
+    label, title = (TEST_LABEL, TITLE + " (manual run)") if test else (LABEL, TITLE)
+    failed_jobs = [j for j, r in jobs.items() if r in ("failure", "cancelled")]
+    if skipped and not failed_jobs and archive_readable:
+        return {"action": "none", "label": label, "title": title, "reasons": [],
+                "body": "Skipped: today's brief already exists."}
     reasons = []
     for job, result in jobs.items():
         if result in ("failure", "cancelled"):
             reasons.append(f"Job \"{JOB_NAMES.get(job, job)}\" {'was cancelled or timed out' if result == 'cancelled' else 'failed'}. "
                            "Open the run to see the step.")
-    build_ran = jobs.get("build") == "success"
+    if not archive_readable:
+        reasons.append("The alert job could not read the briefs branch, so the archive checks below were not made.")
+    build_ran = jobs.get("build") == "success" and not skipped
     if build_ran and report is None:
         reasons.append("The build finished but left no validation report.")
     if report is not None and report.get("crashed"):
@@ -66,9 +80,14 @@ def decide(*, jobs: dict, report: Optional[dict], health: Optional[dict], latest
             if days >= EMPTY_DAYS_ALERT:
                 reasons.append(f"Section `{section}` has been empty on {days} run dates in a row. "
                                "Its reason is in the latest brief and in validation.json.")
-    if scheduled and jobs.get("build") == "success":
-        if latest_archived is None or (today - date.fromisoformat(latest_archived)).days >= MISSED_DAYS_ALERT:
-            reasons.append(f"No brief has been archived since {latest_archived or 'the archive began'}.")
+    # A gap in the archive: no entry for yesterday, although the archive began
+    # before yesterday. (Today's entry was just written by this run, so the
+    # gap is looked for one day back.)
+    yesterday = (today - timedelta(days=1)).isoformat()
+    if scheduled and archive_readable and archive_dates and min(archive_dates) < yesterday \
+            and yesterday not in archive_dates:
+        reasons.append(f"No run was archived for {yesterday}: both scheduled runs were dropped, or failed "
+                       "before archiving. That day has no brief.")
     if break_feed and break_feed != "none":
         reasons.append(f"Failure test: `{break_feed}` was broken on purpose. Check that the brief marks its "
                        "data as missing with the reason, and that this issue appeared. This run was not archived "
@@ -79,9 +98,8 @@ def decide(*, jobs: dict, report: Optional[dict], health: Optional[dict], latest
         lines.insert(0, f"Brief date: {report['brief_date']}\n")
     if run_url:
         lines.append(f"\nRun: {run_url}")
-    test = not scheduled
-    return {"action": "alert" if reasons else "clear", "label": TEST_LABEL if test else LABEL,
-            "title": TITLE + (" (manual run)" if test else ""), "reasons": reasons, "body": "\n".join(lines)}
+    return {"action": "alert" if reasons else "clear", "label": label, "title": title,
+            "reasons": reasons, "body": "\n".join(lines)}
 
 
 def _flag(value: str) -> bool:
@@ -99,21 +117,24 @@ def main(argv=None) -> int:
     parser.add_argument("--no-model", default="false")
     parser.add_argument("--break-feed", default="none")
     parser.add_argument("--archived", default="false")
+    parser.add_argument("--archive-readable", default="true")
     args = parser.parse_args(argv)
 
     needs = json.loads(args.jobs_json or "{}")
     jobs = {name: info.get("result") if isinstance(info, dict) else info for name, info in needs.items()}
+    build_outputs = (needs.get("build") or {}).get("outputs") or {} if isinstance(needs.get("build"), dict) else {}
+    skipped = str(build_outputs.get("skip", "")).lower() == "true"
     report = None
     if args.report and Path(args.report).exists():
         report = json.loads(Path(args.report).read_text(encoding="utf-8"))
     health_path = Path(args.archive) / HEALTH
     health = json.loads(health_path.read_text(encoding="utf-8")) if health_path.exists() else None
     index = read_index(Path(args.archive))
-    latest = next((e["date"] for e in index if e.get("published")), None)
-    decision = decide(jobs=jobs, report=report, health=health, latest_archived=latest,
+    decision = decide(jobs=jobs, report=report, health=health, archive_dates=[e["date"] for e in index],
                       today=datetime.now(SGT).date(), scheduled=_flag(args.scheduled),
                       has_model_key=_flag(args.has_model_key), no_model=_flag(args.no_model),
-                      break_feed=args.break_feed, archived=_flag(args.archived), run_url=args.run_url)
+                      break_feed=args.break_feed, archived=_flag(args.archived), skipped=skipped,
+                      archive_readable=_flag(args.archive_readable), run_url=args.run_url)
     print(json.dumps(decision, indent=1))
     return 0
 

@@ -36,7 +36,7 @@ on:
         type: boolean
         default: false
       publish:
-        description: "Deploy the site to GitHub Pages (public)"
+        description: "Deploy the site to GitHub Pages (public; needs archive ticked too)"
         type: boolean
         default: false
       force:
@@ -121,7 +121,9 @@ jobs:
         id: skip
         run: |
           d=$(TZ=Asia/Singapore date +%F)
-          if [ "${{ inputs.force }}" != "true" ] && [ -f "archive/briefs/${d:0:4}/${d:5:2}/${d:8:2}/brief.md" ]; then
+          # A failure test always builds, so it always has something to show.
+          if [ "${{ inputs.force }}" != "true" ] && [ "$BREAK_FEED" = "none" ] \
+             && [ -f "archive/briefs/${d:0:4}/${d:5:2}/${d:8:2}/brief.md" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"; echo "Brief for $d already exists."
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
@@ -201,7 +203,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add briefs
-          git commit -m "Morning brief for $brief_date" || echo "Nothing new to commit."
+          if git diff --cached --quiet; then
+            echo "Nothing new to commit."
+          else
+            git commit -m "Morning brief for $brief_date"
+          fi
           # Retry a rejected push after rebasing on the remote. The step fails if
           # every attempt fails, so the alert job reports it.
           pushed=""
@@ -260,43 +266,59 @@ jobs:
       contents: read
       issues: write
     steps:
+      # Every step has its own `if: always()`: after a cancellation GitHub
+      # re-evaluates step conditions, and the default `success()` would skip them.
       - uses: actions/checkout@v5
+        if: always()
         with:
           persist-credentials: false
       - uses: actions/setup-python@v6
+        if: always()
         with:
           python-version: "3.12"
       - uses: actions/download-artifact@v4
-        continue-on-error: true            # absent if the build never got that far
+        if: always()
+        continue-on-error: true            # absent if the build skipped or never got that far
         with:
           name: brief-output
           path: work/out
-      - name: Read the archive health
+      - name: Read the archive
+        if: always()
+        id: read_archive
         run: |
           set +e
           git ls-remote --exit-code --heads origin briefs >/dev/null
           code=$?
+          if [ "$code" -eq 0 ]; then
+            git fetch --depth 1 origin briefs && git worktree add --detach archive FETCH_HEAD
+            code=$?
+          fi
           set -e
-          if [ "$code" -eq 0 ]; then git fetch --depth 1 origin briefs && git worktree add --detach archive FETCH_HEAD
-          else mkdir -p archive; fi
+          if [ "$code" -eq 0 ]; then echo "readable=true" >> "$GITHUB_OUTPUT"
+          elif [ "$code" -eq 2 ]; then mkdir -p archive; echo "readable=true" >> "$GITHUB_OUTPUT"
+          else mkdir -p archive; echo "readable=false" >> "$GITHUB_OUTPUT"; fi
       - name: Decide
+        if: always()
         env:
           JOB_RESULTS: ${{ toJSON(needs) }}
           HAS_MODEL_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
           NO_MODEL: ${{ inputs.no_model == true }}
           ARCHIVED: ${{ needs.archive.result == 'success' }}
+          ARCHIVE_READABLE: ${{ steps.read_archive.outputs.readable || 'false' }}
         run: |
           python -m modules.morning_brief.alerts --archive archive --report work/out/validation.json \
             --jobs-json "$JOB_RESULTS" --run-url "$RUN_URL" --scheduled "$SCHEDULED" \
             --has-model-key "$HAS_MODEL_KEY" --no-model "$NO_MODEL" --break-feed "$BREAK_FEED" \
-            --archived "$ARCHIVED" > decision.json
+            --archived "$ARCHIVED" --archive-readable "$ARCHIVE_READABLE" > decision.json
           cat decision.json
       - name: Open, update or close the alert issue
+        if: always()
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
           action=$(jq -r .action decision.json)
+          if [ "$action" = "none" ]; then echo "Nothing to report (the run skipped: today's brief already exists)."; exit 0; fi
           label=$(jq -r .label decision.json)
           title=$(jq -r .title decision.json)
           jq -r .body decision.json > body.md
@@ -309,8 +331,3 @@ jobs:
             gh issue comment "$open" --body "Resolved: this run was clean. $RUN_URL"
             gh issue close "$open" --reason completed
           fi
-      - name: Fail loudly if the alert could not be raised
-        # If deciding or acting on the alert failed, the run itself must show
-        # as failed, so GitHub's own failure e-mail reaches the owner.
-        if: failure()
-        run: echo "::error::The alert job failed; check this run by hand." && exit 1

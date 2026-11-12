@@ -99,7 +99,8 @@ def report(**overrides):
 
 
 def scheduled(**kw):
-    args = dict(jobs=dict(ALL_OK), report=report(), health={"empty_streak_days": {}}, latest_archived="2026-11-13",
+    args = dict(jobs=dict(ALL_OK), report=report(), health={"empty_streak_days": {}},
+                archive_dates=["2026-11-11", "2026-11-12", "2026-11-13"],
                 today=TODAY, scheduled=True, has_model_key=True, no_model=False, archived=True)
     args.update(kw)
     return decide(**args)
@@ -146,10 +147,28 @@ def test_a_section_empty_for_three_run_dates_alerts_only_once_archived():
     assert scheduled(health=health, archived=False)["action"] == "clear"
 
 
-def test_a_missed_day_alerts():
-    assert scheduled(latest_archived="2026-11-12")["action"] == "clear"
-    d = scheduled(latest_archived="2026-11-11")
-    assert d["action"] == "alert" and "No brief has been archived since 2026-11-11" in d["body"]
+def test_a_missed_day_alerts_from_a_gap_in_the_index():
+    # Today's entry exists (this run just archived it); yesterday's does not.
+    d = scheduled(archive_dates=["2026-11-11", "2026-11-13"])
+    assert d["action"] == "alert" and "No run was archived for 2026-11-12" in d["body"]
+
+
+def test_a_young_archive_is_not_a_missed_day():
+    assert scheduled(archive_dates=["2026-11-13"])["action"] == "clear"              # first ever run
+    assert scheduled(archive_dates=["2026-11-12", "2026-11-13"])["action"] == "clear"
+
+
+def test_a_fallback_run_that_skips_neither_alerts_nor_clears():
+    jobs = {**ALL_OK, "archive": "skipped", "site": "skipped"}
+    d = scheduled(jobs=jobs, report=None, skipped=True)
+    assert d["action"] == "none" and d["reasons"] == []
+    # ... but a failure during a skipped run still alerts.
+    assert scheduled(jobs={**jobs, "keepalive": "failure"}, report=None, skipped=True)["action"] == "alert"
+
+
+def test_an_unreadable_archive_is_reported():
+    d = scheduled(archive_readable=False)
+    assert d["action"] == "alert" and "could not read the briefs branch" in d["body"]
 
 
 def test_manual_runs_use_a_separate_label_so_they_never_close_a_real_alert():
@@ -370,3 +389,26 @@ sleep() {{ :; }}
     script.write_text("set -e\n" + fake + _push_loop() + "\n")
     result = subprocess.run(["bash", "-e", "-o", "pipefail", str(script)], capture_output=True, text=True)
     assert result.returncode == expected_exit, result.stdout + result.stderr
+
+
+def test_alerts_command_reads_the_skip_output_and_says_nothing(tmp_path):
+    import subprocess, sys
+    needs = json.dumps({"keepalive": {"result": "success", "outputs": {}},
+                        "build": {"result": "success", "outputs": {"skip": "true"}},
+                        "archive": {"result": "skipped", "outputs": {}}, "site": {"result": "skipped", "outputs": {}}})
+    result = subprocess.run([sys.executable, "-m", "modules.morning_brief.alerts", "--archive", str(tmp_path),
+                             "--report", str(tmp_path / "absent.json"), "--jobs-json", needs, "--scheduled", "true"],
+                            cwd=ROOT, capture_output=True, text=True)
+    assert json.loads(result.stdout)["action"] == "none"
+
+
+def test_every_alert_job_step_runs_after_a_cancellation():
+    text = (ROOT / ".github/workflows/morning-brief.yml").read_text()
+    alert = _job(text, "alert")
+    steps = alert.split("\n      - ")[1:]
+    assert steps and all("if: always()" in step for step in steps), "each alert-job step needs if: always()"
+
+
+def test_a_failure_test_always_builds_even_if_todays_brief_exists():
+    text = (ROOT / ".github/workflows/morning-brief.yml").read_text()
+    assert '[ "$BREAK_FEED" = "none" ]' in _job(text, "build")

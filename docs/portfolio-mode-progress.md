@@ -222,17 +222,18 @@ Workflow, archive, alerts, site, failure-test hook and `docs/operations.md`. Det
 | The gate refuses the brief | Nothing published; alert with the problem codes; the fallback run retries |
 | Our code crashes, a job times out or is cancelled | Alert job names the job |
 | API key expired or deleted, no credit, model down | Headlines-only brief; alert on every scheduled run |
-| Both scheduled runs dropped by GitHub | No brief that day; the next run's alert reports the gap ("no brief archived since …") |
+| Both scheduled runs dropped by GitHub | No brief that day; the next scheduled run's alert job finds the gap in `briefs/index.json` and reports it |
+| Fallback run skips (today's brief exists) | Reports nothing, by design: neither alerts nor closes |
 | Workflow disabled after 60 days | Cannot alert from inside GitHub; staleness banner for readers |
 | Push to `briefs` fails four times | Archive job fails; alert |
 | Archive branch cannot be read | Build or site job fails; alert; never an empty site |
 | Pages deploy fails | Site job fails; alert |
-| The alert job itself fails | Run marked failed; GitHub e-mails the owner |
+| The alert job itself fails | Run marked failed in the Actions tab. GitHub's failure e-mail goes to whoever created, last edited the cron line of, or re-enabled the workflow, if they have Actions notifications on: Linus should make the schedule commit himself (Batch 3) |
 | Archive grows | About 50 KB a day before compression (about 19 MB a year), plus `index.json` rewritten daily; reviewed at 12 months (D7) |
 
 ## Step 3b — Fixes from the fresh-context review of Phase 3 (12/11/2026)
 
-Two blockers and ten should-fix items. All are fixed except the ones listed under "Known limits" in `docs/operations.md`. Details are in the build plan, "Fixes from the fresh-context review of Phase 3". Tests: 288 → 303. actionlint is clean.
+Two blockers and ten should-fix items. All are fixed except the ones listed under "Known limits" in `docs/operations.md`. A second review of the rebuild found one more blocker (a daily false alert from the skipping fallback run) and four should-fix items; all fixed (tests 303 → 309). Details are in the build plan, "Fixes from the fresh-context review of Phase 3". Tests: 288 → 303. actionlint is clean.
 
 ## Step 4 — Phase 4: trial set-up (12/11/2026)
 
