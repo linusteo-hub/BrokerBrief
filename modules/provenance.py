@@ -81,6 +81,13 @@ def parse_as_of(value) -> Optional[datetime]:
             return parsed if parsed.tzinfo is not None else parsed.replace(tzinfo=timezone.utc)
         except ValueError:
             pass
+        # Day/month/year, the project's own date convention (12/11/2026 is
+        # 12 November). Month/day/year is never guessed.
+        for fmt in ("%d/%m/%Y", "%d-%m-%Y"):
+            try:
+                return datetime.strptime(text, fmt).replace(tzinfo=timezone.utc)
+            except ValueError:
+                pass
         try:
             year, month = text.split("-")[:2]
             return datetime(int(year), int(month), 1, tzinfo=timezone.utc)

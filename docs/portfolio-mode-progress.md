@@ -116,3 +116,37 @@ Linus asked for more reputable sources and reported that all four permission ema
 - **Drewry WCI:** permission is recorded on Linus's word, but nothing is published until the reply's scope is confirmed and a stable way to read the index exists (it is a web page, not an API).
 - **Licensed figures** (Baltic Exchange, Platts, Argus, Clarksons and the rest) remain excluded: their terms forbid public display.
 - **EIA "Today in Energy" feed and extra EIA series:** identified as good additions (public domain); not built yet.
+
+## Step 1c — Fixes from the fresh-context review of Step 1 (12/11/2026)
+
+A reviewer that had not seen the work checked the Step 1 change against `CLAUDE.md`, the build plan and the portfolio-mode prompt. It found 3 blockers, 9 should-fix items and a list of minor ones. All tests passed at the time, so the tests had gaps.
+
+### Fixed (each with a test that fails on the old code)
+
+| Finding | Fix |
+|---|---|
+| B1: the confidence strip said "Capped at Medium" when the cap was Low, and claimed a cap even when it had not lowered the score | The strip names the level from the result, and says "capped" only when the score was lowered |
+| B2: a price typed for VLSFO was reused after switching to MGO | Price inputs are keyed by grade and labelled with it |
+| B2: substring grade matching read "ULSFO" as VLSFO and "VLSFO 380CST" as HSFO | Whole-segment matching against an exact alias list; viscosity-only labels refused |
+| B3: README claims that were not true (PDF export of the decision, sources' date and licence, R3 wording, split-stem sizing, regulation citation) | README corrected; the Data Sources panel now shows source, date and licence |
+| S1: a failing feed was refetched on every click | Failures held for 5 minutes, shared across visitors |
+| S2: the server EIA key could reach the browser through session state | Server key never stored in session state or a widget; no shared-cache refresh button for visitors |
+| S3: `Styler.applymap` no longer exists in pandas 3 (Market Intelligence would crash with real rows); deprecated `use_container_width` | `.map` and `width="stretch"`; new UI test renders the signal table |
+| S4: zero, blank, NaN or negative prices were accepted (a zero crashed the page) | One rule everywhere: a price is a finite number above zero |
+| S5: 48-hour CSV limit undocumented; day/month/year dates unreadable | Documented in the README and tested; `12/11/2026` now parses as 12 November |
+| S6: "near Zhoushan" next to "1 day from Singapore" | Default reads "South China Sea, ex Zhoushan (in ballast)" |
+| S7: stale "cached per session" text | Updated |
+| S8: duplicate CSV rows: last row won regardless of date; port names case-sensitive | Latest dated row wins; port names normalised |
+| Minor: R3 wording for VLSFO with a scrubber; HSFO described by viscosity; hybrid-scrubber label; naive `now`; ISO dates in badges; README "same answer", "every assumption", demo-data loading | All corrected |
+| Test gaps | README weights, waits, caps, limits, rule counts and completeness inputs now pinned in `tests/test_decision_rules.py` |
+
+Tests: 183 → 225 passing.
+
+### Not fixed here: decision-engine changes for Decision Batch 2
+
+These change engine behaviour beyond D1–D4, so they are asked, not done:
+
+1. **The split stem's second leg is not checked.** With 280 MT on board and a 400 MT stem, the split takes 240 MT and reaches Fujairah with about 2.5 MT against a 45 MT reserve, yet it is marked feasible with no warning. Proposed: add a removal rule (call it F4) that checks the Singapore-to-Fujairah leg of a split against the reserve.
+2. **P1 ignores the top-up port.** With fuel "Unavailable" at Fujairah, the split that tops up at Fujairah stays feasible. Proposed: P1 checks the top-up port too.
+3. **The default safety reserve (larger of 10% on board or 24 hours of consumption) is thin** against common practice of several days. Proposed: keep the formula, but show a warning when the reserve in use is under 3 days of consumption. A different default would change every demo figure.
+4. **Congestion signal** compares only the first and last days of a short window: a weak basis for the 4 / 8 / 18-hour waits. Proposed: leave it, and state the limitation on the page (wording only).

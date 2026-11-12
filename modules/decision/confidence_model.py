@@ -31,6 +31,8 @@ def _freshness(market_data: dict, key: str, label: str, now: Optional[datetime])
     penalised for being a few days old, and a value past its limit always is.
     """
     prov = market_data.get("provenance", {}).get(key)
+    if now is not None and now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)     # a naive time is taken as UTC
     state = prov.freshness(now) if prov is not None else Freshness.UNKNOWN
     if state == Freshness.FRESH:
         return 0.0, None, f"{label} is within its freshness limit ({prov.max_age.days} days)."

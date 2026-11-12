@@ -13,7 +13,7 @@ from enum import Enum
 class FuelGrade(str, Enum):
     VLSFO = "VLSFO"   # very low sulphur fuel oil, max 0.50% sulphur
     MGO   = "MGO"     # marine gas oil (distillate)
-    HSFO  = "HSFO"    # high sulphur fuel oil, above 0.50% (sold as e.g. IFO380)
+    HSFO  = "HSFO"    # high sulphur fuel oil, above 0.50% and up to 3.50% sulphur
 
 
 class Scrubber(str, Enum):
@@ -22,7 +22,7 @@ class Scrubber(str, Enum):
     lets a ship use and carry fuel above the regulation 14 sulphur limits."""
     NONE             = "None"
     OPEN_LOOP        = "Open-loop"
-    CLOSED_OR_HYBRID = "Closed-loop or hybrid"
+    CLOSED_OR_HYBRID = "Closed-loop, or hybrid run closed-loop in port"
 
 
 class RiskProfile(str, Enum):
@@ -50,7 +50,7 @@ class BunkeringScenario:
     fuel_remaining_mt: float                # MT of fuel currently on board
     daily_consumption_mt: float             # Estimated MT/day consumption
     required_quantity_mt: float             # MT needed to bunker
-    fuel_grade: FuelGrade                   # VLSFO / MGO / IFO380 / HSFO
+    fuel_grade: FuelGrade                   # VLSFO / MGO / HSFO
     eta_singapore_days: float               # Days until Singapore arrival
     eta_fujairah_days: float                # Days until Fujairah arrival
     schedule_flexibility_hours: float       # Hours of acceptable delay

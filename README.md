@@ -8,7 +8,7 @@ BrokerBrief works like a GPS for a commercial decision. It does not pick for you
 
 The first module answers a question bunker buyers and operators face on every voyage: **where, and how much, should this vessel bunker on the Singapore–Fujairah corridor?**
 
-There is **no AI anywhere in the decision**. Every result traces back to a named rule, a visible weight or a dated, attributed data source, and the same inputs and market data always produce the same answer.
+There is **no AI anywhere in the decision**. Every result traces back to a named rule, a visible weight or a dated, attributed data source, and the same inputs and market data, evaluated on the same day, always produce the same answer. (Freshness depends on the date, so a price can turn stale overnight.)
 
 ```mermaid
 flowchart TD
@@ -36,7 +36,7 @@ Bunker prices are entered by the user or uploaded as a CSV. There is no free, re
 The system writes the options itself, so a junior user still sees every commercially realistic choice:
 
 - **Full stem in Singapore.** Removes fuel risk on the next leg.
-- **Partial stem in Singapore, topped up in Fujairah.** The Singapore quantity is sized to reach Fujairah with 1.2× the safety reserve, never below a 200 MT minimum stem.
+- **Partial stem in Singapore, topped up in Fujairah.** The Singapore quantity is sized to reach Fujairah with 1.2× the safety reserve, capped at 60% of the required stem and never below a 200 MT minimum stem. Because of the 60% cap it can fall short of that target; the Singapore-to-Fujairah leg of the split is not checked by a rule yet, and the workspace says so under Assumptions.
 - **Full stem in Fujairah.** Delays bunkering in exchange for a possible price advantage.
 
 ### 2 · Constraint Engine: can this option physically and legally happen?
@@ -53,9 +53,9 @@ These rules are objective. They are not commercial opinions. An option that brea
 | Tight-schedule warning | Do port hours exceed the available flexibility? | Warn |
 | F3 | Would the vessel depart below its safety reserve? | Warn |
 | R2 | Is HSFO being burned through an open-loop scrubber at Singapore or Fujairah? Both ports prohibit open-loop wash-water discharge in port waters. | Warn |
-| R3 | Does the voyage enter an emission control area? Fuel used inside must not exceed 0.10% sulphur (regulation 14.4), so a VLSFO or HSFO stem does not cover that leg. | Warn |
+| R3 | Does the voyage enter an emission control area? Fuel used inside must not exceed 0.10% sulphur (regulation 14.4). Without a scrubber approved as equivalent to 0.10% fuel, a VLSFO or HSFO stem cannot be burned on that leg. | Warn |
 
-MARPOL limits the sulphur content of the fuel a ship uses and carries for use. It does not regulate what a port may sell, so no rule here removes an option because of where the fuel is bought. Regulation wording was checked against IMO resolution MEPC.305(73) on 12/11/2026.
+MARPOL limits the sulphur content of the fuel a ship uses and carries for use. It does not regulate what a port may sell, so no rule here removes an option because of where the fuel is bought. Regulation wording was checked on 12/11/2026 against IMO resolution MEPC.305(73) (regulations 14.1 and 14.4) and IMO's regulation 14 page (regulation 4.1 equivalents). The open-loop discharge bans at Singapore and Fujairah are taken from trade-press reports of the port notices, not from the notices themselves.
 
 Port time comes from waiting time plus bunkering time. Waiting time is estimated from the PortWatch congestion signal: 4 hours when congestion is easing, 8 when stable and 18 when rising. Bunkering time is 8 hours in Singapore and 10 in Fujairah. If congestion is unknown, the system assumes 8 hours of waiting and says so.
 
@@ -86,7 +86,7 @@ Confidence is scored separately from the ranking. Every deduction is itemised.
 
 The result is labelled **High** (80 and above), **Medium** (60–79) or **Low** (below 60).
 
-**Freshness is judged per source.** EIA publishes daily Brent prices once a week, so a value up to 10 days old is normal and costs nothing; older than that, it is stale and costs 15 points. PortWatch's limit is 14 days, because its data arrives 8–10 days behind.
+**Freshness is judged per source.** EIA publishes daily Brent prices once a week, so a value up to 10 days old is normal and costs nothing; older than that, it is stale and costs 15 points. PortWatch's limit is 14 days, because its data arrives 8–10 days behind. A bunker price loaded from a CSV is stale after 48 hours (a placeholder until a refresh routine exists); a typed price has no age to judge. Where a source gives no date (the EIA forecast, or a CSV date that cannot be read), freshness is shown as unknown and nothing is deducted. Dates in a CSV are read as year-month-day or day/month/year, never month/day/year.
 
 **Three caps override the score**, because some gaps make a high label indefensible:
 
@@ -102,10 +102,9 @@ The workspace shows:
 
 - the ranked options, with each criterion's score and weight;
 - the options that were removed, with the rule that removed them;
-- every assumption the system made, labelled as an assumption;
-- each data source with its date, licence and freshness.
+- the assumptions behind the result, listed as assumptions (including the default safety reserve and any assumed waiting time);
+- each input's source, the date the source reports, its licence and its freshness.
 
-Results can be exported as a PDF.
 
 ### Data: no source, no certainty
 
@@ -117,9 +116,9 @@ BrokerBrief is built on two principles. **No source, no certainty:** every value
 | EIA Short-Term Energy Outlook | Forward Brent forecast. Fetched from the EIA API. |
 | IMF PortWatch | Daily port calls (total, tanker, dry bulk) over 14 days for Singapore, Fujairah, Rotterdam, Houston and Port Hedland. A change of more than ±5% reads as rising or easing. Fetched from PortWatch. |
 | User input or uploaded CSV | Port bunker prices, tagged as user override or manual entry |
-| Built-in demo data | Invented values, labelled "SAMPLE — not real data" everywhere they appear. Used only when a demo scenario is loaded. |
+| Built-in demo data | Invented values, labelled "SAMPLE — not real data" everywhere they appear. Loaded only on request (a demo scenario, or the "Load demo data" buttons), and never used by Market Intelligence or the morning brief. |
 
-The deployed app holds its EIA key server-side and caches each fetch for up to three hours, so a visitor needs to enter nothing to get current EIA and PortWatch data. A failed fetch is not cached; the next visit retries.
+When an EIA key is configured on the server (Streamlit secrets or the `EIA_API_KEY` variable), the app fetches EIA and PortWatch data itself, shares each result across visitors for up to three hours, and holds a failed fetch for five minutes before retrying. The key never reaches the browser. Without a server key, a local user can paste one in the sidebar.
 
 Every value carries seven provenance fields: source, URL, licence, quality tier, the date the source reports, the time BrokerBrief fetched it, and a maximum allowed age. Freshness is judged on the source's own date, not on when the value was fetched, so a week-old number fetched a second ago still counts as stale.
 

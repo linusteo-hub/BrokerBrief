@@ -3,8 +3,8 @@
 # Streamlit Community Cloud can pull a breaking release with nobody watching.
 # The weekly CI run (.github/workflows/tests.yml) installs the newest versions
 # inside these ranges and runs the tests, so drift is caught there first.
-streamlit>=1.32.0,<2
-pandas>=2.0.0,<4
+streamlit>=1.50.0,<2
+pandas>=2.1.0,<4
 reportlab>=4.0.0,<6
 requests>=2.28.0,<3
 # Safe XML parsing for the morning brief's news feeds (third-party XML, fetched unattended).

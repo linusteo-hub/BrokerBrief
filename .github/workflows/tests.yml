@@ -7,8 +7,7 @@ name: Tests
 # needs no secrets.
 
 on:
-  push:
-  pull_request:
+  push:            # every branch; a pull request from this repo is covered by its push
   workflow_dispatch:
   schedule:
     - cron: "40 1 * * 1"   # Mondays 01:40 UTC (09:40 SGT); off the hour to avoid peak load

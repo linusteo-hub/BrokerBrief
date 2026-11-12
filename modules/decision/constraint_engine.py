@@ -232,11 +232,18 @@ def _eca_warning(
     """
     if not scenario.voyage_enters_eca:
         return False, ""
-    if scenario.fuel_grade == FuelGrade.VLSFO:
+    if scenario.fuel_grade == FuelGrade.VLSFO and scenario.scrubber == Scrubber.NONE:
         return True, (
             "The voyage enters an emission control area, where fuel used on board must not "
             "exceed 0.10% sulphur (MARPOL Annex VI regulation 14.4). VLSFO (0.50%) cannot be "
-            "burned there: this stem does not cover consumption inside the area."
+            "burned there without an approved equivalent: this stem does not cover "
+            "consumption inside the area."
+        )
+    if scenario.fuel_grade == FuelGrade.VLSFO:
+        return True, (
+            "The voyage enters an emission control area (0.10% sulphur limit, MARPOL Annex VI "
+            "regulation 14.4). VLSFO may be burned there only if the scrubber is approved as "
+            "equivalent to 0.10% fuel; otherwise 0.10% fuel is needed for that leg."
         )
     if scenario.fuel_grade == FuelGrade.HSFO:
         return True, (

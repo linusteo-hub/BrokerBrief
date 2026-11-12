@@ -31,5 +31,7 @@ def _clear_streamlit_cache():
     can never be served to another."""
     import streamlit as st
     st.cache_data.clear()
+    st.cache_resource.clear()
     yield
     st.cache_data.clear()
+    st.cache_resource.clear()
