@@ -9,6 +9,32 @@ Status (12/11/2026): **Portfolio mode** (see "Portfolio mode decision" below). S
 - **Approval rules changed for this work:** minimal approvals. Big decisions are batched (roughly three batches: design; merge to main and secrets; enable the schedule and publish the trial page). This replaces "stop after each phase" and "wait for yes before every state-changing command" in the original prompt below.
 - **Order of work:** (1) credibility fixes; (2) merge the morning brief to main; (3) Phase 2 writer and gate; (4) Phase 3 automation and publishing; (5) Phase 4 trial setup. Email (Phase 5) stays out of scope.
 
+## Decision Batch 1 (Linus, 12/11/2026): all recommendations accepted
+
+| # | Decision |
+|---|---|
+| D1 | Replace R1 with a scrubber rule (MARPOL Annex VI regulations 14.1 and 4.1); add warnings R2 (open-loop scrubber at Singapore or Fujairah) and R3 (voyage enters an ECA, regulation 14.4); merge IFO380 into HSFO; prices follow the selected grade. |
+| D2 | Demo voyage: tanker in ballast, Zhoushan to Ras Tanura, 1 day from Singapore, 11.5 days from Fujairah. |
+| D3 | Confidence: freshness judged against each source's own limit (15 points when stale; PortWatch limit 14 days); cap at Medium when one scored port has no price, at Low when none has. Closes the three parked confidence decisions below. |
+| D4 | EIA key held server-side (Streamlit secrets); live fetches cached 3 hours; bunker price fields in the scenario form. No scheduled refresh is needed for the app. |
+| D5 | Brief published on GitHub Pages; archive on a dedicated `briefs` branch; Pages deployed from GitHub Actions. The Streamlit app links to it. |
+| D6 | 60-day rule: every run re-enables its own schedule through the Actions API; the page shows "last updated" and a stale banner after 2 days. No Streamlit keep-alive pinger. |
+| D7 | Archive: `briefs/YYYY/MM/DD/` with `brief.md`, `payload.json`, `validation.json`; keep everything for 12 months, then review. |
+| D8 | Daily brief. Unchanged figures carry a code-written "unchanged since" label. Scheduled for 06:15 SGT with a 07:00 SGT fallback. |
+| D9 | Writer model: start with Claude Haiku 5.5; move to Sonnet 5.5 only if it fails the gate on the fixtures. Spend limit USD 5 a month. |
+| D10 | Linus reports that gCaptain, Splash247, The Maritime Executive and Drewry replied **yes** to his permission emails (12/11/2026). The replies are not in this repository; Linus keeps them. See "Source policy" below for what this changes. |
+| D11 | `CLAUDE.md` approval rules rewritten to the batched rules. |
+
+Small decisions (Claude, reported 12/11/2026): Singapore Offshore Oil Terminal 1 stays out and is not summed into Singapore; at most half of a news section's slots per publisher; `defusedxml` added for feed parsing; a `brief-alert` issue opens on a failed run or a section empty 3 days running and closes on the next clean run.
+
+### Source policy (Linus, 12/11/2026)
+
+Linus asked for more reputable sources, so that the project does not rest on unreliable data, and authorised rewriting the rules that stand in the way.
+
+- **What changes:** official and primary sources are now preferred and added wherever their licence allows publication: more EIA series, the EIA "Today in Energy" feed, and MPA's monthly bunker sales from data.gov.sg (Singapore Open Data Licence). Further candidates are recorded in the Phase 0 addendum.
+- **What does not change:** figures from licensed sources (the Baltic Exchange, Worldscale, Clarksons, Lloyd's List, Platts, Argus, ICE) stay out of the public repo, brief and archive. Those rules exist because the *sources'* terms forbid public display, not because of a project preference, so BrokerBrief cannot rewrite them. Publishing them would also be recognised at once by the brokers the project is meant to impress.
+- **Drewry:** permission to republish WCI values is recorded above on Linus's word, but no fetcher is built yet: Drewry publishes the index on a web page, not through an API, and the exact scope of the permission (which values, how often, what credit line) needs to be confirmed from the reply before anything is published. Container rates stay `not_covered` until then.
+
 # BrokerBrief Morning Brief — Claude Code build prompt
 
 Paste everything below the line into Claude Code, started from your home folder (`cd ~` then `claude`). It begins by settling which copy of BrokerBrief is current, then builds in phases and stops for your review after each one.
@@ -335,6 +361,8 @@ System prompt:
 Start with Step 0.
 
 ## Parked decisions
+
+**Closed 12/11/2026 by Decision Batch 1:** the missing-price penalty, freshness in confidence scoring and the Brent age penalty (all D3), the Scenario 3 figure (now Medium 79; README re-run), and brief cadence (D8: daily). The notes below are kept as the record of why.
 
 - Confidence model: a missing price on a feasible option drops confidence by only 6 points (Scenario 3 stays High at 85). Options: raise the penalty, or cap confidence at Medium when any feasible option lacks a price. Decide after the morning brief.
 - Freshness in confidence scoring (Linus, 12/10/2026): the confidence model does not read `Provenance.freshness()` or the `max_age` limits, so stale inputs can count as fresh. More precisely (checked 12-10-2026 in `compute_data_quality`): Brent has its own age rule (≤1 day no deduction, 2–3 days −5, older −15), which ignores the shared 10-day `EIA_SPOT_MAX_AGE` and, with EIA's weekly release, will usually deduct 15; PortWatch congestion and the CSV bunker prices have no age check at all. (Commit `9f270f2` on main says "confidence scoring does not read freshness"; that is true of `Provenance.freshness()` only.) Decide alongside the missing-price rule above, after the trial.

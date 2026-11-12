@@ -53,3 +53,66 @@ Updated after each step: what was done, how it was verified, open issues. Dates 
 
 - Decision Batch 1 awaits Linus's answers.
 - `CLAUDE.md` "How to work with me" still carries the old approval rules; whether to rewrite them permanently is asked in Batch 1.
+
+## Step 1 — Credibility fixes (12/11/2026)
+
+Decision Batch 1 was answered "all recommended" (recorded in the build plan). Network access was widened by creating a separate "BrokerBrief" cloud environment with an explicit host list, so the primary sources could be read.
+
+### Facts re-checked against the primary pages (replacing the search summaries in Step 0)
+
+- **MARPOL Annex VI** (IMO resolution MEPC.305(73), read in full): regulation 14.1 "The sulphur content of fuel oil used or carried for use on board a ship shall not exceed 0.50% m/m"; regulation 14.4 "While a ship is operating within an emission control area, the sulphur content of fuel oil used on board that ship shall not exceed 0.10% m/m"; in force 01/03/2020. IMO's regulation 14 page confirms regulation 4.1 equivalents.
+- **GitHub Actions** (docs read): scheduled workflows in a public repository are disabled after 60 days without repository activity, and the docs do **not** define "activity"; schedules run only from the default branch; they can be delayed at times of high load, "include the start of every hour", and "some queued jobs may be dropped"; the `schedule` trigger now accepts a `timezone`; a workflow can be re-enabled through the REST API.
+- **Streamlit Community Cloud** (docs read): "All apps without traffic for 12 hours go to sleep"; a visitor sees a sleeping page and must click to wake the app.
+- **GitHub Pages landing page** (fetched): it is the README rendered from `main`.
+- Still from secondary sources only: the Singapore and Fujairah open-loop scrubber bans (trade press and the Fujairah notice number), and the Singapore–Fujairah distance of about 3,300 nautical miles.
+
+### Done
+
+- **R1 rewritten** as a scrubber rule; **R2** and **R3** added as warnings; IFO380 merged into HSFO; new scenario inputs "scrubber fitted" and "voyage enters an ECA".
+- **Prices follow the selected grade**, and the user can enter prices in the form. Another grade's price is never substituted.
+- **Demo voyage** changed to Zhoushan (in ballast) → Ras Tanura, 1 day from Singapore, 11.5 days from Fujairah.
+- **Confidence model:** per-source freshness (15 points when stale; PortWatch limit 10 → 14 days); caps at Medium (one scored port unpriced) and Low (none priced). `date.today()` removed from the engine.
+- **App:** EIA key read server-side from Streamlit secrets or `EIA_API_KEY`; live fetches cached 3 hours and shared; a failed fetch is not kept; the sidebar key box appears only when no server key is configured.
+- **README** rewritten to match the code, with a demo table pinned by tests.
+- **Dependencies** given upper bounds; `.github/workflows/tests.yml` runs the tests on every push and weekly on a fresh install, to catch dependency drift.
+- `CLAUDE.md` approval rules rewritten (D11).
+
+### Results after the fixes (run by script and pinned in `tests/test_demo_mode.py`)
+
+| Scenario | Top option | Confidence |
+|---|---|---|
+| 1 | Full Fujairah 74.1 (Singapore 66.3, split 57.2) | High 91 |
+| 2 | Full Singapore 66.3 (split 291.5 MT, 57.2); Fujairah removed by F1 | High 91 |
+| 3 | Full Singapore 69.0 (Fujairah 67.0) | Medium 79 (85 before the cap) |
+| Live data, no prices entered | — | Low 59 (capped), stated on the page |
+
+### Failure modes named for the new automation
+
+| Automation | Failure mode | How it is detected or contained |
+|---|---|---|
+| Cached live fetch in the app | EIA or PortWatch fails | Failure is not cached; the page shows MISSING with the error; confidence drops by the stated deduction |
+| Server-side EIA key | Key missing, revoked or expired | Brent shows as unavailable on the Live Data page; confidence loses 20 + 10 points; **not alerted to Linus** (open issue: the brief's daily run uses the same key and will alert) |
+| Dependency drift | A new Streamlit or pandas release breaks the app | Weekly CI run fails; GitHub emails the repository owner on a failed scheduled run |
+| Weekly CI schedule | Disabled after 60 days without activity | Same rule as the brief; to be handled by the keep-alive step in Phase 3 |
+
+### Open issues
+
+- The README says the deployed app holds its EIA key server-side. That becomes true only when Linus adds `EIA_API_KEY` to the Streamlit app's secrets (Batch 2).
+- The Streamlit app's Python version on Community Cloud is unknown; dependencies are bounded, not pinned, until it is confirmed.
+- No WTI or other extra EIA series yet: recording a fixture needs the EIA key.
+
+## Step 1b — Sources (12/11/2026)
+
+Linus asked for more reputable sources and reported that all four permission emails were answered yes. Policy recorded in the build plan ("Source policy").
+
+### Done
+
+- **MPA bunker sales** added as a new brief section, "Singapore bunker sales": monthly sales by fuel type from data.gov.sg under the Singapore Open Data Licence version 1.0 (licence page read; attribution notice built into the credit line). Six figures, each with changes on the previous month and on the same month a year earlier. Checks: all 16 fuel types present, range (a month published in plain tonnes is refused), staleness (62 days from month end).
+- **Per-publisher cap** on news: a section's slots divided by the number of feeds, rounded up, on the first pass; unused slots are refilled. (Changed from the "half" announced in Batch 1: with three feeds, half still let two publishers fill a section. In the example payload Events is now 3 / 3 / 2 across the three publishers; before, The Maritime Executive got none.)
+- **defusedxml** added for feed parsing; an entity-expansion feed is refused as one broken feed.
+
+### Not done, and why
+
+- **Drewry WCI:** permission is recorded on Linus's word, but nothing is published until the reply's scope is confirmed and a stable way to read the index exists (it is a web page, not an API).
+- **Licensed figures** (Baltic Exchange, Platts, Argus, Clarksons and the rest) remain excluded: their terms forbid public display.
+- **EIA "Today in Energy" feed and extra EIA series:** identified as good additions (public domain); not built yet.

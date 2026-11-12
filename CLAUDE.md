@@ -10,10 +10,15 @@ BrokerBrief is my (Linus's) Python/Streamlit maritime decision-support project, 
 ## How to work with me
 
 - I'm a second-year maritime studies student with a data analytics second major. Explain the mechanism and why you chose an approach. Name failure modes, edge cases, and what breaks as data grows.
-- macOS/zsh. Before any state-changing command (install, git, move, delete, push), explain it step by step and wait for my "yes". Read-only commands are fine.
+- macOS/zsh on my laptop; cloud sessions run Linux.
+- **Minimal approvals (since 12/11/2026).** Check your own work and ask me only about big decisions, batched: collect them and ask together, each with your recommendation, the alternatives and the trade-off.
+  - **Do without asking, then report in the next summary:** editing and creating files; running tests and the verify skill; creating branches and committing to non-main branches; adding a dependency to `requirements.txt` (say why); moving files to `_archive/`.
+  - **Big decisions (ask, batched):** anything that changes what the public sees (merging to `main`, enabling a scheduled workflow, publishing the brief page); any change to `modules/decision/`; spending money or anything needing a secret; adding or dropping a data source, or changing the licensing rules; hard-to-reverse architecture choices; deleting anything, force-pushing or rewriting history; anything sent outside the repo (you only draft these).
+  - **Only I can do:** creating API keys and spend limits, adding GitHub or Streamlit secrets, changing repository settings. Give me exact steps and carry on with other work.
 - Never delete files. Move them to `_archive/` and tell me.
-- Ask before substantial work if my answer would change the output. Don't over-engineer before scope is confirmed.
-- Stop at the end of each build phase, show what changed and how to test it, and wait.
+- Don't over-engineer before scope is confirmed.
+- After each step: run the verify skill, then have a fresh-context reviewer check the change against this file and the build plan, and fix what it finds. Never report something as done that you haven't run.
+- Every claim in the README, the brief page, `docs/operations.md` and any external draft must be checkable against code or a test. If it can't be, cut it or flag it.
 - British/Singapore spelling, metric units, day-month-year dates.
 
 ## Architecture boundaries
@@ -36,7 +41,8 @@ BrokerBrief is my (Linus's) Python/Streamlit maritime decision-support project, 
 
 - Every value carries source name, URL, retrieval timestamp, licence and quality tier. Missing data is flagged, never invented.
 - `modules/data.py` contains hard-coded sample rows with invented values. They must be clearly labelled as sample data, and must never reach the brief or be presented under a real source's name.
-- **Banned in any deployed code, payload, brief or archive** (the repo and archive are public):
+- **Prefer official and primary sources** (government statistics, regulators, intergovernmental bodies) whose licence allows publication with credit. News feeds are secondary.
+- **Banned in any deployed code, payload, brief or archive** (the repo and archive are public). These are the sources' own licence terms, not a project preference, so they are not ours to relax:
   - Baltic Exchange data (BDI, all dry and tanker indices and routes, and the FBX container index);
   - Worldscale;
   - Clarksons / Clarksons Research;

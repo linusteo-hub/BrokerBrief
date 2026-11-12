@@ -8,7 +8,7 @@ This is the single place in deployed code that names banned sources: the
 denylist and the banned-name pattern below. Everything else imports them.
 
 Two kinds of source:
-- "data": numeric series (EIA, PortWatch). Numbers may be republished only if
+- "data": numeric series (EIA, PortWatch, MPA). Numbers may be republished only if
   `redistributable` is True.
 - "news": RSS feeds. `redistributable` is False — we never republish their
   text. We use the headline, the link, the credit and our own digit-free
@@ -82,6 +82,30 @@ ALLOWLIST: dict[str, AllowedSource] = {
                     "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/ArcGIS/rest/services/Daily_Chokepoints_Data/FeatureServer/0/query"),
         notes="Physical activity (transits, port calls), not freight rates. "
               "Keep queries small and once per run (no bulk download).",
+    ),
+    "mpa_bunker_sales": AllowedSource(
+        id="mpa_bunker_sales",
+        name="MPA bunker sales (data.gov.sg)",
+        publisher="Maritime and Port Authority of Singapore",
+        url="https://data.gov.sg/datasets/d_4f5abbf4486bf8e52bbed3be56dde562/view",
+        terms_url="https://data.gov.sg/open-data-licence",
+        licence="Singapore Open Data Licence version 1.0: use, copy, distribute and adapt, "
+                "commercially or not, with a conspicuous attribution notice and a link to the licence",
+        redistributable=True,
+        kind="data",
+        credit=("Contains information from Bunker Sales Breakdown, Monthly, accessed from "
+                "data.gov.sg (Maritime and Port Authority of Singapore), which is made available under "
+                "the terms of the Singapore Open Data Licence version 1.0, "
+                "https://data.gov.sg/open-data-licence"),
+        quality_tier="LIVE_API",
+        # Judged from the END of the month the figures describe. MPA publishes a
+        # month around the third week of the next one (September 2026 on
+        # 21-10-2026), so on the day before a release the newest month ended
+        # about 50 days ago. 62 days allows a release to run about ten days late.
+        max_age=timedelta(days=62),
+        fetch_urls=("https://data.gov.sg/api/action/datastore_search",),
+        notes=("Sales volumes, not prices. Values are thousand tonnes; the latest month is a "
+               "preliminary estimate. The licence forbids suggesting official status or endorsement."),
     ),
     "gcaptain": AllowedSource(
         id="gcaptain",

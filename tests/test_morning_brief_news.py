@@ -69,7 +69,11 @@ def test_house_name_is_not_a_byline():
 
 @pytest.fixture
 def special():
-    return by_link(fetch_news(NOW, get=feeds(**{"gcaptain.com": "news/special_cases.xml"})))
+    # The other two feeds are served empty: these tests are about how single
+    # items are built, so the per-publisher cap must not push any of them out.
+    empty = "news/empty_feed.xml"
+    return by_link(fetch_news(NOW, get=feeds(**{"gcaptain.com": "news/special_cases.xml",
+                                                "splash247.com": empty, "maritime-executive.com": empty})))
 
 
 def test_reuters_item_without_author_is_detected_from_dateline(special):
@@ -172,3 +176,42 @@ def test_every_feed_failing_gives_empty_sections():
     result = fetch_news(NOW, get=feeds(**{h: bad for h in RECORDED}))
     assert set(result["feed_errors"]) == set(FEEDS)
     assert all(items == [] for items in result["sections"].values())
+
+
+# ── Per-publisher cap and hostile XML (added 12-11-2026) ─────────────────────
+
+def _item(publisher: str, minutes_ago: int, section: str = "events") -> dict:
+    from datetime import timedelta
+    tag = "".join(chr(ord("a") + int(d)) for d in str(minutes_ago))           # 12 -> "bc"; letters only
+    words = " ".join(f"{publisher.lower()}{tag}{'xyzuvw'[n] * 4}" for n in range(6))  # no overlap between items
+    return {"headline": words,
+            "link": f"https://example.org/{publisher}/{minutes_ago}", "publisher": publisher,
+            "published": NOW - timedelta(minutes=minutes_ago), "section": section, "also_reported_by": []}
+
+
+def test_one_busy_publisher_cannot_crowd_the_others_out():
+    from modules.morning_brief.news import LIMITS, publisher_cap, select_items
+    busy = [_item("Busy", m) for m in range(1, 13)]             # the 12 newest stories
+    quiet = [_item("Quiet", 100 + m) for m in range(1, 4)]      # 3 older ones
+    by_section, dropped = select_items(busy + quiet)
+    publishers = [i["publisher"] for i in by_section["events"]]
+    assert len(publishers) == LIMITS["events"] == 8 and publisher_cap("events") == 3
+    assert publishers.count("Quiet") == 3                       # all three got a slot
+    assert publishers.count("Busy") == 5                        # 3 on the first pass + 2 refills
+    assert sum(1 for _, code in dropped if code == "over_limit") == 7
+    times = [i["published"] for i in by_section["events"]]
+    assert times == sorted(times, reverse=True)
+
+
+def test_unused_slots_are_refilled_when_only_one_publisher_has_stories():
+    from modules.morning_brief.news import select_items
+    by_section, dropped = select_items([_item("Busy", m) for m in range(1, 7)])
+    assert len(by_section["events"]) == 6 and dropped == []
+
+
+def test_entity_expansion_feed_is_refused_as_a_broken_feed():
+    from modules.morning_brief.news import FeedError
+    bomb = (b'<?xml version="1.0"?><!DOCTYPE rss [<!ENTITY a "aaaaaaaaaa"><!ENTITY b "&a;&a;&a;&a;">]>'
+            b'<rss><channel><item><title>&b;</title></item></channel></rss>')
+    with pytest.raises(FeedError, match="forbidden XML feature"):
+        parse_feed(bomb)

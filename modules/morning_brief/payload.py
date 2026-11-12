@@ -21,6 +21,7 @@ from typing import Optional
 
 from modules.morning_brief.activity import fetch_activity
 from modules.morning_brief.allowlist import SourceNotAllowed, mentions_banned_source, require_allowed
+from modules.morning_brief.bunker_sales import fetch_bunker_sales
 from modules.morning_brief.figures import fmt_date
 from modules.morning_brief.news import FEEDS, fetch_news
 from modules.morning_brief.prices import fetch_prices
@@ -76,7 +77,7 @@ def _news_failure(news: dict, label: str) -> str:
     return f"no {label} stories met the rules in the time window"
 
 
-def build_payload(*, now: datetime, prices: dict, activity: dict, news: dict) -> dict:
+def build_payload(*, now: datetime, prices: dict, bunker_sales: dict, activity: dict, news: dict) -> dict:
     """Pure assembly from fetcher results (no network); see fetch_and_build()."""
     news_sections = news["sections"]
     freight_news = news_sections["freight"]
@@ -103,6 +104,10 @@ def build_payload(*, now: datetime, prices: dict, activity: dict, news: dict) ->
     sections = {
         "prices": _section("Prices", "latest available (EIA releases weekly)", prices["items"],
                            _failure_reason(prices, "EIA returned no figures"), figure_counts(prices)),
+        "bunker_sales": _section("Singapore bunker sales", "monthly (MPA publishes about three weeks after month end)",
+                                 bunker_sales["items"],
+                                 _failure_reason(bunker_sales, "MPA returned no figures"),
+                                 figure_counts(bunker_sales)),
         "freight": freight,
         "sale_and_purchase": _section("Sale & Purchase", "weekly", news_sections["sale_and_purchase"],
                                       _news_failure(news, "sale and purchase"), news["counts"]["sale_and_purchase"]),
@@ -119,9 +124,11 @@ def build_payload(*, now: datetime, prices: dict, activity: dict, news: dict) ->
         "sources": [],
         "sections": sections,
         "validation": {
-            "excluded_figures": prices.get("excluded", []) + activity.get("excluded", []),
+            "excluded_figures": (prices.get("excluded", []) + bunker_sales.get("excluded", [])
+                                 + activity.get("excluded", [])),
             "dropped_news": news.get("dropped", []),
             "feed_errors": {**({"eia_spot": prices["error"]} if prices.get("error") else {}),
+                            **({"mpa_bunker_sales": bunker_sales["error"]} if bunker_sales.get("error") else {}),
                             **({"imf_portwatch": activity["error"]} if activity.get("error") else {}),
                             **news.get("feed_errors", {})},
         },
@@ -181,6 +188,7 @@ def fetch_and_build(now: Optional[datetime] = None, eia_api_key: Optional[str] =
     return build_payload(
         now=now,
         prices=fetch_prices(eia_api_key, today, **kwargs),
+        bunker_sales=fetch_bunker_sales(today, **kwargs),
         activity=fetch_activity(today, **kwargs),
         news=fetch_news(now, **kwargs),
     )

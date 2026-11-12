@@ -19,6 +19,18 @@
     },
     {
       "tag": "S2",
+      "id": "mpa_bunker_sales",
+      "name": "MPA bunker sales (data.gov.sg)",
+      "publisher": "Maritime and Port Authority of Singapore",
+      "url": "https://data.gov.sg/datasets/d_4f5abbf4486bf8e52bbed3be56dde562/view",
+      "terms_url": "https://data.gov.sg/open-data-licence",
+      "licence": "Singapore Open Data Licence version 1.0: use, copy, distribute and adapt, commercially or not, with a conspicuous attribution notice and a link to the licence",
+      "credit": "Contains information from Bunker Sales Breakdown, Monthly, accessed from data.gov.sg (Maritime and Port Authority of Singapore), which is made available under the terms of the Singapore Open Data Licence version 1.0, https://data.gov.sg/open-data-licence",
+      "redistributable": true,
+      "kind": "data"
+    },
+    {
+      "tag": "S3",
       "id": "gcaptain",
       "name": "gCaptain",
       "publisher": "gCaptain",
@@ -30,7 +42,7 @@
       "kind": "news"
     },
     {
-      "tag": "S3",
+      "tag": "S4",
       "id": "imf_portwatch",
       "name": "IMF PortWatch",
       "publisher": "International Monetary Fund",
@@ -42,7 +54,7 @@
       "kind": "data"
     },
     {
-      "tag": "S4",
+      "tag": "S5",
       "id": "splash247",
       "name": "Splash247",
       "publisher": "Splash Maritime Group",
@@ -50,6 +62,18 @@
       "terms_url": "https://splash247.com/terms-of-service/",
       "licence": "Terms pages empty; all rights reserved. Headline, link and own summary only.",
       "credit": "Splash247 (https://splash247.com)",
+      "redistributable": false,
+      "kind": "news"
+    },
+    {
+      "tag": "S6",
+      "id": "maritime_executive",
+      "name": "The Maritime Executive",
+      "publisher": "The Maritime Executive",
+      "url": "https://maritime-executive.com/articles.rss",
+      "terms_url": "https://maritime-executive.com/privacy-policy",
+      "licence": "No terms page; all rights reserved. Headline, link and own summary only.",
+      "credit": "The Maritime Executive (https://maritime-executive.com)",
       "redistributable": false,
       "kind": "news"
     }
@@ -142,6 +166,247 @@
         }
       ]
     },
+    "bunker_sales": {
+      "title": "Singapore bunker sales",
+      "status": "ok",
+      "reason": null,
+      "cadence": "monthly (MPA publishes about three weeks after month end)",
+      "counts": {
+        "fetched": 6,
+        "kept": 6,
+        "dropped": {}
+      },
+      "items": [
+        {
+          "id": "sg_bunker_total",
+          "label": "Singapore bunker sales, all fuel types (BrokerBrief sum of MPA's types)",
+          "unit": "thousand tonnes",
+          "value": 4726.39,
+          "display": "4,726.39 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 4772.68,
+              "previous_display": "4,772.68 thousand tonnes",
+              "abs_change": -46.29,
+              "abs_display": "46.29 thousand tonnes",
+              "pct_change": -0.97,
+              "pct_display": "0.97%",
+              "direction": "down"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 4765.08,
+              "previous_display": "4,765.08 thousand tonnes",
+              "abs_change": -38.69,
+              "abs_display": "38.69 thousand tonnes",
+              "pct_change": -0.81,
+              "pct_display": "0.81%",
+              "direction": "down"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "period": "month",
+          "source_tag": "S2"
+        },
+        {
+          "id": "sg_bunker_lsfo",
+          "label": "Low sulphur fuel oil (MPA type: Low Sulphur Fuel Oil)",
+          "unit": "thousand tonnes",
+          "value": 2218.11,
+          "display": "2,218.11 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 2193.8,
+              "previous_display": "2,193.80 thousand tonnes",
+              "abs_change": 24.31,
+              "abs_display": "24.31 thousand tonnes",
+              "pct_change": 1.11,
+              "pct_display": "1.11%",
+              "direction": "up"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 2350.48,
+              "previous_display": "2,350.48 thousand tonnes",
+              "abs_change": -132.37,
+              "abs_display": "132.37 thousand tonnes",
+              "pct_change": -5.63,
+              "pct_display": "5.63%",
+              "direction": "down"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "period": "month",
+          "source_tag": "S2"
+        },
+        {
+          "id": "sg_bunker_mfo",
+          "label": "Marine fuel oil, the high-sulphur grades (MPA type: Marine Fuel Oil)",
+          "unit": "thousand tonnes",
+          "value": 1993.2,
+          "display": "1,993.20 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 2095.18,
+              "previous_display": "2,095.18 thousand tonnes",
+              "abs_change": -101.98,
+              "abs_display": "101.98 thousand tonnes",
+              "pct_change": -4.87,
+              "pct_display": "4.87%",
+              "direction": "down"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 1872.95,
+              "previous_display": "1,872.95 thousand tonnes",
+              "abs_change": 120.25,
+              "abs_display": "120.25 thousand tonnes",
+              "pct_change": 6.42,
+              "pct_display": "6.42%",
+              "direction": "up"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "period": "month",
+          "source_tag": "S2"
+        },
+        {
+          "id": "sg_bunker_lsmgo",
+          "label": "Low sulphur marine gas oil (MPA type: Low Sulphur Marine Gas Oil)",
+          "unit": "thousand tonnes",
+          "value": 378.84,
+          "display": "378.84 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 367.73,
+              "previous_display": "367.73 thousand tonnes",
+              "abs_change": 11.11,
+              "abs_display": "11.11 thousand tonnes",
+              "pct_change": 3.02,
+              "pct_display": "3.02%",
+              "direction": "up"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 373.56,
+              "previous_display": "373.56 thousand tonnes",
+              "abs_change": 5.28,
+              "abs_display": "5.28 thousand tonnes",
+              "pct_change": 1.41,
+              "pct_display": "1.41%",
+              "direction": "up"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "period": "month",
+          "source_tag": "S2"
+        },
+        {
+          "id": "sg_bunker_bio",
+          "label": "Biofuel blends and B100 (BrokerBrief sum of MPA's bio-blended types and B100)",
+          "unit": "thousand tonnes",
+          "value": 83.21,
+          "display": "83.21 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 57.33,
+              "previous_display": "57.33 thousand tonnes",
+              "abs_change": 25.88,
+              "abs_display": "25.88 thousand tonnes",
+              "pct_change": 45.14,
+              "pct_display": "45.14%",
+              "direction": "up"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 119.33,
+              "previous_display": "119.33 thousand tonnes",
+              "abs_change": -36.12,
+              "abs_display": "36.12 thousand tonnes",
+              "pct_change": -30.27,
+              "pct_display": "30.27%",
+              "direction": "down"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "period": "month",
+          "source_tag": "S2"
+        },
+        {
+          "id": "sg_bunker_lng",
+          "label": "LNG (MPA type: LNG)",
+          "unit": "thousand tonnes",
+          "value": 51.51,
+          "display": "51.51 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 58.64,
+              "previous_display": "58.64 thousand tonnes",
+              "abs_change": -7.13,
+              "abs_display": "7.13 thousand tonnes",
+              "pct_change": -12.16,
+              "pct_display": "12.16%",
+              "direction": "down"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 48.45,
+              "previous_display": "48.45 thousand tonnes",
+              "abs_change": 3.06,
+              "abs_display": "3.06 thousand tonnes",
+              "pct_change": 6.32,
+              "pct_display": "6.32%",
+              "direction": "up"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "period": "month",
+          "source_tag": "S2"
+        }
+      ]
+    },
     "freight": {
       "title": "Freight",
       "status": "ok",
@@ -197,7 +462,7 @@
               "section": "freight",
               "segment": "dry_bulk",
               "also_reported_by": [],
-              "source_tag": "S2"
+              "source_tag": "S3"
             }
           ]
         },
@@ -236,7 +501,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             },
             {
               "id": "transits_chokepoint2",
@@ -262,7 +527,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             },
             {
               "id": "transits_chokepoint4",
@@ -288,7 +553,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             },
             {
               "id": "transits_chokepoint5",
@@ -314,7 +579,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             },
             {
               "id": "transits_chokepoint6",
@@ -340,7 +605,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             },
             {
               "id": "transits_chokepoint7",
@@ -366,7 +631,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             },
             {
               "id": "portcalls_port1201",
@@ -392,7 +657,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             },
             {
               "id": "portcalls_port1114",
@@ -418,7 +683,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             },
             {
               "id": "portcalls_port362",
@@ -444,7 +709,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             },
             {
               "id": "portcalls_port955",
@@ -470,7 +735,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             },
             {
               "id": "portcalls_port481",
@@ -496,7 +761,7 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
-              "source_tag": "S3"
+              "source_tag": "S4"
             }
           ]
         }
@@ -534,7 +799,7 @@
           "section": "sale_and_purchase",
           "segment": "dry_bulk",
           "also_reported_by": [],
-          "source_tag": "S4"
+          "source_tag": "S5"
         },
         {
           "id": "56d907003e1c",
@@ -551,7 +816,7 @@
           "section": "sale_and_purchase",
           "segment": "dry_bulk",
           "also_reported_by": [],
-          "source_tag": "S4"
+          "source_tag": "S5"
         }
       ]
     },
@@ -591,7 +856,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S4"
+          "source_tag": "S5"
         },
         {
           "id": "aa893b4f28a4",
@@ -608,7 +873,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S2"
+          "source_tag": "S3"
         },
         {
           "id": "7574f629218b",
@@ -625,7 +890,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S2"
+          "source_tag": "S3"
         },
         {
           "id": "8b8cdc5f3ec8",
@@ -642,7 +907,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S2"
+          "source_tag": "S3"
         },
         {
           "id": "e8fd72eddcea",
@@ -659,24 +924,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S4"
-        },
-        {
-          "id": "49044dd8c640",
-          "headline": "Owners report firmer sentiment in the tanker market",
-          "link": "https://gcaptain.com/test-mixed-digits/",
-          "source_id": "gcaptain",
-          "publisher": "gCaptain",
-          "author": "Jane Example and Sam Writer",
-          "wire_agency": null,
-          "summary_allowed": true,
-          "excerpt": "By Jane Example and Sam Writer, London – Owners say sentiment has improved across the tanker market. Brokers expect activity to stay brisk into the winter.",
-          "published": "2026-10-12T07:00:00+00:00",
-          "published_display": "12 October 2026",
-          "section": "events",
-          "segment": null,
-          "also_reported_by": [],
-          "source_tag": "S2"
+          "source_tag": "S5"
         },
         {
           "id": "dc19c507a379",
@@ -693,24 +941,41 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S4"
+          "source_tag": "S5"
         },
         {
-          "id": "3b66a39edb3b",
-          "headline": "Port operator publishes quarterly volumes",
-          "link": "https://gcaptain.com/test-all-digits/",
-          "source_id": "gcaptain",
-          "publisher": "gCaptain",
-          "author": "Jane Example",
+          "id": "64fa131aa297",
+          "headline": "BIMCO Adopts Addendum to Support Investments in Retrofit Projects",
+          "link": "https://maritime-executive.com/article/bimco-adopts-addendum-to-support-investments-in-retrofit-projects",
+          "source_id": "maritime_executive",
+          "publisher": "The Maritime Executive",
+          "author": null,
           "wire_agency": null,
-          "summary_allowed": false,
-          "excerpt": null,
-          "published": "2026-10-12T06:00:00+00:00",
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item a. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T03:51:00+00:00",
           "published_display": "12 October 2026",
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S2"
+          "source_tag": "S6"
+        },
+        {
+          "id": "38719df7d78c",
+          "headline": "Germany's Navy Rebuilds, Doubling Frigate Order and Adding New Base",
+          "link": "https://maritime-executive.com/article/germany-s-navy-rebuilds-doubling-frigate-order-and-adding-new-base",
+          "source_id": "maritime_executive",
+          "publisher": "The Maritime Executive",
+          "author": null,
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item b. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T03:30:39+00:00",
+          "published_display": "12 October 2026",
+          "section": "events",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S6"
         }
       ]
     }

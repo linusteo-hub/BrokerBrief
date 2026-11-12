@@ -1,0 +1,32 @@
+{
+ "success": true,
+ "result": {
+  "resource_id": "d_4f5abbf4486bf8e52bbed3be56dde562",
+  "fields": [
+   {
+    "type": "text",
+    "id": "month"
+   },
+   {
+    "type": "text",
+    "id": "bunker_type"
+   },
+   {
+    "type": "text",
+    "id": "bunker_sales"
+   },
+   {
+    "type": "int4",
+    "id": "_id"
+   }
+  ],
+  "records": [],
+  "_links": {
+   "start": "/api/action/datastore_search?resource_id=d_4f5abbf4486bf8e52bbed3be56dde562&limit=224&sort=month%20desc",
+   "next": "/api/action/datastore_search?resource_id=d_4f5abbf4486bf8e52bbed3be56dde562&offset=224&limit=224&sort=month%20desc"
+  },
+  "total": 6096,
+  "limit": 224,
+  "sort": "month%20desc"
+ }
+}

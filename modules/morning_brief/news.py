@@ -21,6 +21,9 @@ import hashlib
 import html
 import re
 import xml.etree.ElementTree as ET
+
+from defusedxml import DefusedXmlException
+from defusedxml.ElementTree import fromstring as safe_fromstring
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from typing import Callable, Optional
@@ -113,10 +116,15 @@ def _parse_date(value: str) -> Optional[datetime]:
 
 def parse_feed(content: bytes) -> list[dict]:
     """RSS 2.0 or Atom bytes -> raw entries. Raises FeedError if unparseable."""
+    # defusedxml refuses entity-expansion and external-entity tricks outright.
+    # These feeds are third-party XML parsed unattended every day, so a hostile
+    # or compromised feed must fail as one broken feed, not hang or read files.
     try:
-        root = ET.fromstring(content)
+        root = safe_fromstring(content)
     except ET.ParseError as e:
         raise FeedError(f"feed is not valid XML ({e})") from None
+    except DefusedXmlException as e:
+        raise FeedError(f"feed uses a forbidden XML feature ({type(e).__name__})") from None
 
     entries = []
     if root.tag == "rss":
@@ -267,6 +275,14 @@ def build_item(entry: dict, source_id: str, now: datetime) -> tuple[Optional[dic
     }, None
 
 
+def publisher_cap(section: str) -> int:
+    """Most items one publisher may take in a section on the first pass: the
+    section's slots divided by the number of feeds, rounded up (Events: 8 slots,
+    3 feeds -> 3 each). Half the slots would still let two publishers fill a
+    section between them."""
+    return -(-LIMITS[section] // len(FEEDS))
+
+
 def select_items(items: list[dict]) -> tuple[dict, list]:
     """Deduplicate across feeds (keeping the earliest report), then keep the
     newest LIMITS[section] per section. -> (by_section, [(item, drop code)])."""
@@ -281,12 +297,28 @@ def select_items(items: list[dict]) -> tuple[dict, list]:
             dropped.append((item, "duplicate"))
         else:
             kept.append(item)
+    # Newest first, but no publisher takes more than its share of a section's
+    # slots on the first pass (see publisher_cap), so one busy feed cannot crowd the others out. Slots still
+    # empty after that are refilled, newest first, from the items held back.
     by_section = {section: [] for section in LIMITS}
+    held_back = []
     for item in sorted(kept, key=lambda i: i["published"], reverse=True):
-        if len(by_section[item["section"]]) < LIMITS[item["section"]]:
-            by_section[item["section"]].append(item)
+        chosen = by_section[item["section"]]
+        from_publisher = sum(1 for other in chosen if other["publisher"] == item["publisher"])
+        if len(chosen) >= LIMITS[item["section"]]:
+            dropped.append((item, "over_limit"))
+        elif from_publisher >= publisher_cap(item["section"]):
+            held_back.append(item)
+        else:
+            chosen.append(item)
+    for item in held_back:                      # already newest first
+        chosen = by_section[item["section"]]
+        if len(chosen) < LIMITS[item["section"]]:
+            chosen.append(item)
         else:
             dropped.append((item, "over_limit"))
+    for chosen in by_section.values():
+        chosen.sort(key=lambda i: i["published"], reverse=True)
     return by_section, dropped
 
 

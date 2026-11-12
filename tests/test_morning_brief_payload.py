@@ -25,6 +25,7 @@ NOW = datetime(2026, 10, 12, 12, 0, tzinfo=timezone.utc)
 
 RECORDED = {
     "api.eia.gov": lambda p: "eia/brent_ok.json" if p.get("facets[series][]") == "RBRTE" else "eia/ulsd_ok.json",
+    "data.gov.sg": lambda p: "mpa/bunker_sales_ok.json",
     "Daily_Chokepoints_Data": lambda p: "portwatch/chokepoints_ok.json",
     "Daily_Ports_Data": lambda p: "portwatch/ports_ok.json",
     "gcaptain.com": lambda p: "news/special_cases.xml",
@@ -51,7 +52,7 @@ def test_all_sections_ok_from_recorded_fixtures():
     payload = build()
     sections = payload["sections"]
     assert {k: s["status"] for k, s in sections.items()} == {
-        "prices": "ok", "freight": "ok", "sale_and_purchase": "ok", "events": "ok"}
+        "prices": "ok", "bunker_sales": "ok", "freight": "ok", "sale_and_purchase": "ok", "events": "ok"}
     assert sections["freight"]["subsections"]["container_rates"]["status"] == "not_covered"
     assert payload["brief_date_display"] == "12 October 2026"
     assert payload["trial_notice"] == "Trial — under review"
@@ -87,6 +88,7 @@ def test_out_of_range_price_is_excluded_and_recorded():
 def test_missing_feeds_mark_sections_missing_not_fabricated():
     bad = ("news/malformed.xml",)
     payload = build(key=None, **{"gcaptain.com": bad, "splash247.com": bad, "maritime-executive.com": bad,
+                                 "data.gov.sg": ("mpa/malformed.html",),
                                  "Daily_Chokepoints_Data": ("portwatch/arcgis_error.json",),
                                  "Daily_Ports_Data": ("portwatch/empty.json", 503)})
     sections = payload["sections"]
@@ -95,11 +97,12 @@ def test_missing_feeds_mark_sections_missing_not_fabricated():
     assert sections["events"]["reason"].startswith("every news feed failed")
     assert all(not s["items"] for k, s in sections.items() if k != "freight")
     assert set(payload["validation"]["feed_errors"]) == {
-        "eia_spot", "imf_portwatch", "gcaptain", "splash247", "maritime_executive"}
+        "eia_spot", "mpa_bunker_sales", "imf_portwatch", "gcaptain", "splash247", "maritime_executive"}
 
 
 def _empty_results():
     return dict(prices={"items": [], "excluded": [], "error": None},
+                bunker_sales={"items": [], "excluded": [], "error": None},
                 activity={"items": [], "excluded": [], "error": None},
                 news={"sections": {"freight": [], "sale_and_purchase": [], "events": []},
                       "counts": {s: {"fetched": 0, "kept": 0, "dropped": {}}
