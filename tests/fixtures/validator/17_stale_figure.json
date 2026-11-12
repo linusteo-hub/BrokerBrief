@@ -1,0 +1,16 @@
+{
+ "description": "A figure older than its source's limit at the brief date (staleness re-check).",
+ "check": "brief",
+ "payload": "payload/from_fixtures.json",
+ "brief": "validator/brief_ok.md",
+ "payload_edits": [
+  [
+   "sections.prices.items.0.as_of",
+   "2026-09-20"
+  ]
+ ],
+ "expect": "fail",
+ "expect_codes": [
+  "stale"
+ ]
+}

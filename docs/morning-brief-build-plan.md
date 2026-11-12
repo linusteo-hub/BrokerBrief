@@ -323,7 +323,36 @@ Every section (and Freight's subsections) carries `counts`; `fetched = kept + su
 - The validator's number check must decide how to treat digits inside headlines the brief reproduces verbatim (whitelist exact headline text, or have the model not restate headlines).
 - `tests/fixtures/payload/from_fixtures.json` is a ready payload for writer and validator tests.
 
-## Runtime prompt v1 (for the writer in Phase 2; refine once Phase 0 is done)
+## Phase 2 results — writer and validation gate (12/11/2026)
+
+Built in `modules/morning_brief/`: `writer.py` (renderer, model call, retry and withhold), `validator.py` (the gate), `write.py` and `validate.py` (command-line tools), `model_trial.py` (model comparison). Runtime prompt v1 below is superseded by `writer.SYSTEM_PROMPT`.
+
+### Design as built
+
+- **Code writes the facts.** A template renders every heading, figure, date, change, direction word ("Up", "Down", "Unchanged"), empty-section notice and source credit from payload display strings. The model never receives a figure.
+- **The model writes summaries only:** for each news item with a usable excerpt, one or two sentences; for Events, one hedged "why it matters" sentence. Output is JSON against a schema. Wire items (Reuters, Bloomberg) and items without a digit-free excerpt are never sent.
+- **Item gate:** no digits, no numbers in words, at most two sentences and 55 words, no run of more than ten words copied from the headline or excerpt, no links or Markdown, no banned names, no advice; "why it matters" must be hedged. A failing item is sent back once with its problems listed; if it fails again it is **withheld** and published as headline and link only.
+- **Whole-brief gate (fail closed):** every number in the payload (after normalising separators and trailing zeros); every link a payload item or source page; every source tag listed and every figure tagged; direction words agree with `direction`; headlines verbatim; no digit or number word in news text outside the headline, publisher and date; no banned names; title date correct; no section without either content or a reason. The payload is re-checked too: range (each figure now carries its `plausible_range`), staleness against the brief date, allowlist. **Any failure: nothing is published** (exit code 3) and `validation.json` lists the problems.
+- **Model unavailable** (no key, expired key, no credit, rate limit, outage, refusal): the brief is still published, with news as headline and link only, and the report states the reason.
+- **"Same figure as in the previous brief"** is added by code when a figure's value and date are unchanged from the previous payload (D8).
+
+### Checker tests (build plan list, all present and passing)
+
+`tests/fixtures/validator/` holds 22 cases, run by the validator command (and the verify skill): a number not in the payload (caught); "1,234.5" against "1234.50" (passes after normalisation); a digit in a news summary (caught at item level and at whole-brief level); "rose" where the payload says down (caught, with and without an amount); plus unknown source tag, unknown link, number in words, copied run, unhedged interpretation, Markdown in a summary, altered headline, silent gap, stale figure, out-of-range figure, wrong title date, banned name. 18 of 18 must-fail cases are caught; the 4 good cases pass. `tests/test_morning_brief_writer.py` covers retry, withhold, fail-closed and each API failure.
+
+### Model choice and cost (prices read from Anthropic's pricing page on 12/11/2026)
+
+| Model | USD per million tokens (input / output) | Estimated cost per brief | Per month (31 briefs) |
+|---|---|---|---|
+| Claude Haiku 5.5 | 0.10 / 0.50 | about 0.002–0.003 | about 0.08 |
+| Claude Sonnet 5.5 | 2 / 10 | about 0.04 | about 1.30 |
+| Claude Opus 5.5 | 4 / 20 | about 0.08 | about 2.60 |
+
+Basis, **estimated, not measured**: input about 1,200 tokens on the fixture payload and about 4,100 in the worst case (23 news items with full excerpts), counted at about four characters per token; output up to about 3,300 tokens including the model's thinking at "low" effort; one retry of a few items adds about 20 %. Every run records actual tokens and cost in `validation.json`, so the trial will replace these estimates with measurements.
+
+**Recommendation: Claude Haiku 5.5**, provisionally. It has **not** yet been run against the gate: there is no API key in this environment. `python -m modules.morning_brief.model_trial --runs 3` compares Haiku 5.5 with Sonnet 5.5 on the fixture payload and names the cheapest that passes every run; it is the first thing to run once the key exists (Decision Batch 2). If Haiku withholds more than an occasional item, switch to Sonnet 5.5; even then the month costs under the USD 5 spend limit.
+
+## Runtime prompt v1 (superseded 12/11/2026 by `writer.SYSTEM_PROMPT`; kept for the record)
 
 System prompt:
 

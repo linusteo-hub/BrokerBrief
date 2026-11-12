@@ -1,0 +1,16 @@
+{
+ "description": "A link that is not a payload item or a source page.",
+ "check": "brief",
+ "payload": "payload/from_fixtures.json",
+ "brief": "validator/brief_ok.md",
+ "brief_replace": [
+  [
+   "https://splash247.com/tanker-war-spreads-across-gulf/",
+   "https://example.com/tanker-war"
+  ]
+ ],
+ "expect": "fail",
+ "expect_codes": [
+  "unknown_link"
+ ]
+}

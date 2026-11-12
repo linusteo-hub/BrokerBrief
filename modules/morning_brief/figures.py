@@ -68,7 +68,11 @@ def make_change(current: float, previous: float, fmt: Formatter, *, decimals: in
 
 def make_figure(*, figure_id: str, label: str, unit: str, value: float, fmt: Formatter,
                 as_of: date, source_id: str, quality_tier: str,
-                changes: Optional[list] = None, notes: str = "") -> dict:
+                changes: Optional[list] = None, notes: str = "",
+                plausible_range: Optional[tuple] = None) -> dict:
+    """`plausible_range` (low, high) is the range the fetcher already checked
+    the value against. It travels with the figure so the publishing gate can
+    re-check it: a bug that let a bad value past the fetcher is still caught."""
     return {
         "id": figure_id,
         "label": label,
@@ -81,4 +85,5 @@ def make_figure(*, figure_id: str, label: str, unit: str, value: float, fmt: For
         "source_id": source_id,
         "quality_tier": quality_tier,
         "notes": notes,
+        "plausible_range": list(plausible_range) if plausible_range else None,
     }

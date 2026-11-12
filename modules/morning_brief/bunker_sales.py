@@ -151,7 +151,8 @@ def build_figures(months: dict, today: date) -> tuple[list, list]:
             figure_id=figure_id, label=label, unit=UNIT, value=value, fmt=fmt,
             as_of=month_end(latest), source_id=SOURCE_ID, quality_tier=source.quality_tier,
             changes=changes,
-            notes="Monthly total. MPA marks the latest month's figures as preliminary estimates.")
+            notes="Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+            plausible_range=(low, high))
         figure["as_of_display"] = month_display(latest)     # a month, not a day
         figure["period"] = "month"
         figures.append(figure)

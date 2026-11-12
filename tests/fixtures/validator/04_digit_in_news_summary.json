@@ -1,0 +1,11 @@
+{
+ "description": "A model summary containing a digit is refused.",
+ "check": "summary",
+ "payload": "payload/from_fixtures.json",
+ "item_id": "38ec41e21301",
+ "text": "MISC has lined up 5 more LNG carriers for Petronas.",
+ "expect": "fail",
+ "expect_codes": [
+  "digit"
+ ]
+}

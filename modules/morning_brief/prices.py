@@ -88,7 +88,8 @@ def build_price_figure(series: PriceSeries, rows: list, today: date) -> tuple[Op
 
     return make_figure(figure_id=series.key, label=series.label, unit=series.unit,
                        value=value, fmt=fmt, as_of=as_of, source_id=SOURCE_ID,
-                       quality_tier=source.quality_tier, changes=changes), None
+                       quality_tier=source.quality_tier, changes=changes,
+                       plausible_range=(series.low, series.high)), None
 
 
 def fetch_prices(api_key: Optional[str], today: date, get: Callable = guarded_get) -> dict:

@@ -125,6 +125,10 @@
           "source_id": "eia_spot",
           "quality_tier": "LIVE_API",
           "notes": "",
+          "plausible_range": [
+            10.0,
+            300.0
+          ],
           "source_tag": "S1"
         },
         {
@@ -162,6 +166,10 @@
           "source_id": "eia_spot",
           "quality_tier": "LIVE_API",
           "notes": "",
+          "plausible_range": [
+            0.5,
+            10.0
+          ],
           "source_tag": "S1"
         }
       ]
@@ -212,6 +220,10 @@
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
           "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            1000.0,
+            10000.0
+          ],
           "period": "month",
           "source_tag": "S2"
         },
@@ -250,6 +262,10 @@
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
           "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            0.0,
+            10000.0
+          ],
           "period": "month",
           "source_tag": "S2"
         },
@@ -288,6 +304,10 @@
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
           "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            0.0,
+            10000.0
+          ],
           "period": "month",
           "source_tag": "S2"
         },
@@ -326,6 +346,10 @@
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
           "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            0.0,
+            10000.0
+          ],
           "period": "month",
           "source_tag": "S2"
         },
@@ -364,6 +388,10 @@
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
           "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            0.0,
+            10000.0
+          ],
           "period": "month",
           "source_tag": "S2"
         },
@@ -402,6 +430,10 @@
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
           "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            0.0,
+            10000.0
+          ],
           "period": "month",
           "source_tag": "S2"
         }
@@ -501,6 +533,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             },
             {
@@ -527,6 +563,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             },
             {
@@ -553,6 +593,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             },
             {
@@ -579,6 +623,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             },
             {
@@ -605,6 +653,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             },
             {
@@ -631,6 +683,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             },
             {
@@ -657,6 +713,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             },
             {
@@ -683,6 +743,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             },
             {
@@ -709,6 +773,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             },
             {
@@ -735,6 +803,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             },
             {
@@ -761,6 +833,10 @@
               "source_id": "imf_portwatch",
               "quality_tier": "LIVE_API",
               "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
               "source_tag": "S4"
             }
           ]

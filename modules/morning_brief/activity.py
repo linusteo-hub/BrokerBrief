@@ -106,7 +106,8 @@ def weekly_figures(rows: list, locations: dict, field: str, noun: str, prefix: s
             label=f"{name} {noun}, 7 days to {fmt_date(latest)}",
             unit=noun, value=total, fmt=fmt, as_of=latest, source_id=SOURCE_ID,
             quality_tier=source.quality_tier, changes=[change],
-            notes="Physical activity from AIS ship tracking, not freight rates."))
+            notes="Physical activity from AIS ship tracking, not freight rates.",
+            plausible_range=WEEKLY_RANGE))
     return figures, excluded
 
 

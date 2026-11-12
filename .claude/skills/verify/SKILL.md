@@ -39,7 +39,7 @@ Search the **whole repo**: every tracked file (`git ls-files`) plus every staged
 
 Only these places are allowed to contain these names:
 - the allowlist/denylist definition file;
-- test fixtures that deliberately test that a banned source is rejected;
+- test fixtures that deliberately test that a banned source is rejected: files under `tests/fixtures/` whose file name starts with `banned` (e.g. `tests/fixtures/banned_sources.json`, `tests/fixtures/validator/banned_22_banned_source_in_summary.json`);
 - `docs/`;
 - `CLAUDE.md`;
 - this file (`.claude/skills/verify/SKILL.md`), which has to list the names to search for them.

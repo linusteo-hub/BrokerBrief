@@ -1,0 +1,11 @@
+{
+ "_note": "Hand-written summaries for the items in tests/fixtures/payload/from_fixtures.json, in the form the model returns. They follow every rule, so a brief built from them must pass the gate.",
+ "cfc1c2cab9ac": ["Earnings for the largest dry bulk carriers improved over the week as more Brazilian iron ore cargoes came to market, and owners held back from fixing ahead.", ""],
+ "86fc4834bcf6": ["A Chinese shipyard group has ordered more kamsarmax bulk carriers (a large Panamax design) for its own fleet.", ""],
+ "56d907003e1c": ["Buyers from China have been acquiring capesize bulk carriers (the largest dry bulk ships) on the second-hand market.", ""],
+ "38ec41e21301": ["Malaysian shipowner MISC has lined up further LNG carriers (liquefied natural gas ships) to serve the energy company Petronas.", "This suggests long-term charter demand for gas carriers remains firm in Asia."],
+ "e8fd72eddcea": ["Attacks on tankers have spread across the Gulf, according to the publisher.", "This could raise war-risk insurance costs and tanker freight on routes through the region."],
+ "dc19c507a379": ["A Chinese shipping investor has made an approach for Xin Yuan, an owner of asphalt tankers.", "This may point to consolidation among owners of specialised tankers."],
+ "64fa131aa297": ["The shipping association BIMCO has adopted a contract addendum meant to support investment in retrofitting existing ships.", "This could make it easier for owners and charterers to share the cost of efficiency upgrades."],
+ "38719df7d78c": ["Germany's navy is expanding its frigate order and adding a new base.", "This may tie up shipyard capacity that commercial owners would otherwise compete for."]
+}

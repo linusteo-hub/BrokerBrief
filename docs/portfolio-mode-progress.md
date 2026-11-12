@@ -150,3 +150,35 @@ These change engine behaviour beyond D1–D4, so they are asked, not done:
 2. **P1 ignores the top-up port.** With fuel "Unavailable" at Fujairah, the split that tops up at Fujairah stays feasible. Proposed: P1 checks the top-up port too.
 3. **The default safety reserve (larger of 10% on board or 24 hours of consumption) is thin** against common practice of several days. Proposed: keep the formula, but show a warning when the reserve in use is under 3 days of consumption. A different default would change every demo figure.
 4. **Congestion signal** compares only the first and last days of a short window: a weak basis for the 4 / 8 / 18-hour waits. Proposed: leave it, and state the limitation on the page (wording only).
+
+## Step 2 — Phase 2: writer and validation gate (12/11/2026)
+
+### Done
+
+- Writer and gate as designed: code writes the facts, the model writes summaries; retry once, then withhold a failing summary; fail closed on code-level violations. Details and the test list are in the build plan, "Phase 2 results".
+- Validator command for the verify skill: `python -m modules.morning_brief.validate --cases tests/fixtures/validator` (22 cases; 18 must-fail cases, all caught). Added to `CLAUDE.md` Commands; the verify skill's banned-fixture rule now names the file pattern (`banned*`).
+- Figures carry `plausible_range`, so the gate can re-check range at publishing time.
+- Model trial script (`model_trial.py`) to measure the model choice once a key exists.
+- `requirements-brief.txt`: the brief workflow's extra dependency (`anthropic`), kept out of `requirements.txt` so the Streamlit app does not install it.
+
+### Verified how
+
+- `pytest -q`: 251 passed.
+- Validator command: 22 of 22 cases behaved as expected.
+- A known-good brief (`tests/fixtures/validator/brief_ok.md`) was built from hand-written summaries through the real renderer and gate.
+
+### Failure modes of the writer (each has a test)
+
+| Failure | What happens | How Linus finds out |
+|---|---|---|
+| No `ANTHROPIC_API_KEY` | Brief published, news as headline and link only | `validation.json` writer status `no_model` (the Phase 3 alert reads it) |
+| Key wrong or revoked (401), out of credit or spend limit (400), rate limited (429), outage (5xx), no connection | Same | writer status `model_unavailable`, with the reason |
+| Model declines | Same | `model_unavailable`, "declined" |
+| Model output not JSON | Retried once, then all summaries withheld | withheld list |
+| A summary breaks a rule | Retried once with the reasons, then withheld | withheld list, per item, with codes |
+| Renderer or payload bug | Nothing published; exit code 3 | `validation.json` `refused_because` (Phase 3 opens an alert issue) |
+
+### Open issues
+
+- **Not run against the real API yet.** The model choice and the cost figures are estimates until the key exists.
+- Prompt caching is not used: the fixed part of the prompt is about 600 tokens, and at one request a day the cache would have expired by the next run.

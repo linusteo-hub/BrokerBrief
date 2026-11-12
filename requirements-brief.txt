@@ -1,0 +1,5 @@
+# Extra dependencies for the morning-brief workflow (GitHub Actions), on top of
+# the app's requirements. The Streamlit app does not need these, so they are kept
+# out of requirements.txt, which Streamlit Community Cloud installs.
+-r requirements.txt
+anthropic>=1.17,<2
