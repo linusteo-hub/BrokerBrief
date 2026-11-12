@@ -1,0 +1,25 @@
+{
+  "_comment": "Deliberately names banned sources, to test that they are refused. Allowed by the verify skill's licensed-source scan because the file name starts with banned_.",
+  "denylisted_ids": ["baltic_exchange", "freightos_fbx", "worldscale", "clarksons", "lloyds_list", "platts", "argus", "ice", "hellenic_shipping_news", "the_loadstar", "drewry_wci", "scfi"],
+  "texts_that_must_match": [
+    "Capesize rates firmed as the Baltic Exchange's index climbed",
+    "The BDI fell for a third session",
+    "Freightos FBX shows transpacific rates easing",
+    "VLCC rates hit WS 85 on the TD3C route",
+    "according to Clarksons Research",
+    "the ClarkSea Index slipped",
+    "Lloyd's List reports",
+    "Lloyd’s List Intelligence data show",
+    "Platts assessed VLSFO",
+    "Argus Media said",
+    "ICE Gasoil futures rose",
+    "Baltic Dry Index"
+  ],
+  "texts_that_must_not_match": [
+    "Russian tankers loading in the Baltic Sea",
+    "Baltic ports see record container volumes",
+    "Ice-class tankers enter the Arctic",
+    "Argusville terminal reopens",
+    "Bulkers bid by Chinese buyers"
+  ]
+}

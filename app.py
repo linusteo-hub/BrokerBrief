@@ -19,7 +19,7 @@ from modules.report import generate_email, generate_linkedin
 from modules.pdf_export import generate_pdf_bytes
 from modules.bunker import compute_bunker_spreads
 from modules.eia import fetch_all as eia_fetch_all
-from modules.portwatch import fetch_port_activity
+from modules.portwatch import PORTWATCH_CREDIT, fetch_port_activity
 
 from modules.decision.scenario import (
     BunkeringScenario, FuelGrade, RiskProfile, FuelAvailability,
@@ -564,7 +564,8 @@ elif "Market Intelligence" in page:
             signals.congestion_direction = (max(counts, key=counts.get) if any(counts.values())
                                             else "Unknown")
             has_congestion = True
-            brief_sources.add(portwatch_data["source_name"])
+            # The PDF lists source names; for PortWatch that must be the IMF credit line.
+            brief_sources.add(PORTWATCH_CREDIT)
     brief_sources = sorted(brief_sources)
     # The template brief speaks to freight and bunkers, so it needs real rows for both.
     brief_ready = bool(has_freight and has_bunker)
@@ -601,6 +602,8 @@ elif "Market Intelligence" in page:
                 <div class="stat-pill-row">{pills}{brent_pill}</div>
             </div>
             """, unsafe_allow_html=True)
+            if portwatch_data and portwatch_data.get("success"):
+                st.caption(PORTWATCH_CREDIT)
         else:
             brief = generate_brief(signals)
             tone_css = {"Bullish": "tone-bullish", "Cautiously Bullish": "tone-cautious",
@@ -619,6 +622,8 @@ elif "Market Intelligence" in page:
                 <div class="brief-card-risk">⚠ {brief["risk_note"]}</div>
             </div>
             """, unsafe_allow_html=True)
+            if portwatch_data and portwatch_data.get("success"):
+                st.caption(PORTWATCH_CREDIT)
         if unknown_congestion:
             st.caption("Congestion unknown (not counted in the Congestion pill): "
                        + " ".join(f"{p}: {r}" for p, r in unknown_congestion.items()))
@@ -643,6 +648,7 @@ elif "Market Intelligence" in page:
                     st.markdown(f"- **{port}**: Unknown — {unknown_congestion.get(port, 'No reason recorded.')}")
                 else:
                     st.markdown(f"- **{port}**: {sig}")
+            st.caption(PORTWATCH_CREDIT)
 
     with tab_bunker:
         bunker_data = compute_bunker_spreads(mi_df)
@@ -762,6 +768,7 @@ elif "Live Data" in page:
             st.markdown(f"{colour} **{port}**: {text}")
         with st.expander("Show raw port data"):
             st.dataframe(pd.DataFrame(portwatch_data["ports"]), use_container_width=True)
+        st.caption(PORTWATCH_CREDIT)
     else:
         err = portwatch_data.get("error", "Unknown error") if portwatch_data else "Not fetched"
         st.error(f"❌ Portwatch: {err}")

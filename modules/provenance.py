@@ -33,6 +33,21 @@ class Freshness(str, Enum):
     UNKNOWN = "UNKNOWN"  # as_of is missing/unparseable, or max_age is None
 
 
+def utc_today() -> date:
+    """Today's date in UTC. Use this, never date.today(), which is the machine's
+    local date (on a Singapore laptop it runs 8 hours ahead of UTC)."""
+    return datetime.now(timezone.utc).date()
+
+
+def utc_date(value) -> Optional[date]:
+    """The UTC calendar date of a source timestamp (ISO string, epoch ms,
+    date or datetime), or None if it can't be parsed. Converts to UTC
+    explicitly, so an offset like -04:00 or the machine's time zone never
+    moves a value onto another day."""
+    parsed = parse_as_of(value)
+    return None if parsed is None else parsed.astimezone(timezone.utc).date()
+
+
 def parse_as_of(value) -> Optional[datetime]:
     """
     The only sanctioned way to build the `as_of` field from source data.

@@ -93,6 +93,8 @@ Results can be exported as a PDF.
 
 ### Data: no source, no certainty
 
+BrokerBrief is built on two principles. **No source, no certainty:** every value carries its source and date, and missing data is flagged, never invented. **Runs unattended:** the data refresh and the morning brief are being built to run on a schedule with no manual step, to mark a section empty with the reason when a feed breaks, and to raise an alert when a run fails (in development; not yet live).
+
 | Source | What it provides |
 |---|---|
 | EIA, Brent spot (series RBRTE) | Crude price level and direction |

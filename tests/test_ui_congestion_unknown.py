@@ -7,6 +7,7 @@ PortWatch patched (no network).
 """
 
 import unittest
+from pathlib import Path
 from datetime import datetime, timezone
 from unittest import mock
 
@@ -26,7 +27,7 @@ FAKE = {
 
 def open_page(name):
     with mock.patch.object(portwatch, "fetch_port_activity", return_value=FAKE):
-        at = AppTest.from_file("app.py", default_timeout=60).run()
+        at = AppTest.from_file(str(Path(__file__).resolve().parent.parent / "app.py"), default_timeout=60).run()
         radio = at.sidebar.radio[0]
         radio.set_value(next(o for o in radio.options if name in o)).run()
     return at
@@ -44,11 +45,13 @@ class UnknownCongestionShownTests(unittest.TestCase):
         self.assertIn(f"- **Fujairah**: Unknown — {REASON}", shown)
         self.assertFalse(any("**Fujairah**: Stable" in t for t in shown))
         self.assertTrue(any(t.startswith("Congestion unknown") and REASON in t for t in shown))
+        self.assertIn(portwatch.PORTWATCH_CREDIT, shown)   # IMF credit kept alongside Unknown handling
 
     def test_live_data_shows_unknown_with_reason(self):
         at = open_page("Live Data")
         self.assertEqual(len(at.exception), 0)
         self.assertIn(f"⚪ **Fujairah**: Unknown — {REASON}", texts(at))
+        self.assertIn(portwatch.PORTWATCH_CREDIT, texts(at))
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # BrokerBrief — standing instructions for Claude Code
 
-BrokerBrief is my (Linus's) Python/Streamlit maritime decision-support project, deployed on Streamlit Community Cloud from the public repo `linusteo-hub/BrokerBrief`. I'm currently adding a public daily **morning brief**. These rules apply in every session.
+BrokerBrief is my (Linus's) Python/Streamlit maritime decision-support project, deployed on Streamlit Community Cloud from the public repo `linusteo-hub/BrokerBrief`. I'm currently adding a public daily **morning brief**. Since 12/11/2026 the project is in **portfolio mode** (see `docs/morning-brief-build-plan.md`): a finished, accurate, self-running public project. These rules apply in every session.
 
 ## Working copy
 
@@ -24,6 +24,13 @@ BrokerBrief is my (Linus's) Python/Streamlit maritime decision-support project, 
   - deterministic code builds a JSON payload;
   - the language model only writes prose from that payload;
   - the payload carries pre-formatted display strings, pre-computed changes and an explicit `direction` for every figure, so the model never calculates anything.
+
+## Design principles
+
+- **No source, no certainty.** Every value shown carries its source and date; missing data is flagged, never invented (rules below).
+- **Runs unattended.** The finished BrokerBrief operates without Linus. On a schedule, it fetches, validates, writes, publishes and archives on its own. It fails safe: a broken feed produces a section marked empty with the reason, never unchecked content and never a silent gap. It notices its own failures and tells Linus (e.g. a GitHub issue opened by the workflow). Routine operation needs no manual step. Manual steps are allowed only for one-off setup (secrets, accounts), legal permissions, and decisions.
+  - This covers the data refresh and the morning brief. The decision engine stays user-driven (someone enters a scenario), but it must work on live data with no manual refresh.
+  - It is a requirement for every phase, not a final step. For each piece of automation, name its failure modes and how each is detected.
 
 ## Data rules ("no source, no certainty")
 
@@ -57,7 +64,8 @@ BrokerBrief is my (Linus's) Python/Streamlit maritime decision-support project, 
 
 ## Commands
 
-<!-- Fill in once Step 0 and Phase 1 are done, e.g.: -->
-<!-- Run the app:       streamlit run app.py -->
-<!-- Build the payload: python -m <brief_module>.build_payload -->
-<!-- Run the tests:     pytest -q -->
+- Run the app: `streamlit run app.py`
+- Run the tests: `pytest -q` (no network; fetchers use recorded fixtures in `tests/fixtures/`)
+- Build the morning-brief payload from live sources: `python -m modules.morning_brief --out <file>` (needs `EIA_API_KEY` in `.env` or the environment; without it Prices is marked missing)
+- Regenerate the example payload after a deliberate change: `UPDATE_PAYLOAD_FIXTURE=1 pytest tests/test_morning_brief_payload.py`
+<!-- Morning-brief validator (Phase 2): not built yet. -->
