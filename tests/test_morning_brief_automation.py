@@ -412,3 +412,11 @@ def test_every_alert_job_step_runs_after_a_cancellation():
 def test_a_failure_test_always_builds_even_if_todays_brief_exists():
     text = (ROOT / ".github/workflows/morning-brief.yml").read_text()
     assert '[ "$BREAK_FEED" = "none" ]' in _job(text, "build")
+
+
+def test_model_trial_workflow_is_manual_read_only_and_publishes_nothing():
+    import re
+    text = (ROOT / ".github/workflows/model-trial.yml").read_text()
+    live = [l for l in text.splitlines() if not l.lstrip().startswith("#")]
+    assert not any(re.match(r"\s*schedule:", l) for l in live)
+    assert "permissions:\n  contents: read\n" in text and "write" not in text
