@@ -240,3 +240,7 @@ Two blockers and ten should-fix items. All are fixed except the ones listed unde
 - `docs/trial/pass-criteria.md`: ten measurable pass criteria and a restart rule. **Draft, for Linus to approve** in Decision Batch 3.
 - `docs/trial/review-log.md`: daily five-minute review (three figures checked against the sources, two summaries against their articles, misfiled items), weekly checks (licence scan of the `briefs` branch, cost, false alerts), and the failure-test record.
 - Verified: documents only; no code changed.
+
+## Note: a commit made with a failing test (12/11/2026)
+
+Commit `6fd19eb` (model-trial workflow) was committed while one test failed. The test was new and wrong: it checked that the word "write" did not appear, and the file's comment says "writer models". The verify skill was not re-run after adding that test. The next commit fixes the test (no code change). Rule kept: the verify skill runs immediately before every commit.

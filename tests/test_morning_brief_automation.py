@@ -419,4 +419,5 @@ def test_model_trial_workflow_is_manual_read_only_and_publishes_nothing():
     text = (ROOT / ".github/workflows/model-trial.yml").read_text()
     live = [l for l in text.splitlines() if not l.lstrip().startswith("#")]
     assert not any(re.match(r"\s*schedule:", l) for l in live)
-    assert "permissions:\n  contents: read\n" in text and "write" not in text
+    assert "permissions:\n  contents: read\n" in text
+    assert not re.search(r":\s*write\b", text)            # no write permission anywhere
