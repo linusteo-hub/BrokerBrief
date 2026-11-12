@@ -20,12 +20,23 @@ from typing import Optional
 from modules.provenance import MANUAL_ENTRY_MAX_AGE, SAMPLE_LABEL, Provenance, QualityTier, parse_as_of
 
 
+# CSV `market_segment` text that counts as each fuel grade. HSFO is commonly
+# quoted by its viscosity grade (IFO380).
+GRADE_ALIASES = {
+    "VLSFO": ("VLSFO", "LSFO"),
+    "MGO":   ("MGO",),
+    "HSFO":  ("HSFO", "IFO380", "IFO 380", "380CST"),
+}
+
+
 def assemble_market_data(
     df: Optional[pd.DataFrame],
     eia_data: Optional[dict],
     portwatch_data: Optional[dict],
     fujairah_price_override: Optional[float] = None,
     simulate_fujairah_missing: bool = False,
+    fuel_grade: str = "VLSFO",
+    singapore_price_override: Optional[float] = None,
 ) -> dict:
     """
     Builds the market_data dict consumed by the evaluation and confidence models.
@@ -37,6 +48,13 @@ def assemble_market_data(
         fujairah_price_override: Manually supplied Fujairah price (user input).
         simulate_fujairah_missing: For demo Scenario 3 — treat Fujairah price
                                     as unavailable regardless of CSV contents.
+        fuel_grade: The scenario's fuel grade ("VLSFO", "MGO" or "HSFO"). Prices
+                    are read for this grade only; another grade's price is never
+                    substituted.
+        singapore_price_override: Manually supplied Singapore price (user input).
+
+    Each port's entry in `bunker_prices` is {"price": ..., "price_prev": ...}
+    for the selected grade, or {} when no price is available.
     """
     market_data = {
         "brent_available":     False,
@@ -49,6 +67,7 @@ def assemble_market_data(
         "portwatch_available": False,
         "congestion_signals":  {},
         "congestion_reasons":  {},   # port -> why its signal is "Unknown"
+        "fuel_grade":          fuel_grade,
         "bunker_prices":       {"Singapore": {}, "Fujairah": {}},
         "provenance":          {},   # Dict[str, Optional[Provenance]] — one entry per input
     }
@@ -90,16 +109,16 @@ def assemble_market_data(
             grade = str(row.get("market_segment", "")).strip().upper()
             if port not in ("Singapore", "Fujairah"):
                 continue
-            if "VLSFO" not in grade and "LSFO" not in grade:
+            if not any(alias in grade for alias in GRADE_ALIASES.get(fuel_grade, (fuel_grade,))):
                 continue
             try:
                 current  = float(row["current_value"])
                 previous = float(row["previous_value"])
             except (ValueError, TypeError):
                 continue
-            market_data["bunker_prices"][port]["VLSFO"]      = current
-            market_data["bunker_prices"][port]["VLSFO_prev"] = previous
-            market_data["provenance"][f"{port} VLSFO"] = Provenance(
+            market_data["bunker_prices"][port]["price"]      = current
+            market_data["bunker_prices"][port]["price_prev"] = previous
+            market_data["provenance"][f"{port} {fuel_grade}"] = Provenance(
                 source_name=str(row.get("source_name") or "CSV manual entry"),
                 source_url=row.get("source_url"),
                 as_of=parse_as_of(row.get("updated_at")),
@@ -113,10 +132,14 @@ def assemble_market_data(
             )
 
     # ── Overrides & simulation flags ─────────────────────────────────────────
-    if fujairah_price_override is not None:
-        market_data["bunker_prices"]["Fujairah"]["VLSFO"] = fujairah_price_override
+    # A user-entered price replaces the CSV price for that port. It has no
+    # previous value, so it takes no part in the signal-agreement checks.
+    for port, override in (("Singapore", singapore_price_override), ("Fujairah", fujairah_price_override)):
+        if override is None:
+            continue
+        market_data["bunker_prices"][port] = {"price": override}
         now = datetime.now(timezone.utc)
-        market_data["provenance"]["Fujairah VLSFO"] = Provenance(
+        market_data["provenance"][f"{port} {fuel_grade}"] = Provenance(
             source_name="User override",
             source_url=None,
             as_of=now,
@@ -127,14 +150,12 @@ def assemble_market_data(
         )
 
     if simulate_fujairah_missing:
-        market_data["bunker_prices"]["Fujairah"].pop("VLSFO", None)
-        market_data["bunker_prices"]["Fujairah"].pop("VLSFO_prev", None)
-        market_data["provenance"]["Fujairah VLSFO"] = None
+        market_data["bunker_prices"]["Fujairah"] = {}
+        market_data["provenance"][f"Fujairah {fuel_grade}"] = None
 
     # Flag any missing prices in provenance
-    if "VLSFO" not in market_data["bunker_prices"]["Singapore"]:
-        market_data["provenance"]["Singapore VLSFO"] = None
-    if "VLSFO" not in market_data["bunker_prices"]["Fujairah"]:
-        market_data["provenance"].setdefault("Fujairah VLSFO", None)
+    for port in ("Singapore", "Fujairah"):
+        if "price" not in market_data["bunker_prices"][port]:
+            market_data["provenance"][f"{port} {fuel_grade}"] = None
 
     return market_data

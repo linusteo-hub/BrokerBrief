@@ -33,16 +33,17 @@ SCENARIOS = {
 EXPECTED = {
     1: ("High", 91.0, "Full bunker — Fujairah", {}),
     2: ("High", 91.0, "Full bunker — Singapore", {"Full bunker — Fujairah": "F1"}),
-    3: ("High", 85.0, "Full bunker — Singapore", {}),
+    # Scenario 3: 85.0 before the cap; one scored port has no price, so Medium.
+    3: ("Medium", 79.0, "Full bunker — Singapore", {}),
 }
 
 
 def _scenario(fuel: float) -> BunkeringScenario:
     return BunkeringScenario(
-        vessel_name="MV Demo Trader", current_location="Colombo", destination="Rotterdam",
+        vessel_name="MT Demo Trader", current_location="Zhoushan (in ballast)", destination="Ras Tanura",
         fuel_remaining_mt=fuel, daily_consumption_mt=45.0, required_quantity_mt=1000.0,
         fuel_grade=list(FuelGrade)[0],
-        eta_singapore_days=1.0, eta_fujairah_days=8.0, schedule_flexibility_hours=36.0,
+        eta_singapore_days=1.0, eta_fujairah_days=11.5, schedule_flexibility_hours=36.0,
         safety_reserve_mt=None,
         singapore_vlsfo_available=list(FuelAvailability)[2],
         fujairah_vlsfo_available=list(FuelAvailability)[2],
@@ -109,6 +110,27 @@ class DemoScenariosMatchReadme(unittest.TestCase):
                 prov = market_data["provenance"][key]
                 self.assertEqual(prov.source_name, SAMPLE_LABEL)
                 self.assertEqual(prov.licence, SAMPLE_LABEL)
+
+
+# README demo table: every option's (quantity MT, score), per scenario.
+EXPECTED_OPTIONS = {
+    1: {"SGP_FULL": (1000.0, 66.3), "SGP_PARTIAL": (200.0, 57.2), "FUJ_FULL": (1000.0, 74.1)},
+    2: {"SGP_FULL": (1000.0, 66.3), "SGP_PARTIAL": (291.5, 57.2), "FUJ_FULL": (1000.0, None)},
+    3: {"SGP_FULL": (1000.0, 69.0), "SGP_PARTIAL": (200.0, 59.5), "FUJ_FULL": (1000.0, 67.0)},
+}
+
+
+class DemoScoresMatchReadme(unittest.TestCase):
+    def test_quantities_and_scores(self):
+        for n, expected in EXPECTED_OPTIONS.items():
+            with self.subTest(scenario=n):
+                options, _, _ = _run(n, None, None)
+                self.assertEqual({o.id: (o.quantity_mt, o.score) for o in options}, expected)
+
+    def test_scenario_three_is_85_before_the_cap(self):
+        _, confidence, _ = _run(3, None, None)
+        self.assertEqual(confidence["uncapped_overall"], 85.0)
+        self.assertIn("No VLSFO price for Fujairah", confidence["cap_reason"])
 
 
 class EngineInputsSelection(unittest.TestCase):

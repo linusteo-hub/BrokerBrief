@@ -15,7 +15,7 @@ was removed.
 """
 
 from typing import List, Tuple
-from modules.decision.scenario import BunkeringScenario, FuelAvailability
+from modules.decision.scenario import BunkeringScenario, FuelAvailability, FuelGrade, Scrubber
 from modules.decision.options import BunkeringOption
 
 # ── Port data (POC defaults — replace with database later) ──────────────────
@@ -37,13 +37,12 @@ PORT_BUNKERING_TIME_HOURS = {
     "Fujairah":  10.0,
 }
 
-# ECA zone membership (True = MARPOL Annex VI ECA applies)
-PORT_IN_ECA = {
-    "Singapore": False,
-    "Fujairah":  False,
-    "Rotterdam": True,
-    "Houston":   True,
-}
+# Ports that prohibit the discharge of wash water from open-loop scrubbers in
+# port waters. A ship with an open-loop scrubber must switch to compliant fuel
+# (or closed-loop mode, if hybrid) there.
+#   Singapore: Maritime and Port Authority of Singapore, from 1 January 2020.
+#   Fujairah:  Port of Fujairah Notice to Mariners No. 252 (22 January 2019).
+OPEN_LOOP_DISCHARGE_BANNED = {"Singapore", "Fujairah"}
 
 # ── Congestion → estimated waiting time mapping ──────────────────────────────
 # Source: indicative thresholds, to be validated with industry data.
@@ -168,25 +167,87 @@ def _fuel_grade_check(
     return True, "", ""
 
 
-def _eca_check(
+def _sulphur_check(
     option: BunkeringOption,
     scenario: BunkeringScenario,
 ) -> Tuple[bool, str, str]:
     """
-    R1: HSFO is not permitted in ECA zones.
+    R1: HSFO needs an approved exhaust gas cleaning system (scrubber).
+
+    MARPOL Annex VI regulation 14.1 (as amended by resolution MEPC.305(73), in
+    force 1 March 2020): "The sulphur content of fuel oil used or carried for
+    use on board a ship shall not exceed 0.50% m/m." Regulation 4.1 lets an
+    Administration approve an equivalent, such as a scrubber. The rule is about
+    the fuel the ship uses and carries, not about the port: it applies to every
+    option alike. (MARPOL does not regulate what a port may sell.)
     """
-    port = option.port
-    in_eca = PORT_IN_ECA.get(port, False)
-    if scenario.fuel_grade.value == "HSFO" and in_eca:
+    if scenario.fuel_grade == FuelGrade.HSFO and scenario.scrubber == Scrubber.NONE:
         return (
             False,
             "R1",
             (
-                f"HSFO is not permitted in {port} (ECA zone — MARPOL Annex VI). "
-                "This option is legally infeasible."
+                "HSFO exceeds 0.50% sulphur. MARPOL Annex VI regulation 14.1 prohibits "
+                "using it, or carrying it for use, on a ship without an approved "
+                "equivalent such as a scrubber (regulation 4.1). No scrubber is "
+                "declared, so this stem is not compliant at any port."
             ),
         )
     return True, "", ""
+
+
+def _open_loop_warning(
+    option: BunkeringOption,
+    scenario: BunkeringScenario,
+) -> Tuple[bool, str]:
+    """
+    R2 (warning): HSFO with an open-loop scrubber, calling a port that bans
+    open-loop wash-water discharge. The stem is legal; burning it in port is not
+    possible in open-loop mode.
+    """
+    if scenario.fuel_grade != FuelGrade.HSFO or scenario.scrubber != Scrubber.OPEN_LOOP:
+        return False, ""
+    ports = [p for p in (option.port, option.top_up_port) if p in OPEN_LOOP_DISCHARGE_BANNED]
+    if not ports:
+        return False, ""
+    return (
+        True,
+        (
+            f"{' and '.join(ports)} prohibit{'s' if len(ports) == 1 else ''} open-loop scrubber "
+            "wash-water discharge in port waters. The vessel must burn compliant fuel "
+            "(0.50% sulphur or less) while in port, so it needs enough of it on board."
+        ),
+    )
+
+
+def _eca_warning(
+    option: BunkeringOption,
+    scenario: BunkeringScenario,
+) -> Tuple[bool, str]:
+    """
+    R3 (warning): the voyage enters an emission control area. MARPOL Annex VI
+    regulation 14.4: "While a ship is operating within an emission control
+    area, the sulphur content of fuel oil used on board that ship shall not
+    exceed 0.10% m/m." This limits what is burned inside the area; it does not
+    stop the ship buying or carrying other fuel.
+    """
+    if not scenario.voyage_enters_eca:
+        return False, ""
+    if scenario.fuel_grade == FuelGrade.VLSFO:
+        return True, (
+            "The voyage enters an emission control area, where fuel used on board must not "
+            "exceed 0.10% sulphur (MARPOL Annex VI regulation 14.4). VLSFO (0.50%) cannot be "
+            "burned there: this stem does not cover consumption inside the area."
+        )
+    if scenario.fuel_grade == FuelGrade.HSFO:
+        return True, (
+            "The voyage enters an emission control area (0.10% sulphur limit, MARPOL Annex VI "
+            "regulation 14.4). HSFO may be burned there only if the scrubber is approved as "
+            "equivalent to 0.10% fuel; otherwise 0.10% fuel is needed for that leg."
+        )
+    return True, (
+        "The voyage enters an emission control area (0.10% sulphur limit, MARPOL Annex VI "
+        "regulation 14.4). Check that the MGO's bunker delivery note shows 0.10% sulphur or less."
+    )
 
 
 def _schedule_check(
@@ -195,7 +256,7 @@ def _schedule_check(
     congestion_signals: dict,
 ) -> Tuple[bool, str, str, bool, str]:
     """
-    S1/S2: Does the total time required for this bunkering option exceed
+    S1: Does the total time required for this bunkering option exceed
     the vessel's schedule flexibility?
 
     Returns (is_feasible, rule_id, reason, is_warning, warning_msg).
@@ -292,7 +353,7 @@ def run_constraint_engine(
             _min_stem_check(option, scenario),
             _max_stem_check(option, scenario),
             _fuel_grade_check(option, scenario),
-            _eca_check(option, scenario),
+            _sulphur_check(option, scenario),
         ]
 
         for feasible, rule_id, reason in checks:
@@ -321,6 +382,14 @@ def run_constraint_engine(
             if is_warn:
                 option.is_warning = True
                 warnings.append(warn_msg)
+
+        # ── R2 / R3 regulatory warnings ───────────────────────────────────────
+        if option.is_feasible:
+            for is_warn, warn_msg in (_open_loop_warning(option, scenario),
+                                      _eca_warning(option, scenario)):
+                if is_warn:
+                    option.is_warning = True
+                    warnings.append(warn_msg)
 
         if warnings:
             option.warning_message = " | ".join(warnings)

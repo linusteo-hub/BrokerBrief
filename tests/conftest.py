@@ -22,3 +22,14 @@ def _block_network(monkeypatch):
     monkeypatch.setattr(socket.socket, "connect", refuse)
     monkeypatch.setattr(socket, "create_connection", refuse)
     monkeypatch.setattr(socket, "getaddrinfo", refuse)
+
+
+@pytest.fixture(autouse=True)
+def _clear_streamlit_cache():
+    """app.py caches live fetches with st.cache_data, which lives for the whole
+    process. Clear it around every test so one test's patched PortWatch result
+    can never be served to another."""
+    import streamlit as st
+    st.cache_data.clear()
+    yield
+    st.cache_data.clear()

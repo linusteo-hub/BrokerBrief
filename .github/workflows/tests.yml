@@ -1,0 +1,29 @@
+name: Tests
+
+# Runs the test suite on every push and pull request, and once a week on a
+# fresh install. The weekly run exists to catch dependency drift: a new
+# release of Streamlit or pandas inside the allowed ranges that breaks the app.
+# Tests never touch the network (tests/conftest.py blocks it), so this job
+# needs no secrets.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "40 1 * * 1"   # Mondays 01:40 UTC (09:40 SGT); off the hour to avoid peak load
+
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt pytest
+      - run: pytest -q

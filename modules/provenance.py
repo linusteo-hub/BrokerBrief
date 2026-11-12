@@ -166,9 +166,11 @@ EIA_FORECAST_MAX_AGE = timedelta(days=35)  # assumes STEO forecast is republishe
 # not checked. EIA forecast currently has no as_of at
 # all (see modules/eia.py), so this max_age is presently
 # inert — freshness() always returns UNKNOWN for it.
-PORTWATCH_MAX_AGE = timedelta(days=10)  # assumes weekly (Tuesday) cadence, per app.py's
-# existing (also unverified) UI caption, plus slack;
-# not checked against PortWatch's own documentation
+# PortWatch publishes weekly batches that lag 8–10 days (observed 12-10-2026,
+# Phase 0 source audit). 14 days allows one late batch; the morning brief's
+# allowlist uses the same figure. At 10 days the newest data was often already
+# "stale" on arrival.
+PORTWATCH_MAX_AGE = timedelta(days=14)
 MANUAL_ENTRY_MAX_AGE = timedelta(hours=48)  # arbitrary placeholder — no analyst refresh SLA
 # exists today; needs an actual policy decision, this
 # is not derived from anything
