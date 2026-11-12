@@ -179,9 +179,10 @@ DENYLIST: dict[str, str] = {
 # public archive must not carry these names (verify skill, step 4).
 # "Baltic" alone is not matched — it is also a sea.
 BANNED_NAME_PATTERN = re.compile(
-    r"baltic\s+exchange|baltic\s+(dry|capesize|panamax|supramax|handysize|clean|dirty)"
-    r"|baltic\s+index|\bBDI\b|\bBDTI\b|\bBCTI\b|\bBCI\b|\bBPI\b|\bBSI\b|\bFBX\b|freightos"
-    r"|worldscale|\bWS\s?\d|clarksons|clarksea|lloyd[’']?s\s+list|platts|\bargus\b"
+    r"baltic[\s-]+exchange|baltic[\s-]+(dry|capesize|panamax|supramax|handysize|clean|dirty)"
+    r"|baltic[\s-]+index|\bBDI\b|\bBDTI\b|\bBCTI\b|\bBCI\b|\bBPI\b|\bBSI\b|\bFBX\b|freightos"
+    r"|worldscale|\bWS\s?\d|\bclarkson|clarksea|lloyd[’']?s\s+list|platts|\bargus\b"
+    r"|s\s*&\s*p\s+global\s+commodity|commodity\s+insights"
     r"|\bICE\s+(gasoil|brent|futures)",
     re.IGNORECASE,
 )

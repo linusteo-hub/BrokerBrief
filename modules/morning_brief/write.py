@@ -12,7 +12,8 @@ and link only and the report says so.
 Writes, in --out-dir:
 - validation.json  always: what was written, withheld or refused, and why;
 - brief.md         only if the brief passed every code-level check;
-- payload.json     a copy of the payload the brief was built from.
+- payload.json     the payload the brief was built from, without the news excerpts
+                   (publishers' text, used only to brief the model).
 
 Exit codes: 0 published (possibly with summaries withheld or news as
 headline only); 3 refused by a code-level check, nothing published;
@@ -26,7 +27,9 @@ import sys
 from pathlib import Path
 
 from modules.morning_brief.validator import problems_to_dicts
-from modules.morning_brief.writer import MODEL, BriefRefused, build_brief, make_client, section_status
+from modules.morning_brief.writer import (
+    MODEL, BriefRefused, build_brief, make_client, public_payload, section_status,
+)
 
 
 def main(argv=None) -> int:
@@ -54,21 +57,30 @@ def main(argv=None) -> int:
 
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    (out / "payload.json").write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    # A brief.md left from an earlier run must never be mistaken for today's.
+    for stale in ("brief.md", "validation.json", "payload.json"):
+        (out / stale).unlink(missing_ok=True)
     client = None if args.no_model else make_client(os.environ.get("ANTHROPIC_API_KEY"))
+
+    def save(report: dict) -> None:
+        (out / "validation.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        (out / "payload.json").write_text(json.dumps(public_payload(payload), indent=2, ensure_ascii=False) + "\n",
+                                          encoding="utf-8")
 
     try:
         markdown, report = build_brief(payload, client, args.model, previous)
     except BriefRefused as refused:
-        report = {"brief_date": payload.get("brief_date"), "published": False,
-                  "refused_because": problems_to_dicts(refused.problems),
-                  "section_status": section_status(payload)}
-        (out / "validation.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        save({"brief_date": payload.get("brief_date"), "published": False,
+              "refused_because": problems_to_dicts(refused.problems), "section_status": section_status(payload)})
         print(f"REFUSED: {refused}", file=sys.stderr)
         return 3
+    except Exception as error:      # a crash still leaves a report for the alert step
+        save({"brief_date": payload.get("brief_date"), "published": False,
+              "crashed": f"{type(error).__name__}: {error}"[:300]})
+        raise
 
+    save(report)
     (out / "brief.md").write_text(markdown, encoding="utf-8")
-    (out / "validation.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     writer = report["writer"]
     print(f"Brief for {payload['brief_date_display']} written to {out / 'brief.md'}", file=sys.stderr)
     print(f"  writer: {writer['status']}{' — ' + writer['detail'] if writer['detail'] else ''}; "

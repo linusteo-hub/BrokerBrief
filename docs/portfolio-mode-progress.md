@@ -163,7 +163,7 @@ These change engine behaviour beyond D1–D4, so they are asked, not done:
 
 ### Verified how
 
-- `pytest -q`: 251 passed.
+- `pytest -q`: 251 passed at the first commit; 270 after the review fixes (Step 2b).
 - Validator command: 22 of 22 cases behaved as expected.
 - A known-good brief (`tests/fixtures/validator/brief_ok.md`) was built from hand-written summaries through the real renderer and gate.
 
@@ -182,3 +182,12 @@ These change engine behaviour beyond D1–D4, so they are asked, not done:
 
 - **Not run against the real API yet.** The model choice and the cost figures are estimates until the key exists.
 - Prompt caching is not used: the fixed part of the prompt is about 600 tokens, and at one request a day the cache would have expired by the next run.
+
+## Step 2b — Fixes from the fresh-context review of Phase 2 (12/11/2026)
+
+The reviewer found no route for unchecked content into the brief. It did find eight should-fix problems. The most serious: ordinary feed content could stop the whole brief, the silent-gap check could not fire, figures could be swapped unnoticed, and the archived payload republished excerpts. All are fixed, each with a test; the list is in the build plan under "Fixes from the fresh-context review of Phase 2".
+
+Not changed, and why:
+- **Hedge check** accepts "would". A stricter check would withhold many fair sentences. Interpretation stays labelled "our interpretation" on the page.
+- **Ordinals** ("first", "third") are allowed in summaries: they rarely carry figures, and refusing them would withhold most summaries.
+- **Two figures with the same change amount and opposite directions** can mask a flipped word. Every figure line is code-rendered from `direction`, so this needs a renderer bug and a coincidence together.

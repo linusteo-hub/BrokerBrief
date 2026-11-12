@@ -16,7 +16,7 @@ Run `pytest -q` from the repo root. Report the number passed, failed and skipped
 Run the validator against the test fixture payloads in `tests/fixtures/`. Use the validator command listed under Commands in CLAUDE.md; if it isn't listed, report NOT YET BUILT.
 
 It must confirm all of these:
-- every number in the generated text matches a payload display string, after normalising separators and currency symbols;
+- every number in the brief appears in the payload's text fields (after normalising separators and trailing zeros), and every figure is shown on one line with its own label and source tag;
 - no news summary contains a digit;
 - each figure's direction word agrees with the payload's `direction` field;
 - every source tag exists in the payload's `sources` list;

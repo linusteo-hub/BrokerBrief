@@ -36,9 +36,11 @@ def trial(client, model: str, runs: int, payload: dict) -> dict:
         writer = report["writer"]
         result["published"] += 1
         attempts = writer["attempts"]
-        first_failed = len(attempts) > 1 and attempts[1].get("items_sent", 0) or 0
-        result["first_try"] += len(writer["written"]) + len(writer["withheld"]) - first_failed
-        result["after_retry"] += first_failed - len(writer["withheld"]) if first_failed else 0
+        if attempts and "error" not in attempts[0]:
+            resent = attempts[1].get("items_sent", 0) if len(attempts) > 1 else 0
+            first_ok = attempts[0]["items_sent"] - resent
+            result["first_try"] += first_ok
+            result["after_retry"] += len(writer["written"]) - first_ok
         result["withheld"] += len(writer["withheld"])
         for problems in writer["withheld"].values():
             for p in problems:

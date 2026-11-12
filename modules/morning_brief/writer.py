@@ -83,6 +83,10 @@ RESPONSE_SCHEMA = {
 }
 
 
+# Errors that mean our own code is wrong, not that the API is unavailable.
+PROGRAMMING_ERRORS = (TypeError, AttributeError, NameError, ImportError)
+
+
 class BriefRefused(Exception):
     """The final brief failed a code-level check; nothing may be published."""
 
@@ -214,18 +218,22 @@ def write_summaries(payload: dict, client=None, model: str = MODEL) -> tuple:
     accepted: dict = {}
     pending, feedback = items, None
     last_problems: dict = {}
+    trouble = []          # what went wrong with the model itself, per attempt
     for attempt in range(MAX_ATTEMPTS):
         try:
             written, record = call_model(client, pending, model, feedback)
+        except PROGRAMMING_ERRORS:
+            raise         # a bug in our code must surface, not pass as "API unavailable"
         except Exception as error:      # the SDK's API errors, timeouts, connection failures
             record = {"items_sent": len(pending), "error": _classify_error(error)}
             report.attempts.append(record)
-            if not accepted:
-                report.status, report.detail = "model_unavailable", record["error"]
-            else:
-                report.detail = record["error"]
+            trouble.append(record["error"])
             break
         report.attempts.append(record)
+        if record.get("stop_reason") == "refusal":
+            trouble.append("the model declined the request")
+        elif record.get("parse_error"):
+            trouble.append(f"the model's output could not be read ({record['parse_error']})")
         failed, feedback = [], {}
         for item in pending:
             problems = check_written(item, written.get(item["id"]))
@@ -236,19 +244,24 @@ def write_summaries(payload: dict, client=None, model: str = MODEL) -> tuple:
             else:
                 accepted[item["id"]] = written[item["id"]]
                 last_problems.pop(item["id"], None)
-        if record.get("stop_reason") == "refusal" and not accepted:
-            report.status, report.detail = "model_unavailable", "the model declined the request"
         pending = failed
         if not pending:
             break
 
+    # Status is decided once, from the outcome: nothing written because of the
+    # model itself is "model_unavailable"; some withheld is "partial".
+    report.detail = "; ".join(dict.fromkeys(trouble))
     for item in items:
         if item["id"] not in accepted:
             problems = last_problems.get(item["id"]) or [Problem("not_written", report.detail or "not written", item["id"])]
             report.withheld[item["id"]] = problems_to_dicts(problems)
     report.written = sorted(accepted)
-    if report.status == "ok" and report.withheld:
+    if not accepted and trouble:
+        report.status = "model_unavailable"
+    elif report.withheld:
         report.status = "partial"
+    else:
+        report.status = "ok"
     return accepted, report
 
 
@@ -298,8 +311,9 @@ def render_news(item: dict, accepted: dict) -> list:
 def plain_reason(reason: Optional[str]) -> str:
     """A section's empty-reason, safe to publish: a feed's error message can
     quote the request URL (with a redacted key, or a query string), so URLs
-    are reduced to their host name."""
-    text = re.sub(r"https?://([^/\s?#]+)[^\s)]*", r"\1", reason or "no reason recorded")
+    are removed. (Keeping the host was tried: a host such as "cdn123.net"
+    then failed the number check and stopped the brief.)"""
+    text = re.sub(r"https?://\S+", "(address removed)", reason or "no reason recorded")
     return esc(text)
 
 
@@ -390,6 +404,18 @@ def build_brief(payload: dict, client=None, model: str = MODEL,
     return markdown, {"brief_date": payload["brief_date"], "published": True,
                       "writer": writer.to_dict(), "payload_checks": [], "brief_checks": [],
                       "section_status": section_status(payload)}
+
+
+def public_payload(payload: dict) -> dict:
+    """The payload as it may be archived publicly. News excerpts are the
+    publishers' own text (digit-free, but still theirs), used only to brief the
+    model; the public archive keeps headline, link and credit, as the brief does."""
+    import copy
+    public = copy.deepcopy(payload)
+    from modules.morning_brief.validator import news_items as _news
+    for item in _news(public):
+        item.pop("excerpt", None)
+    return public
 
 
 def section_status(payload: dict) -> dict:

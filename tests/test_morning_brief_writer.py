@@ -175,7 +175,7 @@ def test_missing_and_not_covered_sections_say_which_and_why():
     p["sections"]["prices"].update(status="missing", items=[],
                                    reason="EIA request failed: 503 for url: https://api.eia.gov/v2/x?api_key=REDACTED")
     markdown = render_brief(p, {})
-    assert "No verified data today: EIA request failed: 503 for url: api.eia.gov" in markdown
+    assert "No verified data today: EIA request failed: 503 for url: (address removed)" in markdown
     assert "api_key" not in markdown
     assert "Not covered: No container freight index can be republished" in markdown
 
@@ -195,7 +195,7 @@ def test_feed_text_cannot_inject_markdown():
     item = next(i for i in news_items(p) if i["id"] == MISC)
     item["headline"] = "Owner *orders* [ships](https://evil.example) # now"
     markdown = render_brief(p, {})
-    assert "https://evil.example" in markdown and "\\[ships\\]" in markdown   # escaped, so not a link
+    assert "\\[ships\\]" in markdown            # escaped, so not a link
     assert check_numbers(markdown, p) == []
 
 
@@ -256,3 +256,150 @@ def test_model_trial_reports_pass_rate_and_cost_without_the_network():
     assert result["published"] == 2 and result["passes"] and result["withheld"] == 0
     assert result["after_retry"] == 1 and result["first_try"] == 2 * len(GOOD) - 1
     assert result["cost_per_brief_usd"] == pytest.approx(0.00075 * 3 / 2)
+
+
+
+# ── Fixes from the Phase 2 review (12-11-2026) ───────────────────────────────
+
+def publishes(p, client=None):
+    markdown, report = build_brief(p, client or FakeClient(GOOD))
+    return markdown, report
+
+
+def test_ordinary_feed_content_never_stops_the_brief():
+    p = payload()
+    items = {i["id"]: i for i in news_items(p)}
+    items[MISC]["author"] = "Hans ten Cate"                       # a number word in a name
+    items["e8fd72eddcea"]["author"] = "Staff 2"                   # a digit in a name
+    items["dc19c507a379"]["headline"] = "Owners rush to order *"  # trailing Markdown character
+    items["64fa131aa297"]["headline"] = "Ship <b>names</b> & owners: a [list]"
+    p["sections"]["prices"].update(status="missing", items=[],
+                                   reason="EIA request failed for url: https://cdn123.example456.net/x?api_key=REDACTED")
+    markdown, report = publishes(p)
+    assert report["published"] and validate_brief(markdown, p) == []
+    assert "cdn123" not in markdown
+
+
+def test_unsafe_links_and_urls_in_headlines_are_dropped_at_fetch_time():
+    from datetime import datetime, timezone
+    from modules.morning_brief.news import build_item
+    now = datetime(2026, 10, 12, 12, tzinfo=timezone.utc)
+    base = {"title": "Owners order new ships", "link": "https://gcaptain.com/story/", "published": now,
+            "categories": [], "excerpt_html": "Some words.", "author": "", "credit_fields": []}
+    assert build_item(base, "gcaptain", now)[0] is not None
+    assert build_item({**base, "link": "https://example.org/wiki/Ever_Given_(ship)"}, "gcaptain", now)[1] == "unsafe_link"
+    assert build_item({**base, "link": "https://gcaptain.com/a b"}, "gcaptain", now)[1] == "unsafe_link"
+    assert build_item({**base, "title": "Read more at https://x.org"}, "gcaptain", now)[1] == "link_in_headline"
+    assert build_item({**base, "title": "See www.example.com today"}, "gcaptain", now)[1] == "link_in_headline"
+
+
+def test_a_section_marked_ok_with_no_items_is_refused_not_published_blank():
+    p = payload()
+    p["sections"]["events"]["items"] = []
+    with pytest.raises(BriefRefused) as refused:
+        build_brief(p, FakeClient(GOOD))
+    assert "ok_but_empty" in {x.code for x in refused.value.problems}
+
+
+def test_silent_gap_check_works_on_real_rendered_output():
+    p = payload()
+    markdown = render_brief(p, {})
+    gutted = markdown.replace(
+        next(l for l in markdown.splitlines() if l.startswith("- **Capesize rates climb")) + "\n", "")
+    assert "silent_gap" in {x.code for x in validate_brief(gutted, p)}
+
+
+def test_swapped_figure_values_are_caught():
+    markdown = render_brief(payload(), {})
+    swapped = (markdown.replace("302 transits, as of", "TMP, as of")
+               .replace("190 transits, as of", "302 transits, as of").replace("TMP, as of", "190 transits, as of"))
+    codes = {x.code for x in validate_brief(swapped, payload())}
+    assert "figure_missing" in codes
+
+
+def test_refusal_then_success_is_ok_not_unavailable():
+    _, report = publishes(payload(), FakeClient("refusal", GOOD))
+    assert report["writer"]["status"] == "ok" and report["writer"]["withheld"] == {}
+
+
+def test_error_on_the_retry_after_a_partial_success_is_partial_with_the_reason():
+    first = with_change(MISC, summary="MISC has lined up 5 more LNG carriers.")
+    _, report = publishes(payload(), FakeClient(first, FakeAPIError(529, "overloaded")))
+    writer_report = report["writer"]
+    assert writer_report["status"] == "partial" and list(writer_report["withheld"]) == [MISC]
+    assert "HTTP 529" in writer_report["detail"]
+
+
+def test_unreadable_output_twice_is_unavailable_with_the_reason():
+    _, report = publishes(payload(), FakeClient("garbage", "garbage"))
+    assert report["writer"]["status"] == "model_unavailable"
+    assert "could not be read" in report["writer"]["detail"]
+
+
+def test_permission_denied_is_reported():
+    _, report = publishes(payload(), FakeClient(FakeAPIError(403, "forbidden")))
+    assert "permission denied" in report["writer"]["detail"]
+
+
+def test_a_bug_in_our_code_is_not_reported_as_an_api_outage():
+    with pytest.raises(TypeError):
+        publishes(payload(), FakeClient(TypeError("unexpected keyword argument")))
+
+
+def test_numeric_symbols_and_fold_words_are_refused_in_summaries():
+    from modules.morning_brief.validator import check_summary
+    item = {"id": "x", "headline": "h", "excerpt": ""}
+    for text in ("Orders rose by ½.", "Volumes rose tenfold.", "Volumes rose ten-fold.", "Output rose twice over.",
+                 "A rise of five %.", "Ⅻ ships were ordered.", "Contact press@example.com for more.",
+                 "Details are at example.com today."):
+        assert check_summary(text, item), text
+
+
+def test_archived_payload_carries_no_publisher_excerpts(tmp_path):
+    result = run("-m", "modules.morning_brief.write", "--payload", str(FIXTURES / "payload/from_fixtures.json"),
+                 "--out-dir", str(tmp_path))
+    assert result.returncode == 0
+    archived = json.loads((tmp_path / "payload.json").read_text())
+    assert all("excerpt" not in i for i in news_items(archived))
+    assert any(i.get("excerpt") for i in news_items(PAYLOAD))       # the input did have them
+
+
+def test_a_refused_run_removes_an_old_brief_from_the_folder(tmp_path):
+    (tmp_path / "brief.md").write_text("yesterday's brief")
+    bad = payload()
+    bad["sections"]["prices"]["items"][0]["value"] = 999.0
+    path = tmp_path / "bad.json"
+    path.write_text(json.dumps(bad))
+    assert run("-m", "modules.morning_brief.write", "--payload", str(path), "--out-dir", str(tmp_path)).returncode == 3
+    assert not (tmp_path / "brief.md").exists()
+
+
+def test_model_trial_does_not_count_an_api_error_as_first_try_success():
+    from modules.morning_brief.model_trial import trial
+    result = trial(FakeClient(FakeAPIError(401, "bad key")), "claude-haiku-5-5", 1, payload())
+    assert result["first_try"] == 0 and result["after_retry"] == 0 and not result["passes"]
+
+
+def test_request_serialises_through_the_real_sdk_and_a_real_message_parses():
+    """The fake client returns plain objects; this sends the real request body
+    through the installed anthropic SDK with a mock HTTP transport, and parses
+    a real Message that has a thinking block before the text block."""
+    anthropic = pytest.importorskip("anthropic")
+    import httpx2 as httpx
+    seen = {}
+    body = {"id": "msg_test", "type": "message", "role": "assistant", "model": "claude-haiku-5-5",
+            "stop_reason": "end_turn", "stop_sequence": None,
+            "usage": {"input_tokens": 1200, "output_tokens": 800},
+            "content": [{"type": "thinking", "thinking": "", "signature": "sig"},
+                        {"type": "text", "text": json.dumps({"items": [
+                            {"id": k, "summary": v[0], "why_it_matters": v[1]} for k, v in GOOD.items()]})}]}
+
+    def handler(request):
+        seen["body"] = json.loads(request.content)
+        return httpx.Response(200, json=body)
+
+    client = anthropic.Anthropic(api_key="test-key", http_client=httpx.Client(transport=httpx.MockTransport(handler)))
+    markdown, report = build_brief(payload(), client)
+    assert seen["body"]["model"] == "claude-haiku-5-5"
+    assert seen["body"]["output_config"]["format"]["type"] == "json_schema"
+    assert report["writer"]["status"] == "ok" and len(report["writer"]["written"]) == len(GOOD)

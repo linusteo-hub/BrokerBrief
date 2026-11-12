@@ -47,7 +47,7 @@ class Problem:
 # A number with comma thousands separators (1,234.5), or a plain one (1234.50).
 # A comma counts as a thousands separator only when exactly three digits follow,
 # so "5,3" is read as two numbers, not as 53.
-NUMBER = re.compile(r"(?<![\w.])\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?")
+NUMBER = re.compile(r"(?<![\w.])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)")
 
 
 def to_number(token: str) -> Optional[Decimal]:
@@ -207,9 +207,16 @@ def check_directions(text: str, payload: dict) -> list:
 NUMBER_WORDS = re.compile(
     r"\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|"
     r"sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundreds?|"
-    r"thousands?|millions?|billions?|trillions?|dozens?|percent|per cent|half|double|triple|quarter)\b",
+    r"thousands?|millions?|billions?|trillions?|dozens?|percent|per cent|half|double|triple|quarter|twice|"
+    r"\w+fold|\w+-fold)\b|%",
     re.I)
-MARKUP = re.compile(r"[\[\]<>`#*_|]|https?://|www\.")
+
+
+def has_numeric_character(text: str) -> bool:
+    """Any digit in any script, or a numeric symbol such as ½, ² or Roman Ⅻ."""
+    import unicodedata
+    return any(unicodedata.category(ch) in ("Nd", "No", "Nl") for ch in text)
+MARKUP = re.compile(r"[\[\]<>`#*_|@]|https?://|www\.|\b[a-z0-9-]+\.(com|org|net|io|co|gov|sg|uk)\b", re.I)
 HEDGES = re.compile(r"\b(suggests?|may|might|could|would|likely|appears?|indicates?|points? to|if)\b", re.I)
 SUMMARY_MAX_WORDS = 55
 SUMMARY_MAX_SENTENCES = 2
@@ -218,7 +225,7 @@ QUOTE_MAX_WORDS = 10    # longest run of words copied from the headline or excer
 
 
 def _words(text: str) -> list:
-    return re.findall(r"[a-z0-9']+", text.lower())
+    return re.findall(r"[\w']+", text.lower().replace("’", "'"))
 
 
 def longest_copied_run(text: str, source: str) -> int:
@@ -238,8 +245,8 @@ def longest_copied_run(text: str, source: str) -> int:
 
 def _common_checks(text: str, where: str) -> list:
     problems = []
-    if re.search(r"\d", text):
-        problems.append(Problem("digit", "contains a digit", where))
+    if re.search(r"\d", text) or has_numeric_character(text):
+        problems.append(Problem("digit", "contains a digit or numeric symbol", where))
     words = NUMBER_WORDS.findall(text)
     if words:
         problems.append(Problem("number_word", f"contains a number in words ({', '.join(sorted(set(w.lower() for w in words)))})", where))
@@ -248,7 +255,7 @@ def _common_checks(text: str, where: str) -> list:
         problems.append(Problem("banned_source", f"names a banned source ({banned})", where))
     if MARKUP.search(text) or "\n" in text:
         problems.append(Problem("markup", "contains a link, markup or a line break", where))
-    if re.search(r"\b(recommend|we advise|you should|investors should)\b", text, re.I):
+    if re.search(r"\b(recommend|we advise|you should|investors should|ought to)\b", text, re.I):
         problems.append(Problem("advice", "reads as advice", where))
     return problems
 
@@ -299,6 +306,13 @@ def validate_payload(payload: dict) -> list:
     problems = []
     brief_date = date.fromisoformat(payload["brief_date"])
     tags = {s["tag"] for s in payload.get("sources", [])}
+    for key, section in payload.get("sections", {}).items():
+        for sub_key, sub in section.get("subsections", {"": section}).items():
+            name = f"{key}.{sub_key}" if sub_key else key
+            if sub.get("status") == "ok" and not sub.get("items") and "subsections" not in sub:
+                problems.append(Problem("ok_but_empty", "section marked ok with no items", name))
+            if sub.get("status") in ("missing", "not_covered") and not sub.get("reason"):
+                problems.append(Problem("no_reason", "empty section without a reason", name))
     for fig in figures(payload):
         where = fig.get("id", "")
         source = ALLOWLIST.get(fig.get("source_id"))
@@ -349,7 +363,8 @@ def check_text(text: str, payload: dict) -> list:
 # ── Whole-brief gate ─────────────────────────────────────────────────────────
 
 NEWS_HEADINGS = ("## 4. Sale & Purchase", "## 5. Events and why they matter", "### Freight rate direction")
-BOLD = re.compile(r"\*\*(.+?)\*\*")
+BOLD = re.compile(r"\*\*((?:\\.|[^*\\])+?)\*\*")
+WHY_LABEL = "Why it matters (our interpretation):"
 
 
 def unescape(text: str) -> str:
@@ -383,13 +398,18 @@ def validate_brief(markdown: str, payload: dict) -> list:
                     "## 5. Events and why they matter", "## Sources"):
         if f"\n{heading}\n" not in markdown:
             problems.append(Problem("structure", f"section heading missing: {heading}"))
-    blocks = re.split(r"\n(?=## )", markdown)
-    for block in blocks[1:]:
+    # No silent gaps: every section and subsection must show at least one item
+    # or say why it is empty. Freight's own body only introduces its subsections.
+    for block in re.split(r"\n(?=#{2,3} )", markdown)[1:]:
         heading, _, body = block.partition("\n")
-        if heading == "## Sources":
+        if heading in ("## Sources", "## 3. Freight"):
             continue
-        if not body.strip():
+        shown = [l for l in body.splitlines()
+                 if l.startswith("- ") or l.startswith(("No verified data today:", "Not covered:"))]
+        if not shown:
             problems.append(Problem("silent_gap", "section has neither content nor a reason it is empty", heading))
+    if "\n## 3. Freight\n" in markdown and "\n### " not in markdown.split("\n## 3. Freight\n", 1)[1].split("\n## ", 1)[0]:
+        problems.append(Problem("silent_gap", "Freight shows none of its subsections", "## 3. Freight"))
 
     # Links: only payload links and source pages.
     allowed = allowed_urls(payload)
@@ -405,11 +425,14 @@ def validate_brief(markdown: str, payload: dict) -> list:
     for tag in set(TAG.findall(markdown)):
         if f"S{tag}" not in tags:
             problems.append(Problem("unknown_source_tag", f"[S{tag}] is not in the sources list"))
+    # Each figure must appear on one line together with its own label and tag,
+    # so a value cannot be shown next to another figure's name.
     for fig in figures(payload):
-        lines = [l for l in markdown.splitlines() if fig["display"] in l]
-        if not lines:
-            problems.append(Problem("figure_missing", "payload figure not shown", fig["id"]))
-        elif not any(f"[{fig['source_tag']}]" in l for l in lines):
+        own = [l for l in markdown.splitlines()
+               if f"**{fig['label']}:** {fig['display']}," in unescape(l)]
+        if not own:
+            problems.append(Problem("figure_missing", "figure not shown next to its own label", fig["id"]))
+        elif not any(f"[{fig['source_tag']}]" in l for l in own):
             problems.append(Problem("untagged_figure", f"no [{fig['source_tag']}] next to the figure", fig["id"]))
 
     # Banned names anywhere.
@@ -428,7 +451,8 @@ def validate_brief(markdown: str, payload: dict) -> list:
     # Text the template copies from the payload into a news line: dates and
     # publisher names ("Splash247" contains digits).
     copied = {item.get("published_display", "") for item in news_items(payload)}
-    copied |= {name for item in news_items(payload) for name in [item.get("publisher", "")] + item.get("also_reported_by", [])}
+    copied |= {name for item in news_items(payload)
+               for name in [item.get("publisher", ""), item.get("author") or ""] + item.get("also_reported_by", [])}
     copied = sorted((c for c in copied if c), key=len, reverse=True)
     for line in _news_lines(markdown):
         rest = strip_urls(line)[0]
@@ -436,7 +460,7 @@ def validate_brief(markdown: str, payload: dict) -> list:
             plain = unescape(bold)
             if plain in headlines:
                 rest = rest.replace(f"**{bold}**", "")
-            elif not plain.startswith("Why it matters"):
+            elif plain != WHY_LABEL:
                 problems.append(Problem("headline_not_in_payload", "bold text is not a payload headline", plain))
         rest = TAG.sub("", rest)
         for c in copied:

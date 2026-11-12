@@ -77,4 +77,3 @@ BrokerBrief is my (Linus's) Python/Streamlit maritime decision-support project, 
 - Write the brief from a payload: `python -m modules.morning_brief.write --payload <payload.json> --out-dir <dir>` (uses `ANTHROPIC_API_KEY` if set; without it, or with `--no-model`, news is published as headline and link only). Exit 0 published, 3 refused by the gate.
 - **Validator** (used by the verify skill): `python -m modules.morning_brief.validate --cases tests/fixtures/validator` (exit 0 only if every good case passes and every must-fail case is caught). Check one real brief: `python -m modules.morning_brief.validate --payload <payload.json> --brief <brief.md>`.
 - Compare writer models on the fixture payload (needs the API key; spends a few cents): `python -m modules.morning_brief.model_trial --runs 3`
-<!-- Morning-brief validator (Phase 2): not built yet. -->

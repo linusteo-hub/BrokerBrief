@@ -78,12 +78,15 @@ DROP_REASONS = {
     "banned_source": "names a banned source",
     "digit_in_freight_headline": "freight headline quotes figures",
     "missing_headline_or_link": "missing headline or https link",
+    "unsafe_link": "link contains characters that cannot be published safely",
+    "link_in_headline": "headline contains a web address",
     "no_date": "no publication date",
     "outside_window": "outside the time window",
     "duplicate": "same story as an earlier item",
     "over_limit": "section already full",
 }
 MAIN_DROP_CODES = ("banned_source", "digit_in_freight_headline")
+SAFE_LINK = re.compile(r"https://[A-Za-z0-9\-._~:/?#@!$&*+,;=%]+")
 
 
 class FeedError(Exception):
@@ -237,6 +240,14 @@ def build_item(entry: dict, source_id: str, now: datetime) -> tuple[Optional[dic
     link = entry.get("link", "").strip()
     if not title or not link.startswith("https://"):
         return None, "missing_headline_or_link"
+    # Feed content is published unattended, so anything that would break the
+    # page or the publishing gate is dropped here as one item, never allowed to
+    # stop the whole brief: a link with spaces, brackets, quotes or angle
+    # brackets, or a headline carrying its own web address.
+    if not SAFE_LINK.fullmatch(link):
+        return None, "unsafe_link"
+    if re.search(r"https?://|www\.", title, re.I):
+        return None, "link_in_headline"
     excerpt = strip_html(entry.get("excerpt_html", ""))
     if mentions_banned_source(title) or mentions_banned_source(excerpt):
         return None, "banned_source"
