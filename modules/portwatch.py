@@ -8,14 +8,30 @@ import requests
 from datetime import date, datetime, timedelta, timezone
 from collections import defaultdict
 
-from modules.provenance import PORTWATCH_MAX_AGE, QualityTier, SourceInfo, parse_as_of, stamp
+from modules.provenance import (
+    PORTWATCH_MAX_AGE, QualityTier, SourceInfo, parse_as_of, stamp, utc_date, utc_today,
+)
 
 PORTWATCH_URL = (
     "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/"
     "ArcGIS/rest/services/Daily_Ports_Data/FeatureServer/0/query"
 )
 
+CHOKEPOINTS_URL = (
+    "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/"
+    "ArcGIS/rest/services/Daily_Chokepoints_Data/FeatureServer/0/query"
+)
+LAYER_URLS = {"ports": PORTWATCH_URL, "chokepoints": CHOKEPOINTS_URL}
+
 TARGET_PORTS = ["Singapore", "Rotterdam", "Fujairah", "Port Hedland", "Houston"]
+
+# IMF terms (https://www.imf.org/en/about/copyright-and-terms) allow reuse and
+# publication with a citation, and require stating any material transformation;
+# commercial reuse and automated bulk download need IMF permission. Everything
+# BrokerBrief shows from PortWatch is derived (direction labels, totals,
+# changes), hence "calculations based on". Show it wherever PortWatch data is.
+PORTWATCH_CREDIT = ("BrokerBrief calculations based on data from International Monetary Fund, "
+                    "PortWatch, https://portwatch.imf.org")
 
 # The app's port name -> PortWatch's `portname`, where they differ. This is the
 # only place the mapping lives. PortWatch names the port "Houston (US-TX)"
@@ -28,14 +44,14 @@ APP_NAMES = {pw: app for app, pw in PORTWATCH_NAMES.items()}
 PORTWATCH = SourceInfo(
     name="IMF Portwatch",
     url="https://portwatch.imf.org",
-    licence="IMF Open Data Terms",
+    licence="IMF copyright and terms (reuse with credit; commercial reuse needs permission)",
     quality_tier=QualityTier.LIVE_API,
     max_age=PORTWATCH_MAX_AGE,
 )
 
 
 def fetch_port_activity() -> dict:
-    cutoff = (date.today() - timedelta(days=14)).strftime("%Y-%m-%d")
+    cutoff = (utc_today() - timedelta(days=14)).strftime("%Y-%m-%d")
     port_list = ", ".join(f"'{PORTWATCH_NAMES.get(p, p)}'" for p in TARGET_PORTS)
     params = {
         "where":             f"portname IN ({port_list}) AND date >= DATE '{cutoff}'",
@@ -74,13 +90,43 @@ def fetch_port_activity() -> dict:
             "congestion_reasons": reasons,
             "source_name":        "IMF Portwatch",
             "source_url":         "https://portwatch.imf.org",
-            "updated_at":         date.today().isoformat(),
+            "updated_at":         utc_today().isoformat(),
             "confidence":         0.80,
             # Rows are ordered `portname, date DESC` (grouped per port, not globally
             # sorted) — as_of must be an explicit max() over all rows, not rows[0].
             "provenance":         stamp(PORTWATCH, as_of=latest_as_of),
         }
     except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def fetch_daily_rows(layer: str, portids: list, start: str, fields: list, get=requests.get) -> dict:
+    """Raw daily rows from one PortWatch layer ("ports" or "chokepoints") for the
+    given portids from `start` (YYYY-MM-DD). Returns {"success": True, "rows":
+    [attribute dicts]} or {"success": False, "error": ...}.
+
+    ArcGIS reports query errors with HTTP 200 and an "error" body, and silently
+    truncates large results (exceededTransferLimit); both count as failures.
+    `get` is injectable; only network and response-shape errors are caught."""
+    id_list = ", ".join(f"'{p}'" for p in portids)
+    params = {
+        "where":             f"portid IN ({id_list}) AND date >= DATE '{start}'",
+        "outFields":         ",".join(fields),
+        "orderByFields":     "portid,date DESC",
+        "returnGeometry":    "false",
+        "resultRecordCount": 2000,
+        "f":                 "json",
+    }
+    try:
+        response = get(LAYER_URLS[layer], params=params, timeout=20)
+        response.raise_for_status()
+        body = response.json()
+        if "error" in body:
+            raise ValueError(f"ArcGIS error: {body['error'].get('message')}")
+        if body.get("exceededTransferLimit"):
+            raise ValueError("ArcGIS truncated the result (exceededTransferLimit)")
+        return {"success": True, "rows": [f["attributes"] for f in body["features"]]}
+    except (requests.RequestException, ValueError, KeyError, TypeError) as e:
         return {"success": False, "error": str(e)}
 
 
@@ -114,7 +160,7 @@ def _compute_congestion(rows: list, ports: list) -> tuple[dict, dict]:
         previous = sorted_rows[-1]["portcalls"]
         if previous == 0:
             signals[port] = "Unknown"
-            earliest = parse_as_of(sorted_rows[-1]["date"])
+            earliest = utc_date(sorted_rows[-1]["date"])
             day = f"{earliest.day} {earliest.strftime('%B %Y')}" if earliest else "unknown date"
             reasons[port] = (f"{port} had zero port calls on its earliest day in the window "
                              f"({day}), so there is no baseline to compare against.")

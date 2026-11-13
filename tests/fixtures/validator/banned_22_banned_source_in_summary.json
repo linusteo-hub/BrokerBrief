@@ -1,0 +1,11 @@
+{
+ "description": "A summary naming a banned index provider is refused. (File name starts with 'banned' so the licence scan allows it.)",
+ "check": "summary",
+ "payload": "payload/from_fixtures.json",
+ "item_id": "cfc1c2cab9ac",
+ "text": "Capesize earnings improved, according to the Baltic Exchange.",
+ "expect": "fail",
+ "expect_codes": [
+  "banned_source"
+ ]
+}

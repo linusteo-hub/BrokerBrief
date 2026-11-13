@@ -8,6 +8,9 @@ Architecture:
   → Market Intelligence (repositioned dashboard, supporting role)
 """
 
+import os
+import time
+
 import streamlit as st
 import pandas as pd
 from datetime import date
@@ -19,10 +22,10 @@ from modules.report import generate_email, generate_linkedin
 from modules.pdf_export import generate_pdf_bytes
 from modules.bunker import compute_bunker_spreads
 from modules.eia import fetch_all as eia_fetch_all
-from modules.portwatch import fetch_port_activity
+from modules.portwatch import PORTWATCH_CREDIT, fetch_port_activity
 
 from modules.decision.scenario import (
-    BunkeringScenario, FuelGrade, RiskProfile, FuelAvailability,
+    BunkeringScenario, FuelGrade, RiskProfile, FuelAvailability, Scrubber,
 )
 from modules.decision.options import generate_options
 from modules.decision.constraint_engine import (
@@ -138,6 +141,72 @@ hr{border-color:var(--bdr)!important;}
 </style>
 """, unsafe_allow_html=True)
 
+# ── Live data without a manual step ──────────────────────────────────────────
+# On the deployed app the EIA key is a server-side secret (Streamlit secrets,
+# or the EIA_API_KEY environment variable), so a visitor gets live Brent with
+# nothing to paste. Results are cached for LIVE_TTL_SECONDS and shared by all
+# visitors: EIA releases weekly and PortWatch lags 8–10 days, so refetching on
+# every visit would only add load and failure points.
+#
+# A failed fetch is never kept in that 3-hour cache (it would show an error for
+# hours). It is held for FAILURE_RETRY_SECONDS instead, so that during an outage
+# the app retries every few minutes rather than on every click: without this,
+# each widget edit would wait on network timeouts and hammer the failing API.
+LIVE_TTL_SECONDS = 3 * 60 * 60
+FAILURE_RETRY_SECONDS = 5 * 60
+
+
+def _server_eia_key() -> str:
+    try:
+        key = st.secrets.get("EIA_API_KEY", "")
+    except Exception:          # no secrets file at all (local run, tests)
+        key = ""
+    return key or os.environ.get("EIA_API_KEY", "")
+
+
+SERVER_EIA_KEY = _server_eia_key()
+
+
+@st.cache_data(ttl=LIVE_TTL_SECONDS, show_spinner=False)
+def _cached_eia() -> dict:
+    return eia_fetch_all(SERVER_EIA_KEY)
+
+
+@st.cache_data(ttl=LIVE_TTL_SECONDS, show_spinner=False)
+def _cached_portwatch() -> dict:
+    return fetch_port_activity()
+
+
+@st.cache_resource
+def _recent_failures() -> dict:
+    """name -> (monotonic time, failed result). Shared by all sessions."""
+    return {}
+
+
+def _live(name: str, cached_fetch, succeeded) -> dict:
+    """The cached result of `cached_fetch`, with failures held only briefly."""
+    failures = _recent_failures()
+    held = failures.get(name)
+    if held and time.monotonic() - held[0] < FAILURE_RETRY_SECONDS:
+        return held[1]
+    data = cached_fetch()
+    if succeeded(data):
+        failures.pop(name, None)
+    else:
+        cached_fetch.clear()                       # never keep a failure for 3 hours
+        failures[name] = (time.monotonic(), data)
+    return data
+
+
+def _live_eia() -> dict:
+    return _live("eia", _cached_eia,
+                 lambda d: d.get("spot", {}).get("success") and d.get("forecast", {}).get("success"))
+
+
+def _live_portwatch() -> dict:
+    return _live("portwatch", _cached_portwatch, lambda d: d.get("success"))
+
+
 # ── Session state ─────────────────────────────────────────────────────────────
 _defaults = {
     "df": None, "data_source": "none", "eia_key": "", "eia_data": None,
@@ -176,18 +245,29 @@ with st.sidebar:
     ], label_visibility="collapsed")
 
     st.markdown("---")
-    st.markdown('<div style="font-family:JetBrains Mono,monospace;font-size:0.65rem;color:#8B949E;margin-bottom:4px;">EIA API KEY</div>', unsafe_allow_html=True)
-    eia_key_input = st.text_input("EIA Key", value=st.session_state["eia_key"],
-                                   type="password", label_visibility="collapsed",
-                                   placeholder="Paste EIA key here")
-    if eia_key_input != st.session_state["eia_key"]:
-        st.session_state["eia_key"] = eia_key_input
-        st.session_state["eia_data"] = None
+    if SERVER_EIA_KEY:
+        # Deployed: nothing for the visitor to enter, and no refresh button: the
+        # cache is shared by every visitor, so one visitor must not be able to
+        # force refetches for all. The server key is never put in session state
+        # or in a widget, so it cannot be sent to a browser.
+        st.caption(f"Live data loads automatically and is refetched every "
+                   f"{LIVE_TTL_SECONDS // 3600} hours.")
+    else:
+        # Local run without a configured key: paste one for this session.
+        st.markdown('<div style="font-family:JetBrains Mono,monospace;font-size:0.65rem;color:#8B949E;margin-bottom:4px;">EIA API KEY</div>', unsafe_allow_html=True)
+        eia_key_input = st.text_input("EIA Key", value=st.session_state["eia_key"],
+                                       type="password", label_visibility="collapsed",
+                                       placeholder="Paste EIA key here")
+        if eia_key_input != st.session_state["eia_key"]:
+            st.session_state["eia_key"] = eia_key_input
+            st.session_state["eia_data"] = None
 
-    if st.button("↺  Refresh Live Data"):
-        st.session_state["eia_data"] = None
-        st.session_state["portwatch_data"] = None
-        st.rerun()
+        if st.button("↺  Refresh Live Data"):
+            _cached_portwatch.clear()
+            _recent_failures().clear()
+            st.session_state["eia_data"] = None
+            st.session_state["portwatch_data"] = None
+            st.rerun()
 
     if is_sample(st.session_state["df"]).any():
         st.button("✕  Clear demo data", on_click=_clear_demo_data)
@@ -200,13 +280,15 @@ with st.sidebar:
     st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:0.65rem;color:#8B949E;">Date: {date.today().strftime("%d %b %Y")}</div>', unsafe_allow_html=True)
     st.markdown('<div style="font-family:JetBrains Mono,monospace;font-size:0.6rem;color:#6B7480;line-height:1.6;margin-top:.75rem;">BrokerBrief v0.3<br>No source, no certainty.<br>The decision belongs to you.</div>', unsafe_allow_html=True)
 
-# ── Fetch live data (cached per session) ──────────────────────────────────────
-if st.session_state["eia_key"] and st.session_state["eia_data"] is None:
+# ── Fetch live data (shared cache; see LIVE_TTL_SECONDS) ──────────────────────────────────────
+if SERVER_EIA_KEY:
+    with st.spinner("Fetching EIA data..."):
+        st.session_state["eia_data"] = _live_eia()
+elif st.session_state["eia_key"] and st.session_state["eia_data"] is None:
     with st.spinner("Fetching EIA data..."):
         st.session_state["eia_data"] = eia_fetch_all(st.session_state["eia_key"])
-if st.session_state["portwatch_data"] is None:
-    with st.spinner("Fetching Portwatch data..."):
-        st.session_state["portwatch_data"] = fetch_port_activity()
+with st.spinner("Fetching Portwatch data..."):
+    st.session_state["portwatch_data"] = _live_portwatch()
 
 df             = st.session_state["df"]
 eia_data       = st.session_state["eia_data"]
@@ -231,7 +313,7 @@ def _badge_for(prov: "Provenance | None") -> str:
     label = prov.quality_tier.value.replace("_", " ")
     fresh = prov.freshness()
     if fresh is Freshness.STALE:
-        age_str = f"as of {prov.as_of:%Y-%m-%d}" if prov.as_of else "age unknown"
+        age_str = f"as of {prov.as_of:%d-%m-%Y}" if prov.as_of else "age unknown"
         return f'<span class="stale-badge">{label} — STALE ({age_str})</span>'
     if fresh is Freshness.UNKNOWN:
         return f'<span class="unknown-badge">{label} — freshness unknown</span>'
@@ -289,13 +371,13 @@ elif "Bunkering" in page:
         preset = None
         with c1:
             if st.button("Scenario 1\nBoth ports feasible"):
-                preset = dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=False)
+                preset = dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=11.5, flex=36.0, sim_fuj_missing=False)
         with c2:
             if st.button("Scenario 2\nFujairah unreachable"):
-                preset = dict(fuel=280.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=False)
+                preset = dict(fuel=280.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=11.5, flex=36.0, sim_fuj_missing=False)
         with c3:
             if st.button("Scenario 3\nFujairah price missing"):
-                preset = dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=True)
+                preset = dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=11.5, flex=36.0, sim_fuj_missing=True)
         if preset:
             # The documented scenario results rely on demo prices, so picking a
             # scenario loads demo data (and its banner) if it isn't loaded yet.
@@ -306,16 +388,18 @@ elif "Bunkering" in page:
             st.session_state["decision_result"] = None
             st.rerun()
 
-    p = st.session_state.get("preset", dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=False))
+    p = st.session_state.get("preset", dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=11.5, flex=36.0, sim_fuj_missing=False))
 
     # ── Scenario input form ──────────────────────────────────────────────────
     st.markdown("### Vessel Scenario")
     col1, col2, col3 = st.columns(3)
     with col1:
-        vessel_name  = st.text_input("Vessel name (display only)", value="MV Demo Trader")
-        current_loc  = st.text_input("Current location / last port", value="Colombo")
-        destination  = st.text_input("Destination / next major port", value="Rotterdam")
-        fuel_grade   = st.selectbox("Required fuel grade", [g.value for g in FuelGrade], index=0)
+        vessel_name  = st.text_input("Vessel name (display only)", value="MT Demo Trader")
+        current_loc  = st.text_input("Current location / last port", value="South China Sea, ex Zhoushan (in ballast)")
+        destination  = st.text_input("Destination / next major port", value="Ras Tanura")
+        fuel_grade   = st.selectbox("Required fuel grade", [g.value for g in FuelGrade], index=0,
+                                    help="VLSFO: max 0.50% sulphur. MGO: distillate. HSFO: above 0.50%, up to "
+                                         "3.50% sulphur — usable only with a scrubber.")
     with col2:
         fuel_remaining = st.number_input("Fuel remaining (MT)", min_value=0.0, value=p["fuel"], step=10.0)
         daily_cons     = st.number_input("Daily consumption (MT/day)", min_value=1.0, value=p["cons"], step=1.0)
@@ -328,6 +412,28 @@ elif "Bunkering" in page:
         flex     = st.number_input("Schedule flexibility (hours)", min_value=0.0, value=p["flex"], step=6.0)
         risk     = st.selectbox("Risk profile", [r.value for r in RiskProfile], index=1)
 
+    with st.expander("Regulatory inputs (MARPOL Annex VI) and bunker prices"):
+        r1, r2 = st.columns(2)
+        with r1:
+            scrubber = st.selectbox("Scrubber (exhaust gas cleaning system) fitted",
+                                     [s.value for s in Scrubber], index=0,
+                                     help="HSFO may only be used, or carried for use, with an approved "
+                                          "equivalent such as a scrubber (regulations 14.1 and 4.1).")
+        with r2:
+            enters_eca = st.checkbox("Voyage enters an emission control area (ECA)", value=False,
+                                      help="Inside an ECA the fuel used on board must not exceed 0.10% "
+                                           "sulphur (regulation 14.4). Adds a warning; removes nothing.")
+        st.caption(f"Bunker prices for {fuel_grade}, USD/MT. A price typed for one grade is never carried over to another. No free, redistributable source of port "
+                   "bunker prices exists, so BrokerBrief never fills these in. Enter your own quotes "
+                   "(0 = not provided), upload a CSV on the Data Input page, or load a demo scenario.")
+        pr1, pr2 = st.columns(2)
+        with pr1:
+            sg_price_in = st.number_input(f"Singapore {fuel_grade} price (USD/MT)", min_value=0.0, value=0.0,
+                                          step=5.0, key=f"sg_price_{fuel_grade}")
+        with pr2:
+            fuj_price_in = st.number_input(f"Fujairah {fuel_grade} price (USD/MT)", min_value=0.0, value=0.0,
+                                           step=5.0, key=f"fuj_price_{fuel_grade}")
+
     with st.expander("Optional inputs — improve confidence"):
         c1, c2, c3 = st.columns(3)
         with c1:
@@ -339,7 +445,7 @@ elif "Bunkering" in page:
         with c3:
             sim_fuj_missing = st.checkbox("Simulate: Fujairah price unavailable",
                                            value=p["sim_fuj_missing"],
-                                           help="Demo flag — treats Fujairah VLSFO price as missing to show data-gap behaviour.")
+                                           help="Demo flag — treats the Fujairah price as missing to show data-gap behaviour. It overrides any price typed or loaded.")
 
     run = st.button("⚓  Evaluate Bunkering Strategy", type="primary")
 
@@ -359,6 +465,8 @@ elif "Bunkering" in page:
             singapore_vlsfo_available = FuelAvailability(sg_avail),
             fujairah_vlsfo_available  = FuelAvailability(fuj_avail),
             risk_profile         = RiskProfile(risk),
+            scrubber             = Scrubber(scrubber),
+            voyage_enters_eca    = enters_eca,
         )
 
         # With demo data active, Brent, the forecast and congestion are fixed
@@ -367,6 +475,9 @@ elif "Bunkering" in page:
         market_data = assemble_market_data(
             df, engine_eia, engine_portwatch,
             simulate_fujairah_missing=sim_fuj_missing,
+            fuel_grade=scenario.fuel_grade.value,
+            singapore_price_override=sg_price_in if sg_price_in > 0 else None,
+            fujairah_price_override=fuj_price_in if fuj_price_in > 0 else None,
         )
 
         options = generate_options(scenario)
@@ -476,7 +587,7 @@ elif "Bunkering" in page:
                     "Schedule Risk": bd.get("schedule_risk", {}).get("score", "–"),
                     "Composite": o.score,
                 })
-            st.dataframe(pd.DataFrame(rows).set_index("Rank"), use_container_width=True)
+            st.dataframe(pd.DataFrame(rows).set_index("Rank"), width="stretch")
             with st.expander("Show scoring reasoning per option"):
                 for o in feasible:
                     bd = getattr(o, "_score_breakdown", {})
@@ -490,7 +601,14 @@ elif "Bunkering" in page:
             st.markdown('<div class="info-card"><div class="info-card-title">6 · Decision Confidence</div>', unsafe_allow_html=True)
             st.markdown(f'<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:1.8rem;color:#E6EDF3;">{confidence["overall"]:.0f}% <span style="font-size:.9rem;color:#8B949E;">({confidence["label"]})</span></div>', unsafe_allow_html=True)
             if confidence.get("cap_reason"):
-                st.markdown(f'<div class="warn-strip">⚠ Capped at Medium (would be {confidence["uncapped_overall"]:.0f}%). {confidence["cap_reason"]}</div>', unsafe_allow_html=True)
+                # Say "capped" only when a cap actually lowered the score, and
+                # name the level it was capped at (Medium or Low).
+                if confidence["overall"] < confidence["uncapped_overall"]:
+                    lead = (f'Capped at {confidence["label"]} '
+                            f'(would be {confidence["uncapped_overall"]:.0f}%). ')
+                else:
+                    lead = "A cap applies, but the score was already below it. "
+                st.markdown(f'<div class="warn-strip">⚠ {lead}{confidence["cap_reason"]}</div>', unsafe_allow_html=True)
             for label, comp in [("Data Quality (40%)", "data_quality"),
                                  ("Signal Agreement (30%)", "signal_agreement"),
                                  ("Scenario Completeness (30%)", "scenario_completeness")]:
@@ -524,7 +642,14 @@ elif "Bunkering" in page:
                 f"Bunkering operation times assumed: Singapore {PORT_BUNKERING_TIME_HOURS['Singapore']:.0f}h, Fujairah {PORT_BUNKERING_TIME_HOURS['Fujairah']:.0f}h (indicative).",
                 "No unexpected geopolitical or weather disruption assumed.",
                 "Minimum/maximum stem sizes use indicative POC values, not confirmed supplier data.",
-            ]
+                (f"Safety reserve of {reserve:,.0f} MT is "
+                 + ("as entered." if scenario.safety_reserve_mt is not None
+                    else "the default: the larger of 10% of fuel on board or 24 hours of consumption.")),
+                "The split stem's Singapore-to-Fujairah leg is checked (rule F4) from the two ETAs and the daily "
+                "consumption; fuel burned while waiting and bunkering at Singapore is assumed to be within the ETAs.",
+            ] + [f"Congestion at {port} is unknown, so an 8-hour wait is assumed."
+                 for port in ("Singapore", "Fujairah")
+                 if market_data["congestion_signals"].get(port) not in CONGESTION_WAIT_HOURS]
             st.markdown('<div class="info-card"><div class="info-card-title">8 · Assumptions</div>' +
                         "".join(f'<div class="assumption-item">• {a}</div>' for a in assumptions) +
                         '</div>', unsafe_allow_html=True)
@@ -532,7 +657,11 @@ elif "Bunkering" in page:
             # 9 — DATA SOURCES
             st.markdown('<div class="info-card"><div class="info-card-title">9 · Data Sources</div>', unsafe_allow_html=True)
             for source, prov in market_data["provenance"].items():
-                st.markdown(f'<div class="provenance-row">{source} {_badge_for(prov)}</div>', unsafe_allow_html=True)
+                detail = ""
+                if prov is not None:
+                    dated = f"as of {prov.as_of:%d-%m-%Y}" if prov.as_of else "no source date"
+                    detail = f" · {prov.source_name} · {dated} · licence: {prov.licence}"
+                st.markdown(f'<div class="provenance-row">{source} {_badge_for(prov)}{detail}</div>', unsafe_allow_html=True)
             st.markdown('<div class="data-note">No source, no certainty. Missing data lowers confidence but does not remove physically feasible options. The final commercial decision remains with you — BrokerBrief cannot observe supplier relationships, internal budgets, charterparty obligations, or company risk appetite.</div></div>', unsafe_allow_html=True)
 
 
@@ -564,7 +693,8 @@ elif "Market Intelligence" in page:
             signals.congestion_direction = (max(counts, key=counts.get) if any(counts.values())
                                             else "Unknown")
             has_congestion = True
-            brief_sources.add(portwatch_data["source_name"])
+            # The PDF lists source names; for PortWatch that must be the IMF credit line.
+            brief_sources.add(PORTWATCH_CREDIT)
     brief_sources = sorted(brief_sources)
     # The template brief speaks to freight and bunkers, so it needs real rows for both.
     brief_ready = bool(has_freight and has_bunker)
@@ -601,6 +731,8 @@ elif "Market Intelligence" in page:
                 <div class="stat-pill-row">{pills}{brent_pill}</div>
             </div>
             """, unsafe_allow_html=True)
+            if portwatch_data and portwatch_data.get("success"):
+                st.caption(PORTWATCH_CREDIT)
         else:
             brief = generate_brief(signals)
             tone_css = {"Bullish": "tone-bullish", "Cautiously Bullish": "tone-cautious",
@@ -619,6 +751,8 @@ elif "Market Intelligence" in page:
                 <div class="brief-card-risk">⚠ {brief["risk_note"]}</div>
             </div>
             """, unsafe_allow_html=True)
+            if portwatch_data and portwatch_data.get("success"):
+                st.caption(PORTWATCH_CREDIT)
         if unknown_congestion:
             st.caption("Congestion unknown (not counted in the Congestion pill): "
                        + " ".join(f"{p}: {r}" for p, r in unknown_congestion.items()))
@@ -630,10 +764,10 @@ elif "Market Intelligence" in page:
                 return {"Up":"color:#FF6B6B;font-weight:600","Down":"color:#FF6B6B;font-weight:600",
                         "Flat":"color:#58A6FF;font-weight:600","Rising":"color:#F0A500;font-weight:600",
                         "Easing":"color:#3FB950;font-weight:600","Stable":"color:#58A6FF;font-weight:600"}.get(val,"")
-            styled = (table_df.style.applymap(_colour_dir, subset=["Direction"])
+            styled = (table_df.style.map(_colour_dir, subset=["Direction"])
                       .format({"Pct Change": "{:+.2f}%", "Confidence": "{:.0%}"})
                       .hide(axis="index"))
-            st.dataframe(styled, use_container_width=True, height=420)
+            st.dataframe(styled, width="stretch", height=420)
         else:
             st.warning("MISSING — no real freight, bunker or congestion rows loaded. Demo data is never shown here.")
         if portwatch_data and portwatch_data.get("success"):
@@ -643,6 +777,7 @@ elif "Market Intelligence" in page:
                     st.markdown(f"- **{port}**: Unknown — {unknown_congestion.get(port, 'No reason recorded.')}")
                 else:
                     st.markdown(f"- **{port}**: {sig}")
+            st.caption(PORTWATCH_CREDIT)
 
     with tab_bunker:
         bunker_data = compute_bunker_spreads(mi_df)
@@ -711,7 +846,7 @@ elif "Data Input" in page:
 
     st.markdown("---")
     st.markdown("**Data Preview**")
-    st.dataframe(st.session_state["df"], use_container_width=True)
+    st.dataframe(st.session_state["df"], width="stretch")
 
     st.markdown("**Validation Report**")
     if st.session_state["df"].empty:
@@ -736,8 +871,10 @@ elif "Live Data" in page:
     st.markdown('<div class="page-subtitle">Status of all live API connections</div>', unsafe_allow_html=True)
 
     st.markdown("### EIA Crude Oil API")
-    if not st.session_state["eia_key"]:
-        st.warning("No EIA API key entered. Add your key in the sidebar. Register free at https://www.eia.gov/opendata/")
+    if not (SERVER_EIA_KEY or st.session_state["eia_key"]):
+        st.warning("No EIA API key is configured. On the deployed app the key is a server-side secret; "
+                   "for a local run, set EIA_API_KEY or paste a key in the sidebar "
+                   "(free registration at https://www.eia.gov/opendata/).")
     elif eia_data:
         spot  = eia_data.get("spot", {})
         fcast = eia_data.get("forecast", {})
@@ -747,7 +884,7 @@ elif "Live Data" in page:
             st.error(f"❌ Spot fetch failed: {spot.get('error')}")
         if fcast.get("success"):
             st.success(f"✅ Forecast: ${fcast['nearest_value']:.2f}/bbl for {fcast['nearest_month']}")
-            st.dataframe(pd.DataFrame(fcast["forecast_rows"]), use_container_width=True)
+            st.dataframe(pd.DataFrame(fcast["forecast_rows"]), width="stretch")
         else:
             st.error(f"❌ Forecast fetch failed: {fcast.get('error')}")
 
@@ -761,9 +898,10 @@ elif "Live Data" in page:
             text = f"Unknown — {reasons.get(port, 'No reason recorded.')}" if sig == "Unknown" else sig
             st.markdown(f"{colour} **{port}**: {text}")
         with st.expander("Show raw port data"):
-            st.dataframe(pd.DataFrame(portwatch_data["ports"]), use_container_width=True)
+            st.dataframe(pd.DataFrame(portwatch_data["ports"]), width="stretch")
+        st.caption(PORTWATCH_CREDIT)
     else:
         err = portwatch_data.get("error", "Unknown error") if portwatch_data else "Not fetched"
         st.error(f"❌ Portwatch: {err}")
 
-    st.markdown('<div class="data-note">Live data is cached per session. Click "↺ Refresh Live Data" in the sidebar to force a fresh fetch. EIA publishes its daily spot prices in a weekly release, so the latest value can be up to about 9 days old; it is marked stale after 10 days. IMF PortWatch publishes in weekly batches about 8–10 days behind.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="data-note">On the deployed app, live data is fetched automatically, shared by all visitors and refetched every 3 hours; a failed fetch is retried after 5 minutes. EIA publishes its daily spot prices in a weekly release, so the latest value can be up to about 9 days old; it is marked stale after 10 days. IMF PortWatch publishes in weekly batches about 8–10 days behind.</div>', unsafe_allow_html=True)

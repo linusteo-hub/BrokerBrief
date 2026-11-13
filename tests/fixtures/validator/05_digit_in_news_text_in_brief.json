@@ -1,0 +1,16 @@
+{
+ "description": "A digit that reached a news line of the final brief is caught by the whole-brief gate.",
+ "check": "brief",
+ "payload": "payload/from_fixtures.json",
+ "brief": "validator/brief_ok.md",
+ "brief_replace": [
+  [
+   "has lined up further LNG carriers",
+   "has lined up 5 further LNG carriers"
+  ]
+ ],
+ "expect": "fail",
+ "expect_codes": [
+  "digit_in_news_text"
+ ]
+}

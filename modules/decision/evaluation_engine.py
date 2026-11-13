@@ -46,7 +46,7 @@ def _score_expected_cost(
     market_data: dict,
 ) -> tuple[float, str]:
     """
-    Score 0–100 based on expected fuel cost relative to other ports.
+    Score 0–100 based on expected fuel cost (selected grade) relative to the other port.
     Higher score = lower cost = better commercial outcome.
 
     Returns (score, explanation).
@@ -54,8 +54,9 @@ def _score_expected_cost(
     port = option.port
     prices = market_data.get("bunker_prices", {})
 
-    sg_price  = prices.get("Singapore",  {}).get("VLSFO")
-    fuj_price = prices.get("Fujairah",   {}).get("VLSFO")
+    sg_price  = prices.get("Singapore",  {}).get("price")
+    fuj_price = prices.get("Fujairah",   {}).get("price")
+    grade     = market_data.get("fuel_grade", "VLSFO")
 
     # EIA crude direction as macro signal
     brent_direction = market_data.get("brent_direction", "Flat")
@@ -72,11 +73,11 @@ def _score_expected_cost(
         elif sg_price <= fuj_price:
             diff = fuj_price - sg_price
             score = min(100.0, 65.0 + (diff / fuj_price) * 100)
-            note = f"Singapore VLSFO (${sg_price}/MT) is ${diff:.0f}/MT cheaper than Fujairah."
+            note = f"Singapore {grade} (${sg_price}/MT) is ${diff:.0f}/MT cheaper than Fujairah."
         else:
             diff = sg_price - fuj_price
             score = max(20.0, 50.0 - (diff / sg_price) * 60)
-            note = f"Singapore VLSFO (${sg_price}/MT) is ${diff:.0f}/MT more expensive than Fujairah."
+            note = f"Singapore {grade} (${sg_price}/MT) is ${diff:.0f}/MT more expensive than Fujairah."
 
         # Adjust for bullish crude (buy now before prices rise)
         if brent_direction == "Up" and brent_pct > 1.0:
@@ -95,11 +96,11 @@ def _score_expected_cost(
         elif fuj_price < sg_price:
             diff = sg_price - fuj_price
             score = min(100.0, 65.0 + (diff / sg_price) * 100)
-            note = f"Fujairah VLSFO (${fuj_price}/MT) is ${diff:.0f}/MT cheaper than Singapore."
+            note = f"Fujairah {grade} (${fuj_price}/MT) is ${diff:.0f}/MT cheaper than Singapore."
         else:
             diff = fuj_price - sg_price
             score = max(20.0, 50.0 - (diff / fuj_price) * 60)
-            note = f"Fujairah VLSFO (${fuj_price}/MT) is ${diff:.0f}/MT more expensive than Singapore."
+            note = f"Fujairah {grade} (${fuj_price}/MT) is ${diff:.0f}/MT more expensive than Singapore."
 
         # Bearish crude favours waiting
         if brent_direction == "Down":
@@ -153,7 +154,11 @@ def _score_operational_risk(
         score = max(10.0, score - 10.0)
         note += " Partial stem requires two port calls — additional coordination risk."
 
-    return round(score, 1), f"{note} (Congestion estimate — see data sources.)"
+    if congestion in CONGESTION_WAIT_HOURS:
+        note += (" (The congestion signal compares PortWatch port calls on the latest and earliest days of "
+                 "the last 14 days. It measures traffic, not queues or waiting time; the waiting hours are "
+                 "an indicative assumption.)")
+    return round(score, 1), note
 
 
 def _score_schedule_risk(

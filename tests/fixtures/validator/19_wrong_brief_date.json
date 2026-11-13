@@ -1,0 +1,16 @@
+{
+ "description": "The title must carry the payload's brief date.",
+ "check": "brief",
+ "payload": "payload/from_fixtures.json",
+ "brief": "validator/brief_ok.md",
+ "brief_replace": [
+  [
+   "# BrokerBrief Morning Brief: 12 October 2026",
+   "# BrokerBrief Morning Brief: 13 October 2026"
+  ]
+ ],
+ "expect": "fail",
+ "expect_codes": [
+  "structure"
+ ]
+}

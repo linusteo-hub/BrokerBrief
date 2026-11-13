@@ -1,0 +1,11 @@
+{
+ "description": "A summary copying more than ten consecutive words from the excerpt.",
+ "check": "summary",
+ "payload": "payload/from_fixtures.json",
+ "item_id": "cfc1c2cab9ac",
+ "text": "Rates for the largest bulkers firmed through the week as Brazilian iron ore cargoes increased.",
+ "expect": "fail",
+ "expect_codes": [
+  "copied_run"
+ ]
+}

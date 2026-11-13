@@ -16,7 +16,7 @@ Run `pytest -q` from the repo root. Report the number passed, failed and skipped
 Run the validator against the test fixture payloads in `tests/fixtures/`. Use the validator command listed under Commands in CLAUDE.md; if it isn't listed, report NOT YET BUILT.
 
 It must confirm all of these:
-- every number in the generated text matches a payload display string, after normalising separators and currency symbols;
+- every number in the brief appears in the payload's text fields (after normalising separators and trailing zeros), and every figure is shown on one line with its own label and source tag;
 - no news summary contains a digit;
 - each figure's direction word agrees with the payload's `direction` field;
 - every source tag exists in the payload's `sources` list;
@@ -39,7 +39,7 @@ Search the **whole repo**: every tracked file (`git ls-files`) plus every staged
 
 Only these places are allowed to contain these names:
 - the allowlist/denylist definition file;
-- test fixtures that deliberately test that a banned source is rejected;
+- test fixtures that deliberately test that a banned source is rejected: files under `tests/fixtures/` whose file name starts with `banned` (e.g. `tests/fixtures/banned_sources.json`, `tests/fixtures/validator/banned_22_banned_source_in_summary.json`);
 - `docs/`;
 - `CLAUDE.md`;
 - this file (`.claude/skills/verify/SKILL.md`), which has to list the names to search for them.

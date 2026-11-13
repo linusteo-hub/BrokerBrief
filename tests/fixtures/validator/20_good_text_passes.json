@@ -1,0 +1,7 @@
+{
+ "description": "Correct prose with payload figures and the right direction passes.",
+ "check": "text",
+ "payload": "payload/from_fixtures.json",
+ "text": "Brent fell USD 0.07/bbl to USD 125.44/bbl on 6 October 2026.",
+ "expect": "pass"
+}

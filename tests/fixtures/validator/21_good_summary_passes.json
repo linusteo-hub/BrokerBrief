@@ -1,0 +1,8 @@
+{
+ "description": "A summary that follows every rule passes.",
+ "check": "summary",
+ "payload": "payload/from_fixtures.json",
+ "item_id": "38ec41e21301",
+ "text": "Malaysian shipowner MISC has lined up further LNG carriers to serve Petronas.",
+ "expect": "pass"
+}

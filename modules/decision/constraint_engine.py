@@ -15,7 +15,7 @@ was removed.
 """
 
 from typing import List, Tuple
-from modules.decision.scenario import BunkeringScenario, FuelAvailability
+from modules.decision.scenario import BunkeringScenario, FuelAvailability, FuelGrade, Scrubber
 from modules.decision.options import BunkeringOption
 
 # ── Port data (POC defaults — replace with database later) ──────────────────
@@ -37,13 +37,12 @@ PORT_BUNKERING_TIME_HOURS = {
     "Fujairah":  10.0,
 }
 
-# ECA zone membership (True = MARPOL Annex VI ECA applies)
-PORT_IN_ECA = {
-    "Singapore": False,
-    "Fujairah":  False,
-    "Rotterdam": True,
-    "Houston":   True,
-}
+# Ports that prohibit the discharge of wash water from open-loop scrubbers in
+# port waters. A ship with an open-loop scrubber must switch to compliant fuel
+# (or closed-loop mode, if hybrid) there.
+#   Singapore: Maritime and Port Authority of Singapore, from 1 January 2020.
+#   Fujairah:  Port of Fujairah Notice to Mariners No. 252 (22 January 2019).
+OPEN_LOOP_DISCHARGE_BANNED = {"Singapore", "Fujairah"}
 
 # ── Congestion → estimated waiting time mapping ──────────────────────────────
 # Source: indicative thresholds, to be validated with industry data.
@@ -139,54 +138,172 @@ def _max_stem_check(
     return True, "", ""
 
 
+def _availability_at(scenario: BunkeringScenario, port: str) -> FuelAvailability:
+    if port == "Singapore":
+        return scenario.singapore_vlsfo_available
+    if port == "Fujairah":
+        return scenario.fujairah_vlsfo_available
+    return FuelAvailability.UNKNOWN
+
+
 def _fuel_grade_check(
     option: BunkeringOption,
     scenario: BunkeringScenario,
 ) -> Tuple[bool, str, str]:
     """
-    P1: Is the required fuel grade available at this port?
+    P1: Is the required fuel grade available at every port the option uses?
+    For a split stem that means the top-up port as well: a split that tops up
+    where the grade is unavailable cannot be completed.
     UNKNOWN → option retained, confidence reduced in Confidence Model.
     UNAVAILABLE → option INFEASIBLE.
     """
-    port = option.port
-    if port == "Singapore":
-        availability = scenario.singapore_vlsfo_available
-    elif port == "Fujairah":
-        availability = scenario.fujairah_vlsfo_available
-    else:
-        availability = FuelAvailability.UNKNOWN
-
-    if availability == FuelAvailability.UNAVAILABLE:
-        return (
-            False,
-            "P1",
-            (
-                f"Required fuel grade ({scenario.fuel_grade.value}) is explicitly "
-                f"unavailable at {port}. Option removed."
-            ),
-        )
+    for port in (option.port, option.top_up_port):
+        if port and _availability_at(scenario, port) == FuelAvailability.UNAVAILABLE:
+            role = "top-up port" if port == option.top_up_port else "bunkering port"
+            return (
+                False,
+                "P1",
+                (
+                    f"Required fuel grade ({scenario.fuel_grade.value}) is explicitly "
+                    f"unavailable at {port}, this option's {role}. Option removed."
+                ),
+            )
     return True, "", ""
 
 
-def _eca_check(
+def _split_leg_check(
     option: BunkeringOption,
     scenario: BunkeringScenario,
 ) -> Tuple[bool, str, str]:
     """
-    R1: HSFO is not permitted in ECA zones.
+    F4: Can a split stem reach its top-up port while keeping the safety reserve?
+    The vessel leaves Singapore with what it had on arrival plus the partial
+    stem, and must cover the Singapore–Fujairah leg (the difference between the
+    two ETAs) with the reserve still on board when it arrives.
     """
-    port = option.port
-    in_eca = PORT_IN_ECA.get(port, False)
-    if scenario.fuel_grade.value == "HSFO" and in_eca:
+    if not option.is_partial or option.top_up_port != "Fujairah" or option.port != "Singapore":
+        return True, "", ""
+    if scenario.eta_fujairah_days <= scenario.eta_singapore_days:
+        return (
+            False,
+            "F4",
+            (
+                f"A split stem calls at Singapore first, but the Fujairah ETA ({scenario.eta_fujairah_days:,.1f} days) "
+                f"is not after the Singapore ETA ({scenario.eta_singapore_days:,.1f} days). Check the ETAs."
+            ),
+        )
+    on_departure = scenario.fuel_remaining_mt - scenario.fuel_to_reach_singapore_mt() + option.quantity_mt
+    leg_days = scenario.eta_fujairah_days - scenario.eta_singapore_days
+    leg_fuel = leg_days * scenario.daily_consumption_mt
+    reserve = scenario.effective_safety_reserve_mt()
+    on_arrival = on_departure - leg_fuel
+    if on_arrival < reserve:
+        if on_arrival < 0:
+            short_days = -on_arrival / scenario.daily_consumption_mt
+            outcome = f"so it would run out of fuel about {short_days:,.1f} days before Fujairah"
+        else:
+            outcome = (f"so it would arrive with {on_arrival:,.1f} MT, below the safety reserve "
+                       f"({reserve:,.1f} MT)")
+        return (
+            False,
+            "F4",
+            (
+                f"After taking {option.quantity_mt:,.0f} MT in Singapore the vessel departs with "
+                f"{on_departure:,.1f} MT. The {leg_days:,.1f}-day leg to Fujairah burns {leg_fuel:,.1f} MT, "
+                f"{outcome}. Shortfall against the reserve: {reserve - on_arrival:,.1f} MT."
+            ),
+        )
+    return True, "", ""
+
+
+def _sulphur_check(
+    option: BunkeringOption,
+    scenario: BunkeringScenario,
+) -> Tuple[bool, str, str]:
+    """
+    R1: HSFO needs an approved exhaust gas cleaning system (scrubber).
+
+    MARPOL Annex VI regulation 14.1 (as amended by resolution MEPC.305(73), in
+    force 1 March 2020): "The sulphur content of fuel oil used or carried for
+    use on board a ship shall not exceed 0.50% m/m." Regulation 4.1 lets an
+    Administration approve an equivalent, such as a scrubber. The rule is about
+    the fuel the ship uses and carries, not about the port: it applies to every
+    option alike. (MARPOL does not regulate what a port may sell.)
+    """
+    if scenario.fuel_grade == FuelGrade.HSFO and scenario.scrubber == Scrubber.NONE:
         return (
             False,
             "R1",
             (
-                f"HSFO is not permitted in {port} (ECA zone — MARPOL Annex VI). "
-                "This option is legally infeasible."
+                "HSFO exceeds 0.50% sulphur. MARPOL Annex VI regulation 14.1 prohibits "
+                "using it, or carrying it for use, on a ship without an approved "
+                "equivalent such as a scrubber (regulation 4.1). No scrubber is "
+                "declared, so this stem is not compliant at any port."
             ),
         )
     return True, "", ""
+
+
+def _open_loop_warning(
+    option: BunkeringOption,
+    scenario: BunkeringScenario,
+) -> Tuple[bool, str]:
+    """
+    R2 (warning): HSFO with an open-loop scrubber, calling a port that bans
+    open-loop wash-water discharge. The stem is legal; burning it in port is not
+    possible in open-loop mode.
+    """
+    if scenario.fuel_grade != FuelGrade.HSFO or scenario.scrubber != Scrubber.OPEN_LOOP:
+        return False, ""
+    ports = [p for p in (option.port, option.top_up_port) if p in OPEN_LOOP_DISCHARGE_BANNED]
+    if not ports:
+        return False, ""
+    return (
+        True,
+        (
+            f"{' and '.join(ports)} prohibit{'s' if len(ports) == 1 else ''} open-loop scrubber "
+            "wash-water discharge in port waters. The vessel must burn compliant fuel "
+            "(0.50% sulphur or less) while in port, so it needs enough of it on board."
+        ),
+    )
+
+
+def _eca_warning(
+    option: BunkeringOption,
+    scenario: BunkeringScenario,
+) -> Tuple[bool, str]:
+    """
+    R3 (warning): the voyage enters an emission control area. MARPOL Annex VI
+    regulation 14.4: "While a ship is operating within an emission control
+    area, the sulphur content of fuel oil used on board that ship shall not
+    exceed 0.10% m/m." This limits what is burned inside the area; it does not
+    stop the ship buying or carrying other fuel.
+    """
+    if not scenario.voyage_enters_eca:
+        return False, ""
+    if scenario.fuel_grade == FuelGrade.VLSFO and scenario.scrubber == Scrubber.NONE:
+        return True, (
+            "The voyage enters an emission control area, where fuel used on board must not "
+            "exceed 0.10% sulphur (MARPOL Annex VI regulation 14.4). VLSFO (0.50%) cannot be "
+            "burned there without an approved equivalent: this stem does not cover "
+            "consumption inside the area."
+        )
+    if scenario.fuel_grade == FuelGrade.VLSFO:
+        return True, (
+            "The voyage enters an emission control area (0.10% sulphur limit, MARPOL Annex VI "
+            "regulation 14.4). VLSFO may be burned there only if the scrubber is approved as "
+            "equivalent to 0.10% fuel; otherwise 0.10% fuel is needed for that leg."
+        )
+    if scenario.fuel_grade == FuelGrade.HSFO:
+        return True, (
+            "The voyage enters an emission control area (0.10% sulphur limit, MARPOL Annex VI "
+            "regulation 14.4). HSFO may be burned there only if the scrubber is approved as "
+            "equivalent to 0.10% fuel; otherwise 0.10% fuel is needed for that leg."
+        )
+    return True, (
+        "The voyage enters an emission control area (0.10% sulphur limit, MARPOL Annex VI "
+        "regulation 14.4). Check that the MGO's bunker delivery note shows 0.10% sulphur or less."
+    )
 
 
 def _schedule_check(
@@ -195,7 +312,7 @@ def _schedule_check(
     congestion_signals: dict,
 ) -> Tuple[bool, str, str, bool, str]:
     """
-    S1/S2: Does the total time required for this bunkering option exceed
+    S1: Does the total time required for this bunkering option exceed
     the vessel's schedule flexibility?
 
     Returns (is_feasible, rule_id, reason, is_warning, warning_msg).
@@ -241,6 +358,33 @@ def _schedule_check(
             )
 
     return True, "", "", False, ""
+
+
+# A threshold chosen by this project, not a regulation or a charter-party
+# term: the default reserve (larger of 10% of fuel on board or 24 hours of
+# consumption) is often one or two days, so a reserve under this many days of
+# consumption is flagged for the user to check against company policy.
+THIN_RESERVE_DAYS = 3.0
+
+
+def _thin_reserve_warning(
+    option: BunkeringOption,
+    scenario: BunkeringScenario,
+) -> Tuple[bool, str]:
+    """Warning: the safety reserve in use is under THIN_RESERVE_DAYS of consumption."""
+    reserve = scenario.effective_safety_reserve_mt()
+    if scenario.daily_consumption_mt <= 0:
+        return False, ""
+    days = reserve / scenario.daily_consumption_mt
+    if days < THIN_RESERVE_DAYS:
+        source = "entered" if scenario.safety_reserve_mt is not None else "default"
+        return True, (
+            f"The {source} safety reserve ({reserve:,.1f} MT) covers {days:,.2f} days of consumption. "
+            f"BrokerBrief flags reserves under {THIN_RESERVE_DAYS:.0f} days (its own threshold, not a regulation "
+            "or charter-party term): check it against company policy (SMS) and the charter party. A larger "
+            "reserve can make options infeasible."
+        )
+    return False, ""
 
 
 def _departure_reserve_warning(
@@ -292,7 +436,8 @@ def run_constraint_engine(
             _min_stem_check(option, scenario),
             _max_stem_check(option, scenario),
             _fuel_grade_check(option, scenario),
-            _eca_check(option, scenario),
+            _split_leg_check(option, scenario),
+            _sulphur_check(option, scenario),
         ]
 
         for feasible, rule_id, reason in checks:
@@ -315,12 +460,21 @@ def run_constraint_engine(
                 option.is_warning = True
                 warnings.append(warn_msg)
 
-        # ── F3 departure reserve warning ──────────────────────────────────────
+        # ── F3 departure reserve warning, and the thin-reserve warning ────────
         if option.is_feasible:
-            is_warn, warn_msg = _departure_reserve_warning(option, scenario)
-            if is_warn:
-                option.is_warning = True
-                warnings.append(warn_msg)
+            for is_warn, warn_msg in (_departure_reserve_warning(option, scenario),
+                                      _thin_reserve_warning(option, scenario)):
+                if is_warn:
+                    option.is_warning = True
+                    warnings.append(warn_msg)
+
+        # ── R2 / R3 regulatory warnings ───────────────────────────────────────
+        if option.is_feasible:
+            for is_warn, warn_msg in (_open_loop_warning(option, scenario),
+                                      _eca_warning(option, scenario)):
+                if is_warn:
+                    option.is_warning = True
+                    warnings.append(warn_msg)
 
         if warnings:
             option.warning_message = " | ".join(warnings)

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sanitised fixture: structure, headlines, links, authors, dates and categories recorded 12-10-2026; excerpt text replaced with neutral placeholder text written for BrokerBrief tests. -->
+
+<?xml-stylesheet href="/vendor/feed/atom.xsl" type="text/xsl"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+                        <id>https://maritime-executive.com</id>
+                                <link href="https://maritime-executive.com" rel="self"></link>
+                                <title><![CDATA[The Maritime Executive]]></title>
+                    
+                                <subtitle></subtitle>
+                                                    <updated>2026-10-11T23:51:00-04:00</updated>
+                        <entry>
+            <title><![CDATA[BIMCO Adopts Addendum to Support Investments in Retrofit Projects]]></title>
+            <link rel="alternate" href="https://maritime-executive.com/article/bimco-adopts-addendum-to-support-investments-in-retrofit-projects" />
+            <id>https://maritime-executive.com/article/bimco-adopts-addendum-to-support-investments-in-retrofit-projects</id>
+            <author>
+                <name><![CDATA[The Maritime Executive]]></name>
+            </author>
+            <summary type="html"><![CDATA[<p>Placeholder excerpt for test item a. It describes the story in general terms. Nothing here is quoted from the publisher &#8230;</p>]]></summary>
+                                    <updated>2026-10-11T23:51:00-04:00</updated>
+        </entry>
+<entry>
+            <title><![CDATA[Germany's Navy Rebuilds, Doubling Frigate Order and Adding New Base]]></title>
+            <link rel="alternate" href="https://maritime-executive.com/article/germany-s-navy-rebuilds-doubling-frigate-order-and-adding-new-base" />
+            <id>https://maritime-executive.com/article/germany-s-navy-rebuilds-doubling-frigate-order-and-adding-new-base</id>
+            <author>
+                <name><![CDATA[The Maritime Executive]]></name>
+            </author>
+            <summary type="html"><![CDATA[<p>Placeholder excerpt for test item b. It describes the story in general terms. Nothing here is quoted from the publisher &#8230;</p>]]></summary>
+                                    <updated>2026-10-11T23:30:39-04:00</updated>
+        </entry>
+<entry>
+            <title><![CDATA[The Continuously Shifting Control of the Strait of Hormuz]]></title>
+            <link rel="alternate" href="https://maritime-executive.com/article/the-continuously-shifting-control-of-the-strait-of-hormuz" />
+            <id>https://maritime-executive.com/article/the-continuously-shifting-control-of-the-strait-of-hormuz</id>
+            <author>
+                <name><![CDATA[The Maritime Executive]]></name>
+            </author>
+            <summary type="html"><![CDATA[<p>Placeholder excerpt for test item c. It describes the story in general terms. Nothing here is quoted from the publisher &#8230;</p>]]></summary>
+                                    <updated>2026-10-11T21:54:54-04:00</updated>
+        </entry>
+<entry>
+            <title><![CDATA[Morocco Cancels Concession Tender for Casablanca Shipyard]]></title>
+            <link rel="alternate" href="https://maritime-executive.com/article/morocco-cancels-concession-tender-for-casablanca-shipyard" />
+            <id>https://maritime-executive.com/article/morocco-cancels-concession-tender-for-casablanca-shipyard</id>
+            <author>
+                <name><![CDATA[The Maritime Executive]]></name>
+            </author>
+            <summary type="html"><![CDATA[<p>Placeholder excerpt for test item d. It describes the story in general terms. Nothing here is quoted from the publisher &#8230;</p>]]></summary>
+                                    <updated>2026-10-11T21:47:40-04:00</updated>
+        </entry>
+<entry>
+            <title><![CDATA[Two Seafarers Missing in Drone Attack on Product Tanker off Oman]]></title>
+            <link rel="alternate" href="https://maritime-executive.com/article/two-seafarers-missing-in-drone-attack-on-product-tanker-off-oman" />
+            <id>https://maritime-executive.com/article/two-seafarers-missing-in-drone-attack-on-product-tanker-off-oman</id>
+            <author>
+                <name><![CDATA[The Maritime Executive]]></name>
+            </author>
+            <summary type="html"><![CDATA[<p>Placeholder excerpt for test item e. It describes the story in general terms. Nothing here is quoted from the publisher &#8230;</p>]]></summary>
+                                    <updated>2026-10-11T20:47:29-04:00</updated>
+        </entry>
+<entry>
+            <title><![CDATA[Despite Challenges, Floating Offshore Wind Capacity Continues to Grow]]></title>
+            <link rel="alternate" href="https://maritime-executive.com/article/despite-challenges-floating-offshore-wind-capacity-continues-to-grow" />
+            <id>https://maritime-executive.com/article/despite-challenges-floating-offshore-wind-capacity-continues-to-grow</id>
+            <author>
+                <name><![CDATA[The Maritime Executive]]></name>
+            </author>
+            <summary type="html"><![CDATA[<p>Placeholder excerpt for test item f. It describes the story in general terms. Nothing here is quoted from the publisher &#8230;</p>]]></summary>
+                                    <updated>2026-10-11T20:22:27-04:00</updated>
+        </entry>
+</feed>

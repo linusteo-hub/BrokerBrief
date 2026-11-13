@@ -1,0 +1,16 @@
+{
+ "description": "A figure changed by one cent is not in the payload.",
+ "check": "brief",
+ "payload": "payload/from_fixtures.json",
+ "brief": "validator/brief_ok.md",
+ "brief_replace": [
+  [
+   "USD 125.44/bbl",
+   "USD 125.45/bbl"
+  ]
+ ],
+ "expect": "fail",
+ "expect_codes": [
+  "number_not_in_payload"
+ ]
+}

@@ -1,0 +1,11 @@
+{
+ "description": "'Why it matters' must be phrased as interpretation.",
+ "check": "why",
+ "payload": "payload/from_fixtures.json",
+ "item_id": "38ec41e21301",
+ "text": "Gas carrier demand in Asia is firm.",
+ "expect": "fail",
+ "expect_codes": [
+  "not_hedged"
+ ]
+}

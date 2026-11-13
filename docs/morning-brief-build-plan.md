@@ -1,4 +1,49 @@
-Status (12/10/2026): Step 0 complete — ~/Projects/BrokerBrief is the working copy; Streamlit deploys from main. Next: Step 1.
+Status (12/11/2026): **Portfolio mode** (see "Portfolio mode decision" below). Step 0, Step 1, Phase 0 and Phase 1 complete. Work continues on branch `claude/brokerbrief-portfolio-mode-5ygs8o` (which contains `feature/morning-brief`). Next: Decision Batch 1, then credibility fixes and Phase 2. Progress is tracked in `docs/portfolio-mode-progress.md`. Phase 0 and Phase 1 results and decisions (below) supersede the candidate-source notes where they conflict.
+
+## Portfolio mode decision (Linus, 12/11/2026)
+
+- **Decision:** BrokerBrief switches to portfolio mode. The goal is to land a shipbroking or bunker-trading attachment in Singapore, so the deliverable is a finished, accurate, self-running public project to show to brokers and hiring managers.
+- **K1 fired:** the Strategic Operating Plan's K1 kill criterion fired. Linus deliberately chose portfolio mode instead of stopping the project. (The Strategic Operating Plan is not in this repository; its wording of K1 is not reproduced here.)
+- **Paused:** the customer-discovery targets in the Strategic Operating Plan.
+- **New design principle:** "Runs unattended" (see `CLAUDE.md`, Design principles). It is a requirement for every phase, not a final step.
+- **Approval rules changed for this work:** minimal approvals. Big decisions are batched (roughly three batches: design; merge to main and secrets; enable the schedule and publish the trial page). This replaces "stop after each phase" and "wait for yes before every state-changing command" in the original prompt below.
+- **Order of work:** (1) credibility fixes; (2) merge the morning brief to main; (3) Phase 2 writer and gate; (4) Phase 3 automation and publishing; (5) Phase 4 trial setup. Email (Phase 5) stays out of scope.
+
+## Decision Batch 1 (Linus, 12/11/2026): all recommendations accepted
+
+| # | Decision |
+|---|---|
+| D1 | Replace R1 with a scrubber rule (MARPOL Annex VI regulations 14.1 and 4.1); add warnings R2 (open-loop scrubber at Singapore or Fujairah) and R3 (voyage enters an ECA, regulation 14.4); merge IFO380 into HSFO; prices follow the selected grade. |
+| D2 | Demo voyage: tanker in ballast, Zhoushan to Ras Tanura, 1 day from Singapore, 11.5 days from Fujairah. |
+| D3 | Confidence: freshness judged against each source's own limit (15 points when stale; PortWatch limit 14 days); cap at Medium when one scored port has no price, at Low when none has. Closes the three parked confidence decisions below. |
+| D4 | EIA key held server-side (Streamlit secrets); live fetches cached 3 hours; bunker price fields in the scenario form. No scheduled refresh is needed for the app. |
+| D5 | Brief published on GitHub Pages; archive on a dedicated `briefs` branch; Pages deployed from GitHub Actions. The Streamlit app links to it. |
+| D6 | 60-day rule: every run re-enables its own schedule through the Actions API; the page shows "last updated" and a stale banner after 2 days. No Streamlit keep-alive pinger. |
+| D7 | Archive: `briefs/YYYY/MM/DD/` with `brief.md`, `payload.json`, `validation.json`; keep everything for 12 months, then review. |
+| D8 | Daily brief. Unchanged figures carry a code-written "unchanged since" label. Scheduled for 06:15 SGT with a 07:00 SGT fallback. |
+| D9 | Writer model: start with Claude Haiku 5.5; move to Sonnet 5.5 only if it fails the gate on the fixtures. Spend limit USD 5 a month. |
+| D10 | Linus reports that gCaptain, Splash247, The Maritime Executive and Drewry replied **yes** to his permission emails (12/11/2026). The replies are not in this repository; Linus keeps them. See "Source policy" below for what this changes. |
+| D11 | `CLAUDE.md` approval rules rewritten to the batched rules. |
+
+Small decisions (Claude, reported 12/11/2026): Singapore Offshore Oil Terminal 1 stays out and is not summed into Singapore; at most half of a news section's slots per publisher; `defusedxml` added for feed parsing; a `brief-alert` issue opens on a failed run or a section empty 3 days running and closes on the next clean run.
+
+## Decision Batch 2 (Linus, 13/11/2026): all recommended, and no spending
+
+| # | Decision |
+|---|---|
+| E1 | Merge the working branch into `main`, through a pull request that Linus reviews and merges. |
+| E2 | Four decision-engine fixes. **F4** removes a split stem that would reach Fujairah below its reserve. **P1** also checks the top-up port. A warning flags a safety reserve under three days of consumption. The congestion signal's limits are stated. |
+| E3 | Cruise and leisure stories are left out of the brief (`off_topic`). |
+| E4 | Container rates stay `not_covered` until Linus shares the scope of Drewry's reply. |
+| E5, D9 changed | **No language model and no spending.** The brief runs with every word written by code; news is headline and link. The model path stays in the code, switched off by the repository variable `BRIEF_USE_MODEL`. The model-trial workflow is moved to `_archive/`. GitHub Models, a free option considered, has been retired: GitHub's documentation (docs.github.com/en/github-models, read 13/11/2026) says "As of July 30, 2026, GitHub Models has been fully retired". Other free options (a small open model on the runner, other providers' free tiers) may be revisited later. |
+
+### Source policy (Linus, 12/11/2026)
+
+Linus asked for more reputable sources, so that the project does not rest on unreliable data, and authorised rewriting the rules that stand in the way.
+
+- **What changes:** official and primary sources are now preferred and added wherever their licence allows publication: more EIA series, the EIA "Today in Energy" feed, and MPA's monthly bunker sales from data.gov.sg (Singapore Open Data Licence). Further candidates are recorded in the Phase 0 addendum.
+- **What does not change:** figures from licensed sources (the Baltic Exchange, Worldscale, Clarksons, Lloyd's List, Platts, Argus, ICE) stay out of the public repo, brief and archive. Those rules exist because the *sources'* terms forbid public display, not because of a project preference, so BrokerBrief cannot rewrite them. Publishing them would also be recognised at once by the brokers the project is meant to impress.
+- **Drewry:** permission to republish WCI values is recorded above on Linus's word, but no fetcher is built yet: Drewry publishes the index on a web page, not through an API, and the exact scope of the permission (which values, how often, what credit line) needs to be confirmed from the reply before anything is published. Container rates stay `not_covered` until then.
 
 # BrokerBrief Morning Brief — Claude Code build prompt
 
@@ -148,7 +193,232 @@ I haven't yet read each site's terms of use. Phase 0 must do that.
 - **Phase 4 — Trial.** Help me set up a review log (errors, missing sections, corrections) and agree pass criteria before any rollout.
 - **Phase 5 — Email.** Not now.
 
-## Runtime prompt v1 (for the writer in Phase 2; refine once Phase 0 is done)
+## Phase 0 results — source audit (12 October 2026)
+
+Terms pages were read on 12 October 2026. Baltic Exchange, Worldscale and the licensed sources were not re-researched (already verified above). The five RSS feeds were checked live the same day.
+
+### 1. Prices
+
+| Source | Terms (page read) | Update frequency | Access | Reliability |
+|---|---|---|---|---|
+| EIA Brent spot (`RBRTE`) | [EIA copyright and reuse](https://www.eia.gov/about/copyrights_reuse.php): public domain; credit "Source: U.S. Energy Information Administration (<publication date>)". **Caveat:** the spot prices come from **Refinitiv, an LSEG business** ([definitions](https://www.eia.gov/dnav/pet/TblDefs/pet_pri_spt_tbldef2.asp)). EIA's policy says privately licensed material "may be protected", but EIA puts no restriction on these tables, and [FRED](https://fred.stlouisfed.org/series/DCOILBRENTEU) tags the series "Public Domain: Citation Requested". | Daily values, **released weekly** (release 07-10-2026 held data to 06-10; next release 15-10, moved for Columbus Day). [Table](https://www.eia.gov/dnav/pet/pet_pri_spt_s1_d.htm) | API v2 with key (already in `modules/eia.py`) | High; lag up to about 9 days |
+| EIA NY Harbor ULSD (`EER_EPD2DXL0_PF4_Y35NY_DPG`) | Same as Brent | Same | Same | Same |
+
+Series IDs were read from EIA's own table. Confirm the exact API v2 route against EIA's documentation in Phase 1.
+
+### 2. Freight — containers (numbers)
+
+| Source | Terms | Update frequency | Access | Reliability |
+|---|---|---|---|---|
+| Drewry WCI | [Drewry terms](https://www.drewry.co.uk/terms): "User may not copy, reproduce, republish, distribute…"; downloads for "personal, internal use" only; commercial use needs a licence. The WCI page grants nothing extra. | Weekly, Thursdays (latest 08-10-2026) | HTML page, no API | High as data; **republishing prohibited** |
+| SCFI | No reuse terms found; "All Rights Reserved" ([en.sse.net.cn](https://en.sse.net.cn/)). English index page asks for username and password. Publisher changed to Shanghai Shipping Exchange Institute (Prep.) on 18-06-2026 ([notice](https://www.sse.net.cn/announcement/business)). | Weekly, Fridays (secondary sources) | Login-walled | Unknown |
+
+### 3. Freight — physical activity
+
+| Source | Terms | Update frequency | Access | Reliability |
+|---|---|---|---|---|
+| IMF PortWatch | Dataset licence field points to the [IMF terms](https://www.imf.org/en/about/copyright-and-terms): reuse and publication allowed with credit "Source: International Monetary Fund, PortWatch, <link>". **Commercial reuse needs permission**; **automated bulk download prohibited** without permission. | Weekly batches; on 12-10-2026 latest data was 02-10 (ports) and 04-10 (chokepoints), a lag of about 8–10 days | ArcGIS FeatureServer (already in `modules/portwatch.py`), no key | Good; AIS draft fields are crew-entered and can be wrong |
+
+PortWatch credit (Linus, 12/10/2026):
+- Link chosen: `https://portwatch.imf.org`.
+- IMF terms require stating any material transformation alongside the citation. Everything BrokerBrief shows from PortWatch is transformed (Market Intelligence's Rising/Easing/Stable labels and majority "Congestion" pill; the brief's 7-day totals and week-on-week changes), so the credit used everywhere is: "BrokerBrief calculations based on data from International Monetary Fund, PortWatch, https://portwatch.imf.org" (`PORTWATCH_CREDIT` in `modules/portwatch.py`).
+- Commercial reuse requires permission from copyright@imf.org (see Pending permission).
+
+### 4. News feeds
+
+| Source | Terms | Frequency | Access | Reliability | Verdict |
+|---|---|---|---|---|---|
+| gCaptain | No terms of use published; only [privacy policy](https://gcaptain.com/about/privacy-policy/) and [editorial standards](https://gcaptain.com/editorial-standards/). Default copyright. Carries Reuters and Bloomberg wires. | Many per day | RSS | Good | Conditional GO |
+| Splash247 | `/terms-of-service/` and `/legal-agreement/` exist but are **empty** (last edited 2014). © Splash Maritime Group, all rights reserved. | Many per day | RSS | Fair: 403 to one fetcher, one timeout | Conditional GO |
+| Hellenic Shipping News | [Disclaimer](https://www.hellenicshippingnews.com/disclaimer/): "STRICTLY PROHIBITS the republication, the reproduction, total, partial or at paraphrase… without previous written authorisation" | Many per day | RSS | Blocks bots (403) | **NO-GO** |
+| The Loadstar | [Licensing and copyright](https://theloadstar.com/licencing-and-copyright): RSS only "to create links back"; free use max 2 articles/week, 150 words; use in "operating artificial intelligence systems… or ingestion into large language models" not permitted | Many per day | RSS | Good | **NO-GO** |
+| The Maritime Executive | No terms page; footer "All rights reserved" ([privacy policy](https://maritime-executive.com/privacy-policy)) | Many per day | Atom | Good; many press releases | Conditional GO |
+
+### 5. GDELT (optional)
+
+| Terms | Frequency | Access | Reliability |
+|---|---|---|---|
+| [gdeltproject.org/about.html](https://www.gdeltproject.org/about.html): "unlimited and unrestricted use… academic, commercial, or governmental"; may "redistribute, rehost, republish"; must cite the GDELT Project and link to gdeltproject.org | Near real-time; last 3 months searchable ([DOC 2.0](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/)) | `api.gdeltproject.org/api/v2/doc/doc`, no key | **Poor on 12-10-2026:** every request, including the first, returned HTTP 429 "limit requests to one every 5 seconds" |
+
+### Go/no-go
+
+| Section | Verdict |
+|---|---|
+| 1. Prices | **GO** — EIA, latest available with as-of date |
+| 2. Freight: container numbers | **NO-GO** → `not_covered` |
+| 2. Freight: dry bulk, tanker and container direction | **Conditional GO** — from news, words only, no figures |
+| 2. Freight: physical activity | **GO** — PortWatch, weekly, labelled as activity not rates |
+| 3. S&P | **Conditional GO, weekly** — thin (mainly Splash247) now that Hellenic Shipping News is out |
+| 4. Events | **Conditional GO** — gCaptain, Splash247, Maritime Executive |
+| GDELT | GO on terms; **deferred** for reliability |
+
+### Decisions (Linus, 12 October 2026)
+
+1. Hellenic Shipping News and The Loadstar are dropped entirely for v1.
+2. gCaptain, Splash247 and The Maritime Executive are conditional GO: headline, link and our own no-digit summary. **Wire items** (feed author Reuters or Bloomberg) are headline and link only. This is enforced in code from the feed's author field, not left to the model. Linus is emailing these three publishers and Drewry for permission separately.
+3. Prices are "latest available, with as-of date" (replaces "prices daily"). Staleness threshold about 10 days for EIA; PortWatch threshold set to suit its 8–10 day lag.
+4. Container numbers are `not_covered`; container rate **direction** from news is included, as for dry bulk and tankers.
+5. Add the IMF PortWatch credit line ("Source: International Monetary Fund, PortWatch, <link>") to the existing Market Intelligence page as well. (To do; not yet implemented.)
+6. Daily vs weekly brief is parked until after the personal trial (see Parked decisions).
+7. Phase 3: before the first scheduled run, test that the Splash247 feed works from a GitHub Actions runner (it blocked one fetcher with 403).
+
+### Pending permission
+
+| Who | What | Status |
+|---|---|---|
+| gCaptain, Splash247, The Maritime Executive | Use of headlines, links and our own summaries in the public brief | Linus emailing (decision 2) |
+| Drewry | Republishing WCI values | Linus emailing (decision 2); `not_covered` until granted |
+| IMF (copyright@imf.org) | Commercial reuse of PortWatch data | **Conditional:** only if BrokerBrief becomes commercial |
+
+## Phase 1 results — payload (12 October 2026)
+
+Built in `modules/morning_brief/` (no import from `modules/decision/`; a test enforces it). Run: `python -m modules.morning_brief --out <file>`.
+
+| File | Role |
+|---|---|
+| `allowlist.py` | Allowed sources (terms, credit, `redistributable`, staleness limit, permitted fetch URLs), denylist with reasons, banned-name pattern |
+| `guarded_http.py` | The only HTTP path: refuses any URL not in the allowlist's `fetch_urls` (raises, never caught) and does not follow redirects |
+| `prices.py` | EIA Brent (`RBRTE`) and NY Harbor ULSD (`EER_EPD2DXL0_PF4_Y35NY_DPG`) via API v2 route `petroleum/pri/spt/data` (confirmed live 12-10-2026) |
+| `activity.py` | PortWatch chokepoint transits and port calls |
+| `news.py` | gCaptain, Splash247, The Maritime Executive (RSS/Atom title and excerpt only) |
+| `figures.py`, `checks.py` | Display strings, changes, direction; range and staleness checks |
+| `payload.py`, `__main__.py` | Assembly, source tags, final gate, CLI |
+
+### Decisions made in Phase 1 (Linus's additions of 12/10/2026, and Claude's defaults, for review)
+
+Linus (12/10/2026):
+1. Wire items are detected from the author field **and** from "Reuters"/"Bloomberg" in the title, the excerpt's first line, or a source/credit field (supersedes decision 2's "author field" wording). Fixture: a Reuters item with no author.
+2. All HTTP goes through the URL allowlist; a URL outside it fails loudly.
+3. Fetcher tests never touch the network (blocked in `tests/conftest.py`); they use saved fixtures, including empty and malformed responses per fetcher.
+4. Commits stay local on `feature/morning-brief`; full test suite before every commit.
+
+Claude's defaults — please confirm or change:
+5. **Units as published:** USD/bbl and USD/gal (not converted to metric), so our figures match EIA's. Open question for Linus.
+6. **Changes:** prices compared with the previous published day and with about one week earlier; activity as 7-day totals compared with the previous 7 days. `direction` comes from the change *as displayed*: if it rounds to zero it is `flat`.
+7. **Staleness (brief only):** EIA 10 days, PortWatch 14 days. `provenance.py`'s 36-hour EIA limit for the app is unchanged (see findings).
+8. **Ranges:** Brent USD 10–300/bbl; ULSD USD 0.5–10/gal; any location's 7-day transits or port calls 0–10,000.
+9. **PortWatch locations** by portid (names aren't stable): Suez, Panama, Bab el-Mandeb, Malacca, Hormuz, Cape of Good Hope; Singapore, Rotterdam, Fujairah, Port Hedland, Houston. A location missing any of the 14 days is excluded, not compared on unequal weeks. Two small queries per run (IMF prohibits automated *bulk* download).
+10. **News content in the payload:** our own items carry the excerpt with every digit-bearing sentence removed; wire items carry headline and link only. Items whose title or excerpt names a banned source are dropped whole and their link is not recorded (its slug can carry the name). Freight headlines containing digits are dropped (usually index levels). Other headlines are kept verbatim even with digits (e.g. "Saudi Eyes 10 Million Barrels a Day…"); see Phase 2 note below.
+11. **Sections:** S&P needs a deal word and a merchant-ship word in the headline, and includes newbuilding orders and recycling; company takeovers and naval orders go to Events. Freight needs rate wording ("rates", "earnings", "spot market", "fixtures", "time charter"…). Windows: Events 48 hours, Freight and S&P 7 days. Limits: Events 8, Freight 9, S&P 6, newest first. Duplicates (≥60 % title-word overlap or same link) are kept once, earliest report, with the others listed in `also_reported_by`.
+12. **Status:** if feeds work but no story qualifies, the section is `missing` with the reason "no … stories met the rules in the time window".
+13. **Brief date** is the Singapore (UTC+8) date.
+14. **Fixtures:** recorded EIA and PortWatch responses are committed as-is (public domain / IMF with credit). News feeds are committed **sanitised**: structure, headlines, links, authors, dates and categories kept, excerpt text replaced, because the raw feeds would republish publisher text (Splash247's feed on 12-10-2026 named banned sources three times).
+
+### Phase 1 review decisions (Linus, 12/10/2026)
+
+- **Units:** keep EIA's source units (USD/bbl, USD/gal). Any future USD/mt figure must be labelled as a BrokerBrief calculation, with the density assumption stated.
+- **Confirmed:** sanitised news fixtures (decision 14); dropping banned-source items whole (decision 10); dropping freight headlines containing any digit (decision 10).
+- **Phase 2 number rule:** verbatim headlines from allowlisted general-news sources may contain digits. Freight headlines with any digit are still dropped. Summaries never contain digits.
+- **New payload requirement:** every section reports counts: fetched, kept, and dropped by reason (see "Section counts" below).
+- **Hotfix for main before Phase 2** (branch `hotfix/main-fixes` from `main`): EIA key redaction, `pytest.ini`, one EIA staleness threshold of 10 days shared by the app and the brief with the Live Data caption corrected. Houston and port-name mismatches are reported first, not fixed. `main` is merged into `feature/morning-brief` only after Linus confirms the hotfix is on `main`.
+
+### Section counts (added 12/10/2026)
+
+Every section (and Freight's subsections) carries `counts`; `fetched = kept + sum(dropped)` always holds, and a test checks it.
+- News sections: `dropped` = `banned_source`, `digit_in_freight_headline`, `other`, with `other_detail` (outside the time window, duplicate, over the section limit, no date, no link). Wire items are **kept** as headline and link only, so they are reported as `wire_headline_only`, not as drops.
+- Data sections (Prices, activity): `dropped` by `feed_failed`, `no_data`, `stale`, `out_of_range`, `incomplete`. A failed feed or missing key counts every series/location it covers.
+- `container_rates` (`not_covered`) has `counts: null`. Freight's top level sums its subsections.
+
+### Findings outside the brief (not changed; for Linus)
+
+- **Houston and port names (checked 12-10-2026 against PortWatch's port database, `PortWatch_ports_database`):** of `TARGET_PORTS` in `modules/portwatch.py`, Singapore (`port1201`), Rotterdam (`port1114`), Fujairah (`port362`) and Port Hedland (`port955`) match exactly. **"Houston" does not:** PortWatch's name is "Houston (US-TX)" (`port481`), so the app gets no Houston rows. The decision engine scores only Singapore and Fujairah, so today this affects Market Intelligence only. Fix in progress on `hotfix/congestion-unknown`. (The brief already queries by portid.)
+- **Missing congestion data reads as "Stable" in the decision engine (found 12-10-2026):** a port with no PortWatch rows is absent from `congestion_signals`, and the scheduling check (`constraint_engine._schedule_check`) and both risk scores (`evaluation_engine._score_operational_risk`, `_score_schedule_risk`) look ports up with `.get(port, "Stable")`: an assumed 8-hour wait and an operational-risk score of 70. The existing "Congestion data unavailable — moderate risk assumed" branch (55) can never be reached for a missing port. `portwatch._compute_congestion` also returns "Stable" for a port with fewer than 2 days of data or zero calls on the older day. The confidence model applies its −15 only when the whole PortWatch fetch fails; a single missing port just skips the Singapore–Fujairah agreement check. Fix in progress on `hotfix/congestion-unknown`.
+- **Open question — Singapore Offshore Oil Terminal 1:** PortWatch lists "Singapore - Offshore Oil Terminal 1" (`fso161`) as a separate location from Singapore (`port1201`). Neither the app nor the brief includes it, so Singapore port calls exclude it. Should it be added (and shown separately or summed)? Undecided.
+- **Fixed on main (PR #1, merged 12-10-2026):** EIA error messages quoted the request URL including `api_key=…`, and the Live Data page displayed them; now redacted. Plain `pytest -q` could not import `modules`; `pytest.ini` now sets the path. `EIA_SPOT_MAX_AGE` was 36 hours though EIA releases weekly; it is now 10 days, shared by the app and the brief, and the Live Data caption is corrected.
+- Events are newest-first across feeds, so a busy feed can crowd out the others (in the fixture payload The Maritime Executive gets no slot). Consider a per-publisher cap after the trial.
+- Feeds are parsed with the standard library's ElementTree; Python 3.14's expat limits entity expansion. `defusedxml` would add belt and braces but needs an install.
+
+### Notes for Phase 2
+
+- The validator's number check must decide how to treat digits inside headlines the brief reproduces verbatim (whitelist exact headline text, or have the model not restate headlines).
+- `tests/fixtures/payload/from_fixtures.json` is a ready payload for writer and validator tests.
+
+## Phase 2 results — writer and validation gate (12/11/2026)
+
+Built in `modules/morning_brief/`: `writer.py` (renderer, model call, retry and withhold), `validator.py` (the gate), `write.py` and `validate.py` (command-line tools), `model_trial.py` (model comparison). Runtime prompt v1 below is superseded by `writer.SYSTEM_PROMPT`.
+
+### Design as built
+
+- **Code writes the facts.** A template renders every heading, figure, date, change, direction word ("Up", "Down", "Unchanged"), empty-section notice and source credit from payload display strings. The model never receives a figure.
+- **The model writes summaries only:** for each news item with a usable excerpt, one or two sentences; for Events, one hedged "why it matters" sentence. Output is JSON against a schema. Wire items (Reuters, Bloomberg) and items without a digit-free excerpt are never sent.
+- **Item gate:** no digits or numeric symbols (any script, ½, Roman numerals), no numbers in words (including "twice" and "-fold"), at most two sentences and 55 words, no run of more than ten words copied from the headline or excerpt, no links, web addresses with common endings, email addresses or Markdown, no banned names, no advice; "why it matters" must be hedged. A failing item is sent back once with its problems listed; if it fails again it is **withheld** and published as headline and link only.
+- **Whole-brief gate (fail closed):** every number appears in the payload's text (after normalising separators and trailing zeros); every figure shown on one line with its own label and tag, so values cannot be swapped between figures; every link a payload item or source page; every source tag listed; direction words agree with `direction`; headlines verbatim; no digit or number word in news text outside the headline, publisher and date; no banned names; title date correct; every section and subsection shows an item or the reason it is empty. The payload is re-checked too: each figure's range (figures now carry `plausible_range`), staleness against the brief date and source allowlist; and no section may be marked ok with no items. **Any failure: nothing is published** (exit code 3) and `validation.json` lists the problems.
+- **Model unavailable** (no key, expired key, no credit, rate limit, outage, refusal): the brief is still published, with news as headline and link only, and the report states the reason.
+- **"Same figure as in the previous brief"** is added by code when a figure's value and date are unchanged from the previous payload (D8).
+
+### Checker tests (build plan list, all present and passing)
+
+`tests/fixtures/validator/` holds 22 cases, run by the validator command (and the verify skill): a number not in the payload (caught); "1,234.5" against "1234.50" (passes after normalisation); a digit in a news summary (caught at item level and at whole-brief level); "rose" where the payload says down (caught, with and without an amount); plus unknown source tag, unknown link, number in words, copied run, unhedged interpretation, Markdown in a summary, altered headline, silent gap, stale figure, out-of-range figure, wrong title date, banned name. 18 of 18 must-fail cases are caught; the 4 good cases pass. `tests/test_morning_brief_writer.py` covers retry, withhold, fail-closed and each API failure.
+
+### Fixes from the fresh-context review of Phase 2
+
+- **Ordinary feed content could stop the whole brief.** This affected an author named "ten Cate", a link containing brackets, a headline ending in "*", and an error message quoting a host with digits. Such content is now made safe or dropped as one item at fetch time (`unsafe_link`, `link_in_headline`), and the gate allows authors' names. Each case is tested through the real renderer and gate.
+- **The silent-gap check could not fire on real output** (every section has a cadence note). It now checks each section and subsection for an item or a reason, and a section marked ok with no items is refused.
+- **Values could be swapped between figures** without the gate noticing. Each figure must now appear with its own label and tag on one line.
+- **Writer status:** "declined then succeeded" no longer reads as unavailable. Unreadable output and errors on the retry are named in the report.
+- **The public archive copy of the payload no longer contains the news excerpts.** They are the publishers' text, used only to brief the model.
+- Banned-name pattern widened ("Clarkson's", "Clarkson Platou", "Baltic-Exchange", the Platts parent's current name). Numeric symbols, "-fold", "twice", email addresses and bare domains are refused in summaries. Programming errors are no longer reported as API outages. A refused run deletes any old `brief.md` in its folder.
+- A test now sends the real request through the installed Anthropic SDK (mock HTTP transport) and parses a real response with a thinking block before the text.
+
+### Model choice and cost (prices read from Anthropic's pricing page on 12/11/2026)
+
+| Model | USD per million tokens (input / output) | Estimated cost per brief | Per month (31 briefs) |
+|---|---|---|---|
+| Claude Haiku 5.5 | 0.10 / 0.50 | about 0.002–0.003 | about 0.08 |
+| Claude Sonnet 5.5 | 2 / 10 | about 0.04 | about 1.30 |
+| Claude Opus 5.5 | 4 / 20 | about 0.08 | about 2.60 |
+
+Basis, **estimated, not measured**: input about 1,200 tokens on the fixture payload and about 4,100 in the worst case (23 news items with full excerpts), counted at about four characters per token; output up to about 3,300 tokens including the model's thinking at "low" effort; one retry of a few items adds about 20 %. Every run records actual tokens and cost in `validation.json`, so the trial will replace these estimates with measurements.
+
+**Superseded on 13/11/2026 by Decision Batch 2 (E5): no language model, no spending.** The text below is kept as the record.
+
+**Recommendation (12/11/2026): Claude Haiku 5.5**, provisionally. It has **not** yet been run against the gate: there is no API key in this environment. `python -m modules.morning_brief.model_trial --runs 3` compares Haiku 5.5 with Sonnet 5.5 on the fixture payload and names the cheapest that passes every run; it is the first thing to run once the key exists (Decision Batch 2). If Haiku withholds more than an occasional item, switch to Sonnet 5.5; even then the month costs under the USD 5 spend limit.
+
+## Phase 3 results — automation and publishing (12/11/2026; schedule not enabled)
+
+Built: `.github/workflows/morning-brief.yml`, `modules/morning_brief/archive.py`, `alerts.py`, `site.py`, the failure-test hook in `guarded_http.py`, and `docs/operations.md` (what runs when, health, alerts, the 60-day rule, Streamlit sleep, key rotation, archive and retention, failure tests).
+
+- **Workflow:** manual trigger only until Decision Batch 3. Five jobs, each with only the permissions it needs: keepalive (re-enable workflows), build (read only; holds the API keys; cannot push), archive (push to `briefs`), site (deploy Pages), alert (issues; runs last, whatever happened, and sees every job's result). Manual runs neither archive nor publish unless asked; failure-test runs never do.
+- **Schedule (proposed for Batch 3, not decided):** 06:15 Singapore time, with a 06:50 fallback that skips if the brief exists. This uses cron's `timezone: Asia/Singapore`, which GitHub documents; Singapore has no daylight saving. The fallback differs from D8's 07:00 because GitHub names the start of each hour as its busiest time.
+- **Archive (D7):** `briefs/YYYY/MM/DD/` plus `index.json` and `health.json`; a re-run replaces its date. The archived payload has no news excerpts.
+- **Alerts:** any failed, cancelled or timed-out job; a refused brief or crashed writer; the model unavailable on a scheduled run (even if the secret was deleted); any section empty on three archived run dates in a row; a day missing from the archive; an unreadable archive; and every failure test. A fallback run that skips reports nothing. Manual runs use a separate `brief-alert-test` label.
+- **Site (D5):** landing page from the README, latest brief, archive table, one page per brief. Markdown rendered with raw HTML off. The latest-brief page shows readers a staleness banner once the brief is more than two days old (from 06:00 Singapore time on its date). Needs the Pages source set to "GitHub Actions" (owner setting, Batch 3).
+- **The 60-day rule (D6), corrected:** a disabled workflow cannot run to re-enable itself, so the keep-alive call helps only if calling it on an active workflow resets the clock. GitHub does not document that. Backstops: the daily archive commit, and the reader-facing staleness banner. See `docs/operations.md`.
+- **No scheduled refresh for the Streamlit app** is needed: it fetches on visit with a shared 3-hour cache (Step 1).
+
+### Fixes from the fresh-context review of Phase 3
+
+The first version had two blockers. A failed archive push left its step green, so no alert fired and an open alert could be closed. A failed archive read in the site job deployed an empty site. It also had several ways to fail with no alert (cancellation, timeout, a failed artifact or alert step). The workflow was rebuilt as the five jobs above:
+- the alert job sees every job's result;
+- "branch absent" is told apart from "could not read";
+- the push loop fails the job when every push fails (a test runs the loop under bash);
+- manual runs have their own label;
+- failure tests are never archived or published and always open a test issue;
+- scheduled runs always expect the model;
+- a crashed writer is reported as a crash;
+- a missed day alerts (checked as a gap in the archive index);
+- only the latest-brief page carries the staleness banner;
+- public status words are plain English;
+- banned names are kept out of validation messages.
+
+actionlint 1.7.12 is clean on the workflow, both as committed and with the proposed schedule switched on.
+
+A second fresh-context review of the rebuild found one more blocker: the 06:50 fallback run, which skips, would have raised a false alert every day, reopening the issue the 06:15 run had closed. Fixed: a skipping run reports nothing. It also found:
+- the missed-day check could never fire; it now looks for a gap in the archive index;
+- the claim that GitHub e-mails the repository owner was wrong (see `docs/operations.md`, "Notifications");
+- two runbook steps would have done nothing on a day with a brief;
+- the alert job's steps could be skipped after a cancellation; each now runs `if: always()`.
+
+### Live dry run in the development environment (12/11/2026, Singapore date 13 November)
+
+Run without the workflow, without an EIA key and without the model, against the real sources:
+- payload built from the live MPA, PortWatch and news feeds, with Prices marked missing ("no EIA API key configured");
+- brief passed the gate on real feed content;
+- archived, the alert decided, and the site built and checked at phone width.
+
+It exposed weak news classification: a cruise ship "ordered back to Texas" was filed as Sale & Purchase, and two real deals as Events. The rules are fixed and pinned by a test using those headlines. **Not yet run as a GitHub workflow:** that needs the workflow on `main` and the secrets (Decision Batch 2).
+
+## Runtime prompt v1 (superseded 12/11/2026 by `writer.SYSTEM_PROMPT`; kept for the record)
 
 System prompt:
 
@@ -187,4 +457,10 @@ Start with Step 0.
 
 ## Parked decisions
 
+**Closed 12/11/2026 by Decision Batch 1:** the missing-price penalty, freshness in confidence scoring and the Brent age penalty (all D3), the Scenario 3 figure (now Medium 79; README re-run), and brief cadence (D8: daily). The notes below are kept as the record of why.
+
 - Confidence model: a missing price on a feasible option drops confidence by only 6 points (Scenario 3 stays High at 85). Options: raise the penalty, or cap confidence at Medium when any feasible option lacks a price. Decide after the morning brief.
+- Freshness in confidence scoring (Linus, 12/10/2026): the confidence model does not read `Provenance.freshness()` or the `max_age` limits, so stale inputs can count as fresh. More precisely (checked 12-10-2026 in `compute_data_quality`): Brent has its own age rule (≤1 day no deduction, 2–3 days −5, older −15), which ignores the shared 10-day `EIA_SPOT_MAX_AGE` and, with EIA's weekly release, will usually deduct 15; PortWatch congestion and the CSV bunker prices have no age check at all. (Commit `9f270f2` on main says "confidence scoring does not read freshness"; that is true of `Provenance.freshness()` only.) Decide alongside the missing-price rule above, after the trial.
+- Brent age penalty fires on almost every live run (Linus, 12/10/2026): `compute_data_quality` deducts 15 points when Brent is more than 3 days old, but EIA releases daily prices once a week, so live Brent is usually 4–9 days old. The penalty therefore lowers nearly every live score rather than signalling anything. **Proposed fix** (decide with the confidence decision above): measure age against the source's expected lag: no penalty within `EIA_SPOT_MAX_AGE` (10 days), stale beyond it.
+- Scenario 3 "High at 85" (README demo table) comes from demo mode, where Brent is dated today and carries no age penalty. Re-run it under live freshness before quoting it anywhere.
+- Brief cadence: daily or weekly. EIA prices are released weekly and PortWatch lags 8–10 days, so a daily brief may repeat figures. Decide after the personal trial.

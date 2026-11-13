@@ -1,0 +1,16 @@
+{
+ "description": "A section with neither content nor a reason is a silent gap.",
+ "check": "brief",
+ "payload": "payload/from_fixtures.json",
+ "brief": "validator/brief_ok.md",
+ "brief_replace": [
+  [
+   "*Weekly section: deals reported in the past week, up to the brief date.*\n\n- **Yangzijiang Maritime adds kamsarmax bulkers to newbuild spree** (Splash247, by Adis Ajdin, 12 October 2026). A Chinese shipyard group has ordered more kamsarmax bulk carriers (a large Panamax design) for its own fleet. [Read the story](https://splash247.com/yangzijiang-maritime-adds-kamsarmax-bulkers-to-newbuild-spree/) [S5]\n- **MISC lines up five more LNG carriers for Petronas** (Splash247, by Adis Ajdin, 12 October 2026). Malaysian shipowner MISC has lined up further LNG carriers (liquefied natural gas ships) to serve the energy company Petronas. [Read the story](https://splash247.com/misc-lines-up-five-more-lng-carriers-for-petronas/) [S5]\n- **Chinese buyers snap up capesizes** (Splash247, by Hans Thaulow, 12 October 2026). Buyers from China have been acquiring capesize bulk carriers (the largest dry bulk ships) on the second-hand market. [Read the story](https://splash247.com/chinese-buyers-snap-up-capesizes/) [S5]\n\n",
+   ""
+  ]
+ ],
+ "expect": "fail",
+ "expect_codes": [
+  "silent_gap"
+ ]
+}

@@ -1,0 +1,1371 @@
+{
+ "success": true,
+ "result": {
+  "resource_id": "d_4f5abbf4486bf8e52bbed3be56dde562",
+  "fields": [
+   {
+    "type": "text",
+    "id": "month"
+   },
+   {
+    "type": "text",
+    "id": "bunker_type"
+   },
+   {
+    "type": "text",
+    "id": "bunker_sales"
+   },
+   {
+    "type": "int4",
+    "id": "_id"
+   }
+  ],
+  "records": [
+   {
+    "_id": 6081,
+    "month": "2026-09",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6082,
+    "month": "2026-09",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6083,
+    "month": "2026-09",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "1.12"
+   },
+   {
+    "_id": 6084,
+    "month": "2026-09",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "4.33"
+   },
+   {
+    "_id": 6085,
+    "month": "2026-09",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "378.84"
+   },
+   {
+    "_id": 6086,
+    "month": "2026-09",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0.1"
+   },
+   {
+    "_id": 6087,
+    "month": "2026-09",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "1993.2"
+   },
+   {
+    "_id": 6088,
+    "month": "2026-09",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6089,
+    "month": "2026-09",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2218.11"
+   },
+   {
+    "_id": 6090,
+    "month": "2026-09",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "76.2"
+   },
+   {
+    "_id": 6091,
+    "month": "2026-09",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0.4"
+   },
+   {
+    "_id": 6092,
+    "month": "2026-09",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6093,
+    "month": "2026-09",
+    "bunker_type": "B100",
+    "bunker_sales": "2.58"
+   },
+   {
+    "_id": 6095,
+    "month": "2026-09",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6096,
+    "month": "2026-09",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6065,
+    "month": "2026-08",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6066,
+    "month": "2026-08",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6067,
+    "month": "2026-08",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6068,
+    "month": "2026-08",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6069,
+    "month": "2026-08",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "367.73"
+   },
+   {
+    "_id": 6070,
+    "month": "2026-08",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6071,
+    "month": "2026-08",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "2095.18"
+   },
+   {
+    "_id": 6072,
+    "month": "2026-08",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "8.65"
+   },
+   {
+    "_id": 6073,
+    "month": "2026-08",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2193.8"
+   },
+   {
+    "_id": 6074,
+    "month": "2026-08",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "47.87"
+   },
+   {
+    "_id": 6075,
+    "month": "2026-08",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6076,
+    "month": "2026-08",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6077,
+    "month": "2026-08",
+    "bunker_type": "B100",
+    "bunker_sales": "0.81"
+   },
+   {
+    "_id": 6078,
+    "month": "2026-08",
+    "bunker_type": "LNG",
+    "bunker_sales": "58.64"
+   },
+   {
+    "_id": 6079,
+    "month": "2026-08",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6080,
+    "month": "2026-08",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6049,
+    "month": "2026-07",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6050,
+    "month": "2026-07",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6051,
+    "month": "2026-07",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "0.72"
+   },
+   {
+    "_id": 6052,
+    "month": "2026-07",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6053,
+    "month": "2026-07",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "358.87"
+   },
+   {
+    "_id": 6054,
+    "month": "2026-07",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6055,
+    "month": "2026-07",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "1952.9"
+   },
+   {
+    "_id": 6056,
+    "month": "2026-07",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "8.23"
+   },
+   {
+    "_id": 6057,
+    "month": "2026-07",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2327.9"
+   },
+   {
+    "_id": 6058,
+    "month": "2026-07",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "29.92"
+   },
+   {
+    "_id": 6059,
+    "month": "2026-07",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "1.55"
+   },
+   {
+    "_id": 6060,
+    "month": "2026-07",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6061,
+    "month": "2026-07",
+    "bunker_type": "B100",
+    "bunker_sales": "1.36"
+   },
+   {
+    "_id": 6062,
+    "month": "2026-07",
+    "bunker_type": "LNG",
+    "bunker_sales": "58.69"
+   },
+   {
+    "_id": 6063,
+    "month": "2026-07",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6064,
+    "month": "2026-07",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6033,
+    "month": "2026-06",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6034,
+    "month": "2026-06",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6035,
+    "month": "2026-06",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "1.87"
+   },
+   {
+    "_id": 6036,
+    "month": "2026-06",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6037,
+    "month": "2026-06",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "343.8"
+   },
+   {
+    "_id": 6038,
+    "month": "2026-06",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6039,
+    "month": "2026-06",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "2034.55"
+   },
+   {
+    "_id": 6040,
+    "month": "2026-06",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "8.08"
+   },
+   {
+    "_id": 6041,
+    "month": "2026-06",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2197"
+   },
+   {
+    "_id": 6042,
+    "month": "2026-06",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "30.72"
+   },
+   {
+    "_id": 6043,
+    "month": "2026-06",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6044,
+    "month": "2026-06",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6045,
+    "month": "2026-06",
+    "bunker_type": "B100",
+    "bunker_sales": "1.5"
+   },
+   {
+    "_id": 6046,
+    "month": "2026-06",
+    "bunker_type": "LNG",
+    "bunker_sales": "54.97"
+   },
+   {
+    "_id": 6047,
+    "month": "2026-06",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6048,
+    "month": "2026-06",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6017,
+    "month": "2026-05",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6018,
+    "month": "2026-05",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6019,
+    "month": "2026-05",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "0.64"
+   },
+   {
+    "_id": 6020,
+    "month": "2026-05",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6021,
+    "month": "2026-05",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "328.7"
+   },
+   {
+    "_id": 6022,
+    "month": "2026-05",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6023,
+    "month": "2026-05",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "1795.83"
+   },
+   {
+    "_id": 6024,
+    "month": "2026-05",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "11.58"
+   },
+   {
+    "_id": 6025,
+    "month": "2026-05",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2296.76"
+   },
+   {
+    "_id": 6026,
+    "month": "2026-05",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "37.05"
+   },
+   {
+    "_id": 6027,
+    "month": "2026-05",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6028,
+    "month": "2026-05",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6029,
+    "month": "2026-05",
+    "bunker_type": "B100",
+    "bunker_sales": "12.83"
+   },
+   {
+    "_id": 6030,
+    "month": "2026-05",
+    "bunker_type": "LNG",
+    "bunker_sales": "70.27"
+   },
+   {
+    "_id": 6031,
+    "month": "2026-05",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6032,
+    "month": "2026-05",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6001,
+    "month": "2026-04",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6002,
+    "month": "2026-04",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6003,
+    "month": "2026-04",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6004,
+    "month": "2026-04",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6005,
+    "month": "2026-04",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "256.25"
+   },
+   {
+    "_id": 6006,
+    "month": "2026-04",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0.8"
+   },
+   {
+    "_id": 6007,
+    "month": "2026-04",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "1787.93"
+   },
+   {
+    "_id": 6008,
+    "month": "2026-04",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "18.3"
+   },
+   {
+    "_id": 6009,
+    "month": "2026-04",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2192.51"
+   },
+   {
+    "_id": 6010,
+    "month": "2026-04",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "48.82"
+   },
+   {
+    "_id": 6011,
+    "month": "2026-04",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6012,
+    "month": "2026-04",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6013,
+    "month": "2026-04",
+    "bunker_type": "B100",
+    "bunker_sales": "8.03"
+   },
+   {
+    "_id": 6014,
+    "month": "2026-04",
+    "bunker_type": "LNG",
+    "bunker_sales": "42.43"
+   },
+   {
+    "_id": 6015,
+    "month": "2026-04",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6016,
+    "month": "2026-04",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5985,
+    "month": "2026-03",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5986,
+    "month": "2026-03",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5987,
+    "month": "2026-03",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "5.7"
+   },
+   {
+    "_id": 5988,
+    "month": "2026-03",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5989,
+    "month": "2026-03",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "346.87"
+   },
+   {
+    "_id": 5990,
+    "month": "2026-03",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0.4"
+   },
+   {
+    "_id": 5991,
+    "month": "2026-03",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "1934.22"
+   },
+   {
+    "_id": 5992,
+    "month": "2026-03",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "14.39"
+   },
+   {
+    "_id": 5993,
+    "month": "2026-03",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2338.69"
+   },
+   {
+    "_id": 5994,
+    "month": "2026-03",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "77.55"
+   },
+   {
+    "_id": 5995,
+    "month": "2026-03",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5996,
+    "month": "2026-03",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5997,
+    "month": "2026-03",
+    "bunker_type": "B100",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5998,
+    "month": "2026-03",
+    "bunker_type": "LNG",
+    "bunker_sales": "49.02"
+   },
+   {
+    "_id": 5999,
+    "month": "2026-03",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 6000,
+    "month": "2026-03",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5969,
+    "month": "2026-02",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5970,
+    "month": "2026-02",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5971,
+    "month": "2026-02",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "3.57"
+   },
+   {
+    "_id": 5972,
+    "month": "2026-02",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5973,
+    "month": "2026-02",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "371.72"
+   },
+   {
+    "_id": 5974,
+    "month": "2026-02",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5975,
+    "month": "2026-02",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "1833.57"
+   },
+   {
+    "_id": 5976,
+    "month": "2026-02",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "13.96"
+   },
+   {
+    "_id": 5977,
+    "month": "2026-02",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2310.01"
+   },
+   {
+    "_id": 5978,
+    "month": "2026-02",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "77.46"
+   },
+   {
+    "_id": 5979,
+    "month": "2026-02",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "1.56"
+   },
+   {
+    "_id": 5980,
+    "month": "2026-02",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5981,
+    "month": "2026-02",
+    "bunker_type": "B100",
+    "bunker_sales": "1.3"
+   },
+   {
+    "_id": 5982,
+    "month": "2026-02",
+    "bunker_type": "LNG",
+    "bunker_sales": "59.01"
+   },
+   {
+    "_id": 5983,
+    "month": "2026-02",
+    "bunker_type": "Methanol",
+    "bunker_sales": "6.01"
+   },
+   {
+    "_id": 5984,
+    "month": "2026-02",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5953,
+    "month": "2026-01",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5954,
+    "month": "2026-01",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5955,
+    "month": "2026-01",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "2.01"
+   },
+   {
+    "_id": 5956,
+    "month": "2026-01",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5957,
+    "month": "2026-01",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "402.06"
+   },
+   {
+    "_id": 5958,
+    "month": "2026-01",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5959,
+    "month": "2026-01",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "2159.67"
+   },
+   {
+    "_id": 5960,
+    "month": "2026-01",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "14.26"
+   },
+   {
+    "_id": 5961,
+    "month": "2026-01",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2561.23"
+   },
+   {
+    "_id": 5962,
+    "month": "2026-01",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "45.95"
+   },
+   {
+    "_id": 5963,
+    "month": "2026-01",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5964,
+    "month": "2026-01",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5965,
+    "month": "2026-01",
+    "bunker_type": "B100",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5966,
+    "month": "2026-01",
+    "bunker_type": "LNG",
+    "bunker_sales": "42.59"
+   },
+   {
+    "_id": 5967,
+    "month": "2026-01",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0.3"
+   },
+   {
+    "_id": 5968,
+    "month": "2026-01",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5937,
+    "month": "2025-12",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5938,
+    "month": "2025-12",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5939,
+    "month": "2025-12",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "3.18"
+   },
+   {
+    "_id": 5940,
+    "month": "2025-12",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5941,
+    "month": "2025-12",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "410.55"
+   },
+   {
+    "_id": 5942,
+    "month": "2025-12",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5943,
+    "month": "2025-12",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "2117.58"
+   },
+   {
+    "_id": 5944,
+    "month": "2025-12",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "20.35"
+   },
+   {
+    "_id": 5945,
+    "month": "2025-12",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2830.32"
+   },
+   {
+    "_id": 5946,
+    "month": "2025-12",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "70.72"
+   },
+   {
+    "_id": 5947,
+    "month": "2025-12",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "1.36"
+   },
+   {
+    "_id": 5948,
+    "month": "2025-12",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5949,
+    "month": "2025-12",
+    "bunker_type": "B100",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5950,
+    "month": "2025-12",
+    "bunker_type": "LNG",
+    "bunker_sales": "54.57"
+   },
+   {
+    "_id": 5951,
+    "month": "2025-12",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5952,
+    "month": "2025-12",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5921,
+    "month": "2025-11",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5922,
+    "month": "2025-11",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5923,
+    "month": "2025-11",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "2.99"
+   },
+   {
+    "_id": 5924,
+    "month": "2025-11",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5925,
+    "month": "2025-11",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "366.41"
+   },
+   {
+    "_id": 5926,
+    "month": "2025-11",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0.45"
+   },
+   {
+    "_id": 5927,
+    "month": "2025-11",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "1818.67"
+   },
+   {
+    "_id": 5928,
+    "month": "2025-11",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "11.08"
+   },
+   {
+    "_id": 5929,
+    "month": "2025-11",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2512.38"
+   },
+   {
+    "_id": 5930,
+    "month": "2025-11",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "45.81"
+   },
+   {
+    "_id": 5931,
+    "month": "2025-11",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5932,
+    "month": "2025-11",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5933,
+    "month": "2025-11",
+    "bunker_type": "B100",
+    "bunker_sales": "4.84"
+   },
+   {
+    "_id": 5934,
+    "month": "2025-11",
+    "bunker_type": "LNG",
+    "bunker_sales": "55.04"
+   },
+   {
+    "_id": 5935,
+    "month": "2025-11",
+    "bunker_type": "Methanol",
+    "bunker_sales": "3.01"
+   },
+   {
+    "_id": 5936,
+    "month": "2025-11",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5905,
+    "month": "2025-10",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5906,
+    "month": "2025-10",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5907,
+    "month": "2025-10",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "2.25"
+   },
+   {
+    "_id": 5908,
+    "month": "2025-10",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5909,
+    "month": "2025-10",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "392"
+   },
+   {
+    "_id": 5910,
+    "month": "2025-10",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5911,
+    "month": "2025-10",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "1866.53"
+   },
+   {
+    "_id": 5912,
+    "month": "2025-10",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "11.14"
+   },
+   {
+    "_id": 5913,
+    "month": "2025-10",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2433.38"
+   },
+   {
+    "_id": 5914,
+    "month": "2025-10",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "50.03"
+   },
+   {
+    "_id": 5915,
+    "month": "2025-10",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5916,
+    "month": "2025-10",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5917,
+    "month": "2025-10",
+    "bunker_type": "B100",
+    "bunker_sales": "1.8"
+   },
+   {
+    "_id": 5918,
+    "month": "2025-10",
+    "bunker_type": "LNG",
+    "bunker_sales": "60.6"
+   },
+   {
+    "_id": 5919,
+    "month": "2025-10",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5920,
+    "month": "2025-10",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5889,
+    "month": "2025-09",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5890,
+    "month": "2025-09",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5891,
+    "month": "2025-09",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "0.31"
+   },
+   {
+    "_id": 5892,
+    "month": "2025-09",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5893,
+    "month": "2025-09",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "373.56"
+   },
+   {
+    "_id": 5894,
+    "month": "2025-09",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5895,
+    "month": "2025-09",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "1872.95"
+   },
+   {
+    "_id": 5896,
+    "month": "2025-09",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "43.11"
+   },
+   {
+    "_id": 5897,
+    "month": "2025-09",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2350.48"
+   },
+   {
+    "_id": 5898,
+    "month": "2025-09",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "71.7"
+   },
+   {
+    "_id": 5899,
+    "month": "2025-09",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5900,
+    "month": "2025-09",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5901,
+    "month": "2025-09",
+    "bunker_type": "B100",
+    "bunker_sales": "4.52"
+   },
+   {
+    "_id": 5902,
+    "month": "2025-09",
+    "bunker_type": "LNG",
+    "bunker_sales": "48.45"
+   },
+   {
+    "_id": 5903,
+    "month": "2025-09",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5904,
+    "month": "2025-09",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5873,
+    "month": "2025-08",
+    "bunker_type": "Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5874,
+    "month": "2025-08",
+    "bunker_type": "Bio-Blended Marine Diesel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5875,
+    "month": "2025-08",
+    "bunker_type": "Marine Gas Oil",
+    "bunker_sales": "1.75"
+   },
+   {
+    "_id": 5876,
+    "month": "2025-08",
+    "bunker_type": "Bio-Blended Marine Gas Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5877,
+    "month": "2025-08",
+    "bunker_type": "Low Sulphur Marine Gas Oil",
+    "bunker_sales": "368.56"
+   },
+   {
+    "_id": 5878,
+    "month": "2025-08",
+    "bunker_type": "Bio-Blended Low Sulphur Marine Gas Oil",
+    "bunker_sales": "1.9"
+   },
+   {
+    "_id": 5879,
+    "month": "2025-08",
+    "bunker_type": "Marine Fuel Oil",
+    "bunker_sales": "1891.84"
+   },
+   {
+    "_id": 5880,
+    "month": "2025-08",
+    "bunker_type": "Bio-Blended Marine Fuel Oil",
+    "bunker_sales": "34.69"
+   },
+   {
+    "_id": 5881,
+    "month": "2025-08",
+    "bunker_type": "Low Sulphur Fuel Oil",
+    "bunker_sales": "2500.97"
+   },
+   {
+    "_id": 5882,
+    "month": "2025-08",
+    "bunker_type": "Bio-Blended Low Sulphur Fuel Oil",
+    "bunker_sales": "93.8"
+   },
+   {
+    "_id": 5883,
+    "month": "2025-08",
+    "bunker_type": "Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5884,
+    "month": "2025-08",
+    "bunker_type": "Bio-Blended Ultra Low Sulphur Fuel Oil",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5885,
+    "month": "2025-08",
+    "bunker_type": "B100",
+    "bunker_sales": "4.79"
+   },
+   {
+    "_id": 5886,
+    "month": "2025-08",
+    "bunker_type": "LNG",
+    "bunker_sales": "66.96"
+   },
+   {
+    "_id": 5887,
+    "month": "2025-08",
+    "bunker_type": "Methanol",
+    "bunker_sales": "0"
+   },
+   {
+    "_id": 5888,
+    "month": "2025-08",
+    "bunker_type": "Ammonia",
+    "bunker_sales": "0"
+   }
+  ],
+  "_links": {
+   "start": "/api/action/datastore_search?resource_id=d_4f5abbf4486bf8e52bbed3be56dde562&limit=224&sort=month%20desc",
+   "next": "/api/action/datastore_search?resource_id=d_4f5abbf4486bf8e52bbed3be56dde562&offset=224&limit=224&sort=month%20desc"
+  },
+  "total": 6096,
+  "limit": 224,
+  "sort": "month%20desc"
+ }
+}
