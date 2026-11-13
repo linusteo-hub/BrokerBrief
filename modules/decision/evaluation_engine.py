@@ -154,7 +154,8 @@ def _score_operational_risk(
         score = max(10.0, score - 10.0)
         note += " Partial stem requires two port calls — additional coordination risk."
 
-    return round(score, 1), f"{note} (Congestion estimate — see data sources.)"
+    return round(score, 1), (f"{note} (Congestion estimate: the signal compares port calls at the start and "
+                             "end of PortWatch's latest window, a rough guide to waiting time, not a queue count.)")
 
 
 def _score_schedule_risk(

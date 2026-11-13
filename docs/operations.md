@@ -42,7 +42,7 @@ Run time on GitHub: **not yet measured** (the workflow has not run there). The s
 | "No run was archived for <date>" | The archive has no entry for yesterday: both scheduled runs were dropped, or failed before archiving. | Check the Actions tab for that day. Nothing else to do: today's brief is out. |
 | "The alert job could not read the briefs branch" | A network or permission problem reading the archive; the archive checks were not made. | Usually temporary; check the next run. |
 | "The publishing gate refused the brief" | The final brief broke a code-level rule (a number not in the payload, an unknown link, a wrong date…). Nothing was published, by design. | A bug in BrokerBrief. The problem codes are in the alert and in `validation.json` (kept as a run artifact). Fix the code; the next run will clear the alert. |
-| "The writer could not use the model" | The API key is missing, wrong or revoked; the `ANTHROPIC_API_KEY` secret was deleted; credit or the spend limit ran out; the API was down; or the model declined. The brief went out with news as headline and link only. Scheduled runs always expect the model, so a vanished secret is caught. | Check the secret, then the Anthropic Console: key, credit, spend limit. See "Rotate the API key". |
+| "The writer could not use the model" | Only when the model has been switched on (`BRIEF_USE_MODEL`): the key is missing, wrong or revoked, the secret was deleted, credit ran out, the API was down, or the model declined. News went out as headline and link only. | Check the secret, then the provider's console. See "Language model (off)". |
 | "Job "Publish to GitHub Pages" failed" | The brief was archived, but the page was not updated. | Open the run and use **Re-run failed jobs**: that re-runs only publishing and the alert. (Running the workflow again from the start would skip, because today's brief already exists.) |
 | "Section `x` has been empty on N run dates in a row" | A source has failed or produced nothing on three or more consecutive archived runs. (Run dates, not calendar days; a missing day raises its own alert.) | Read the reason under that section in the latest brief. A changed feed format or a dead URL needs a code fix; an outage needs nothing. |
 
@@ -62,16 +62,27 @@ GitHub disables scheduled workflows in a public repository when there has been n
 
 Streamlit Community Cloud puts an app to sleep after 12 hours without traffic; the next visitor sees a page with a button to wake it (Streamlit documentation, read 12/11/2026). BrokerBrief does **not** ping the app to keep it awake: that may breach Streamlit's terms. The morning brief is on GitHub Pages, which does not sleep, and links to the app.
 
-## Rotate the API key
+## Language model (off)
 
-Do this if the key may have leaked, or once a year.
+The brief runs **without a language model** (Decision Batch 2, 13/11/2026: no spending). Every word is written by code; news items are headline, publisher, date and link. Nothing calls a paid API, and no API key is needed apart from the free EIA key.
 
-1. Anthropic Console → API keys → create a new key, named `brokerbrief-github-actions`. Check the workspace spend limit (USD 5 a month was agreed in Decision Batch 1).
-2. GitHub → repository → Settings → Secrets and variables → Actions → `ANTHROPIC_API_KEY` → Update, paste the new key, save. Never paste it anywhere else.
-3. Actions → Morning brief → Run workflow, with "force" ticked and "archive" and "publish" unticked ("force" makes it build even though today's brief exists; nothing is published). Open the run's `brief-output` artifact: `validation.json` should show writer status `ok`.
-4. Back in the Console, delete the old key.
+The model path is kept in the code and tested, so it can be switched on later without code changes:
 
-The EIA key is rotated the same way: the secret is `EIA_API_KEY` in GitHub, and `EIA_API_KEY` in the Streamlit app's secrets (Streamlit Community Cloud → app → Settings → Secrets).
+1. Choose a provider and key, and set a spend limit.
+2. GitHub → repository → Settings → Secrets and variables → Actions → Secrets → `ANTHROPIC_API_KEY`.
+3. Same page → Variables → `BRIEF_USE_MODEL` = `true`.
+4. Optionally restore the model-trial workflow from `_archive/workflows/` first, to measure cost and quality.
+
+With the variable unset, the workflow passes no key to the writer, whatever secrets exist.
+
+## Rotate the EIA key
+
+The EIA key is free, but rotate it if it may have leaked:
+
+1. Register a new key at eia.gov/opendata.
+2. GitHub → repository → Settings → Secrets and variables → Actions → `EIA_API_KEY` → Update.
+3. Streamlit Community Cloud → the app → Settings → Secrets → replace the `EIA_API_KEY` line, then save.
+4. Actions → Morning brief → Run workflow with "force" ticked, and "archive" and "publish" unticked. Then open the run's `brief-output` artifact and check that `validation.json` shows Prices `ok`.
 
 ## Archive and retention
 
@@ -100,5 +111,5 @@ Download the run's `brief-output` artifact to see the brief the test produced. S
 ## Known limits
 
 - If both the primary and the fallback runs are dropped by GitHub, that day has no brief. The next scheduled run's alert job finds the gap in `briefs/index.json` and reports it.
-- A refused day is retried by the fallback run. If the cause is a bug, it will be refused again (a second model call, about a fifth of a US cent with Haiku, and a second comment on the alert).
+- A refused day is retried by the fallback run. If the cause is a bug, it will be refused again, and the alert gets a second comment.
 - The workflow allows one queued run at a time. If three runs were started together, the middle one would be cancelled; the alert job of the run that does go ahead does not see it.

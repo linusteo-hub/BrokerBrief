@@ -7,7 +7,12 @@ name: Morning brief
 #
 # Jobs, each with only the permissions it needs:
 #   keepalive  actions: write   re-enable the scheduled workflows (60-day rule)
-#   build      contents: read   fetch, check and write; holds the API keys; cannot push
+#   build      contents: read   fetch, check and write; holds the EIA key; cannot push
+#
+# NO LANGUAGE MODEL by default (Decision Batch 2, 13/11/2026: no spending).
+# News is published as headline and link only. The model path stays in the
+# code; to switch it on later, set the repository variable BRIEF_USE_MODEL to
+# "true" and add the ANTHROPIC_API_KEY secret (docs/operations.md).
 #   archive    contents: write  commit the result to the briefs branch
 #   site       pages: write     build and deploy GitHub Pages from the archive
 #   alert      issues: write    sees every other job's result; runs whatever happened
@@ -28,7 +33,7 @@ on:
         default: none
         options: [none, eia_spot, mpa_bunker_sales, imf_portwatch, gcaptain, splash247, maritime_executive]
       no_model:
-        description: "Publish news as headline and link only (no model call)"
+        description: "Skip the model even if BRIEF_USE_MODEL is on (it is off by default)"
         type: boolean
         default: false
       archive:
@@ -141,7 +146,8 @@ jobs:
       - name: Write and check the brief
         if: steps.skip.outputs.skip != 'true'
         env:
-          ANTHROPIC_API_KEY: ${{ inputs.no_model != true && secrets.ANTHROPIC_API_KEY || '' }}
+          # Empty unless the model has been switched on, so no API is called.
+          ANTHROPIC_API_KEY: ${{ vars.BRIEF_USE_MODEL == 'true' && inputs.no_model != true && secrets.ANTHROPIC_API_KEY || '' }}
         run: |
           prev=$(python -m modules.morning_brief.archive previous --archive archive --payload work/payload.json)
           set +e
@@ -301,14 +307,14 @@ jobs:
         if: always()
         env:
           JOB_RESULTS: ${{ toJSON(needs) }}
-          HAS_MODEL_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+          USE_MODEL: ${{ vars.BRIEF_USE_MODEL == 'true' }}
           NO_MODEL: ${{ inputs.no_model == true }}
           ARCHIVED: ${{ needs.archive.result == 'success' }}
           ARCHIVE_READABLE: ${{ steps.read_archive.outputs.readable || 'false' }}
         run: |
           python -m modules.morning_brief.alerts --archive archive --report work/out/validation.json \
             --jobs-json "$JOB_RESULTS" --run-url "$RUN_URL" --scheduled "$SCHEDULED" \
-            --has-model-key "$HAS_MODEL_KEY" --no-model "$NO_MODEL" --break-feed "$BREAK_FEED" \
+            --use-model "$USE_MODEL" --no-model "$NO_MODEL" --break-feed "$BREAK_FEED" \
             --archived "$ARCHIVED" --archive-readable "$ARCHIVE_READABLE" > decision.json
           cat decision.json
       - name: Open, update or close the alert issue

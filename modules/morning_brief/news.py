@@ -85,12 +85,18 @@ DROP_REASONS = {
     "missing_headline_or_link": "missing headline or https link",
     "unsafe_link": "link contains characters that cannot be published safely",
     "link_in_headline": "headline contains a web address",
+    "off_topic": "cruise or leisure story (outside the brief's scope)",
     "no_date": "no publication date",
     "outside_window": "outside the time window",
     "duplicate": "same story as an earlier item",
     "over_limit": "section already full",
 }
 MAIN_DROP_CODES = ("banned_source", "digit_in_freight_headline")
+# Stories outside a shipbroking reader's scope (Decision Batch 2, E3). Matched
+# on the headline only. Cruise lines' newbuilding orders are also left out:
+# passenger shipping is not part of the brief.
+OFF_TOPIC = re.compile(r"\b(cruises?|cruising|cruise (ship|line)s?|super-?yachts?|yachts?|yachting|"
+                       r"marinas?|sail(ing)? race|regatta)\b", re.IGNORECASE)
 SAFE_LINK = re.compile(r"https://[A-Za-z0-9\-._~:/?#@!$&*+,;=%]+")
 
 
@@ -253,6 +259,8 @@ def build_item(entry: dict, source_id: str, now: datetime) -> tuple[Optional[dic
         return None, "unsafe_link"
     if re.search(r"https?://|www\.", title, re.I):
         return None, "link_in_headline"
+    if OFF_TOPIC.search(title):
+        return None, "off_topic"
     excerpt = strip_html(entry.get("excerpt_html", ""))
     if mentions_banned_source(title) or mentions_banned_source(excerpt):
         return None, "banned_source"

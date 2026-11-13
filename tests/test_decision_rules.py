@@ -326,6 +326,40 @@ class RulePrecedenceAndWording(unittest.TestCase):
         self.assertEqual({o.infeasible_rule for o in options}, {"F1"})
 
 
+class SplitStemAndTopUpRules(unittest.TestCase):
+    """E2 (Decision Batch 2): the split stem's second leg, and the top-up port's availability."""
+
+    def split(self, options):
+        return next(o for o in options if o.is_partial)
+
+    def test_f4_removes_a_split_that_would_reach_fujairah_below_the_reserve(self):
+        # 280 MT on board, 400 MT stem: the split takes 240 MT (60% cap) and arrives with about 2.5 MT.
+        options = constrained(scenario(fuel_remaining_mt=280.0, required_quantity_mt=400.0))
+        split = self.split(options)
+        self.assertFalse(split.is_feasible)
+        self.assertEqual(split.infeasible_rule, "F4")
+        self.assertIn("below the safety reserve", split.infeasible_reason)
+
+    def test_f4_keeps_a_split_with_enough_fuel(self):
+        self.assertTrue(self.split(constrained(scenario())).is_feasible)
+
+    def test_p1_checks_the_top_up_port(self):
+        from modules.decision.scenario import FuelAvailability
+        options = constrained(scenario(fujairah_vlsfo_available=FuelAvailability.UNAVAILABLE))
+        split = self.split(options)
+        self.assertEqual(split.infeasible_rule, "P1")
+        self.assertIn("top-up port", split.infeasible_reason)
+        full_sg = next(o for o in options if o.id == "SGP_FULL")
+        self.assertTrue(full_sg.is_feasible)
+
+    def test_thin_reserve_warns_and_removes_nothing(self):
+        options = constrained(scenario())                        # default reserve: 90 MT = 2 days
+        self.assertTrue(all(o.is_feasible for o in options))
+        self.assertTrue(all("covers only 2.0 days" in (o.warning_message or "") for o in options))
+        thick = constrained(scenario(safety_reserve_mt=180.0))  # 4 days
+        self.assertFalse(any("covers only" in (o.warning_message or "") for o in thick))
+
+
 class ReadmeFiguresMatchCode(unittest.TestCase):
     """Figures the README states, pinned so a code change cannot leave it wrong."""
 
@@ -346,15 +380,15 @@ class ReadmeFiguresMatchCode(unittest.TestCase):
         self.assertEqual((EIA_SPOT_MAX_AGE.days, PORTWATCH_MAX_AGE.days), (10, 14))
         self.assertEqual(MANUAL_ENTRY_MAX_AGE, timedelta(hours=48))
 
-    def test_rule_counts_six_removals_four_warnings(self):
+    def test_rule_counts_seven_removals_five_warnings(self):
         import inspect
         from modules.decision import constraint_engine
         source = inspect.getsource(constraint_engine)
-        removals = {r for r in ("F1", "F2", "C1", "P1", "R1", "S1") if f'"{r}"' in source}
-        self.assertEqual(len(removals), 6)
-        warnings = [name for name in ("_schedule_check", "_departure_reserve_warning",
+        removals = {r for r in ("F1", "F2", "C1", "P1", "R1", "S1", "F4") if f'"{r}"' in source}
+        self.assertEqual(len(removals), 7)
+        warnings = [name for name in ("_schedule_check", "_departure_reserve_warning", "_thin_reserve_warning",
                                       "_open_loop_warning", "_eca_warning") if hasattr(constraint_engine, name)]
-        self.assertEqual(len(warnings), 4)
+        self.assertEqual(len(warnings), 5)
 
     def test_three_optional_inputs_drive_completeness(self):
         fields = scenario().completeness_score()["fields"]

@@ -226,3 +226,17 @@ def test_deal_words_and_commands_are_told_apart():
     assert classify("Chinese shipbuilder wins AHTS order from South American owner", [])[0] == "sale_and_purchase"
     assert classify("Owner orders six car carriers", [])[0] == "sale_and_purchase"
     assert classify("Tanker Ablaze Off UAE as More Attacks Rattle Gulf Shipping", [])[0] == "events"
+
+
+
+def test_cruise_and_leisure_stories_are_left_out():
+    """Decision Batch 2, E3. Headlines from the live feeds of 12-11-2026."""
+    from modules.morning_brief.news import OFF_TOPIC
+    for title in ("MSC Cruises Makes History in Miami with Record 4 Ships Sailing this Winter",
+                  "MSC Cruise Ship Ordered Back to Texas with Report of Suspected Homicide",
+                  "Superyacht builder posts record year"):
+        assert OFF_TOPIC.search(title), title
+    for title in ("Tanker Ablaze Off UAE as More Attacks Rattle Gulf Shipping",
+                  "Seanergy lines up four more bulkers in $855m fleet push",
+                  "Owners rush to order car carriers"):
+        assert not OFF_TOPIC.search(title), title

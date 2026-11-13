@@ -244,3 +244,15 @@ Two blockers and ten should-fix items. All are fixed except the ones listed unde
 ## Note: a commit made with a failing test (12/11/2026)
 
 Commit `6fd19eb` (model-trial workflow) was committed while one test failed. The test was new and wrong: it checked that the word "write" did not appear, and the file's comment says "writer models". The verify skill was not re-run after adding that test. The next commit fixes the test (no code change). Rule kept: the verify skill runs immediately before every commit.
+
+## Step 5 — Decision Batch 2 work (13/11/2026)
+
+### Done
+
+- **No language model (option A).** The writer is off unless `BRIEF_USE_MODEL` is set. The brief's notice says whether a model wrote anything. An unusable model alerts only when the model is switched on. The model-trial workflow is moved to `_archive/workflows/`. "Events and why they matter" is renamed "Events", because without a model there are no "why it matters" notes.
+- **E2 engine fixes:** F4, P1 on the top-up port, the thin-reserve warning, and the congestion wording. The demo figures are unchanged (pinned by `tests/test_demo_mode.py`); the thin-reserve warning now shows on the demo scenarios. README rule table: 7 removal rules, 5 warnings.
+- **E3:** cruise and leisure stories are dropped at fetch time (`off_topic`).
+
+### Verified how
+
+- `pytest -q`: 317 passed. Validator: 22 of 22 cases. actionlint clean.

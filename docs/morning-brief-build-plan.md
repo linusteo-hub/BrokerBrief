@@ -27,6 +27,16 @@ Status (12/11/2026): **Portfolio mode** (see "Portfolio mode decision" below). S
 
 Small decisions (Claude, reported 12/11/2026): Singapore Offshore Oil Terminal 1 stays out and is not summed into Singapore; at most half of a news section's slots per publisher; `defusedxml` added for feed parsing; a `brief-alert` issue opens on a failed run or a section empty 3 days running and closes on the next clean run.
 
+## Decision Batch 2 (Linus, 13/11/2026): all recommended, and no spending
+
+| # | Decision |
+|---|---|
+| E1 | Merge the working branch into `main`, through a pull request that Linus reviews and merges. |
+| E2 | Four decision-engine fixes. **F4** removes a split stem that would reach Fujairah below its reserve. **P1** also checks the top-up port. A warning flags a safety reserve under three days of consumption. The congestion signal's limits are stated. |
+| E3 | Cruise and leisure stories are left out of the brief (`off_topic`). |
+| E4 | Container rates stay `not_covered` until Linus shares the scope of Drewry's reply. |
+| E5, D9 changed | **No language model and no spending.** The brief runs with every word written by code; news is headline and link. The model path stays in the code, switched off by the repository variable `BRIEF_USE_MODEL`. The model-trial workflow is moved to `_archive/`. GitHub Models, a free option considered, was retired by GitHub on 30/07/2026. Other free options (a small open model on the runner, other providers' free tiers) may be revisited later. |
+
 ### Source policy (Linus, 12/11/2026)
 
 Linus asked for more reputable sources, so that the project does not rest on unreliable data, and authorised rewriting the rules that stand in the way.

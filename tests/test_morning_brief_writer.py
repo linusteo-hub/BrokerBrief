@@ -138,7 +138,7 @@ def test_a_refusal_publishes_headlines_only():
 def test_no_key_means_no_model_call():
     markdown, report = build_brief(payload(), None)
     assert report["writer"]["status"] == "no_model" and report["published"]
-    assert "no API key configured" in report["writer"]["detail"]
+    assert "no language model in use" in report["writer"]["detail"]
 
 
 # ── Fail closed on code-level faults ─────────────────────────────────────────
@@ -403,3 +403,11 @@ def test_request_serialises_through_the_real_sdk_and_a_real_message_parses():
     assert seen["body"]["model"] == "claude-haiku-5-5"
     assert seen["body"]["output_config"]["format"]["type"] == "json_schema"
     assert report["writer"]["status"] == "ok" and len(report["writer"]["written"]) == len(GOOD)
+
+
+
+def test_the_notice_says_whether_a_model_wrote_anything():
+    no_model = render_brief(payload(), {})
+    assert "no language model is used" in no_model and "written by a language model" not in no_model
+    with_model, _ = build_brief(payload(), FakeClient(GOOD))
+    assert "written by a language model" in with_model

@@ -111,7 +111,7 @@ def build_payload(*, now: datetime, prices: dict, bunker_sales: dict, activity: 
         "freight": freight,
         "sale_and_purchase": _section("Sale & Purchase", "weekly", news_sections["sale_and_purchase"],
                                       _news_failure(news, "sale and purchase"), news["counts"]["sale_and_purchase"]),
-        "events": _section("Events and why they matter", "daily", news_sections["events"],
+        "events": _section("Events", "daily", news_sections["events"],
                            _news_failure(news, "event"), news["counts"]["events"]),
     }
 

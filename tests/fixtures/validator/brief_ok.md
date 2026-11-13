@@ -54,7 +54,7 @@ Not covered: No container freight index can be republished: Drewry's terms forbi
 - **MISC lines up five more LNG carriers for Petronas** (Splash247, by Adis Ajdin, 12 October 2026). Malaysian shipowner MISC has lined up further LNG carriers (liquefied natural gas ships) to serve the energy company Petronas. [Read the story](https://splash247.com/misc-lines-up-five-more-lng-carriers-for-petronas/) [S5]
 - **Chinese buyers snap up capesizes** (Splash247, by Hans Thaulow, 12 October 2026). Buyers from China have been acquiring capesize bulk carriers (the largest dry bulk ships) on the second-hand market. [Read the story](https://splash247.com/chinese-buyers-snap-up-capesizes/) [S5]
 
-## 5. Events and why they matter
+## 5. Events
 
 *Stories published since the previous brief.*
 

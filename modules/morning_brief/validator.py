@@ -362,7 +362,7 @@ def check_text(text: str, payload: dict) -> list:
 
 # ── Whole-brief gate ─────────────────────────────────────────────────────────
 
-NEWS_HEADINGS = ("## 4. Sale & Purchase", "## 5. Events and why they matter", "### Freight rate direction")
+NEWS_HEADINGS = ("## 4. Sale & Purchase", "## 5. Events", "### Freight rate direction")
 BOLD = re.compile(r"\*\*((?:\\.|[^*\\])+?)\*\*")
 WHY_LABEL = "Why it matters (our interpretation):"
 
@@ -395,7 +395,7 @@ def validate_brief(markdown: str, payload: dict) -> list:
     if not markdown.startswith(f"# BrokerBrief Morning Brief: {payload['brief_date_display']}\n"):
         problems.append(Problem("structure", "title line missing or has the wrong date"))
     for heading in ("## 1. Prices", "## 2. Singapore bunker sales", "## 3. Freight", "## 4. Sale & Purchase",
-                    "## 5. Events and why they matter", "## Sources"):
+                    "## 5. Events", "## Sources"):
         if f"\n{heading}\n" not in markdown:
             problems.append(Problem("structure", f"section heading missing: {heading}"))
     # No silent gaps: every section and subsection must show at least one item

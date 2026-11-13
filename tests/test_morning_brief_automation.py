@@ -101,7 +101,7 @@ def report(**overrides):
 def scheduled(**kw):
     args = dict(jobs=dict(ALL_OK), report=report(), health={"empty_streak_days": {}},
                 archive_dates=["2026-11-11", "2026-11-12", "2026-11-13"],
-                today=TODAY, scheduled=True, has_model_key=True, no_model=False, archived=True)
+                today=TODAY, scheduled=True, use_model=False, no_model=False, archived=True)
     args.update(kw)
     return decide(**args)
 
@@ -133,11 +133,15 @@ def test_build_success_without_a_report_alerts():
     assert scheduled(report=None)["action"] == "alert"
 
 
-def test_scheduled_runs_always_expect_the_model_even_if_the_secret_vanished():
-    r = report(writer={"status": "no_model", "detail": "no API key configured"})
-    assert scheduled(report=r, has_model_key=False)["action"] == "alert"
-    manual = scheduled(report=r, has_model_key=False, scheduled=False)
-    assert manual["action"] == "clear"                     # a manual run without a key is a choice
+def test_with_the_model_off_headline_only_news_is_normal():
+    r = report(writer={"status": "no_model", "detail": "no language model in use"})
+    assert scheduled(report=r)["action"] == "clear"                       # the default: no model
+
+
+def test_with_the_model_switched_on_an_unusable_model_alerts_even_if_the_secret_vanished():
+    r = report(writer={"status": "no_model", "detail": "no language model in use"})
+    assert scheduled(report=r, use_model=True)["action"] == "alert"
+    assert scheduled(report=r, use_model=True, no_model=True)["action"] == "clear"   # skipped on purpose
 
 
 def test_a_section_empty_for_three_run_dates_alerts_only_once_archived():
@@ -242,13 +246,14 @@ def test_public_archive_table_uses_plain_words(tmp_path):
     root = tmp_path / "archive"
     out_dir = run_output(tmp_path, "2026-11-12")
     data = json.loads((out_dir / "validation.json").read_text())
-    data["writer"]["status"] = "no_model"
+    data["writer"]["status"] = "model_unavailable"
     (out_dir / "validation.json").write_text(json.dumps(data))
     archive.store(root, out_dir)
+    archive.store(root, run_output(tmp_path, "2026-11-13"))                   # writer ok
     readme = tmp_path / "README.md"; readme.write_text("# x\n")
     site.build(root, readme, tmp_path / "_site")
     table = (tmp_path / "_site/brief/archive.html").read_text()
-    assert "headlines only (no model configured)" in table and "no_model" not in table
+    assert "headlines only (model unavailable)" in table and "model_unavailable" not in table
 
 
 def test_site_with_no_brief_yet_says_so(tmp_path):
@@ -414,10 +419,11 @@ def test_a_failure_test_always_builds_even_if_todays_brief_exists():
     assert '[ "$BREAK_FEED" = "none" ]' in _job(text, "build")
 
 
-def test_model_trial_workflow_is_manual_read_only_and_publishes_nothing():
-    import re
-    text = (ROOT / ".github/workflows/model-trial.yml").read_text()
-    live = [l for l in text.splitlines() if not l.lstrip().startswith("#")]
-    assert not any(re.match(r"\s*schedule:", l) for l in live)
-    assert "permissions:\n  contents: read\n" in text
-    assert not re.search(r":\s*write\b", text)            # no write permission anywhere
+def test_no_workflow_calls_a_paid_model_unless_switched_on():
+    """Decision Batch 2 (13/11/2026): no spending. The model-trial workflow is
+    archived, and the brief passes an API key only when BRIEF_USE_MODEL is on."""
+    assert not (ROOT / ".github/workflows/model-trial.yml").exists()
+    assert (ROOT / "_archive/workflows/model-trial.yml").exists()
+    text = (ROOT / ".github/workflows/morning-brief.yml").read_text()
+    key_lines = [l for l in text.splitlines() if "ANTHROPIC_API_KEY:" in l]
+    assert key_lines and all("vars.BRIEF_USE_MODEL == 'true'" in l for l in key_lines)

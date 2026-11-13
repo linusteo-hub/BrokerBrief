@@ -138,30 +138,65 @@ def _max_stem_check(
     return True, "", ""
 
 
+def _availability_at(scenario: BunkeringScenario, port: str) -> FuelAvailability:
+    if port == "Singapore":
+        return scenario.singapore_vlsfo_available
+    if port == "Fujairah":
+        return scenario.fujairah_vlsfo_available
+    return FuelAvailability.UNKNOWN
+
+
 def _fuel_grade_check(
     option: BunkeringOption,
     scenario: BunkeringScenario,
 ) -> Tuple[bool, str, str]:
     """
-    P1: Is the required fuel grade available at this port?
+    P1: Is the required fuel grade available at every port the option uses?
+    For a split stem that means the top-up port as well: a split that tops up
+    where the grade is unavailable cannot be completed.
     UNKNOWN → option retained, confidence reduced in Confidence Model.
     UNAVAILABLE → option INFEASIBLE.
     """
-    port = option.port
-    if port == "Singapore":
-        availability = scenario.singapore_vlsfo_available
-    elif port == "Fujairah":
-        availability = scenario.fujairah_vlsfo_available
-    else:
-        availability = FuelAvailability.UNKNOWN
+    for port in (option.port, option.top_up_port):
+        if port and _availability_at(scenario, port) == FuelAvailability.UNAVAILABLE:
+            role = "top-up port" if port == option.top_up_port else "bunkering port"
+            return (
+                False,
+                "P1",
+                (
+                    f"Required fuel grade ({scenario.fuel_grade.value}) is explicitly "
+                    f"unavailable at {port}, this option's {role}. Option removed."
+                ),
+            )
+    return True, "", ""
 
-    if availability == FuelAvailability.UNAVAILABLE:
+
+def _split_leg_check(
+    option: BunkeringOption,
+    scenario: BunkeringScenario,
+) -> Tuple[bool, str, str]:
+    """
+    F4: Can a split stem reach its top-up port while keeping the safety reserve?
+    The vessel leaves Singapore with what it had on arrival plus the partial
+    stem, and must cover the Singapore–Fujairah leg (the difference between the
+    two ETAs) with the reserve still on board when it arrives.
+    """
+    if not option.is_partial or option.top_up_port != "Fujairah" or option.port != "Singapore":
+        return True, "", ""
+    on_departure = scenario.fuel_remaining_mt - scenario.fuel_to_reach_singapore_mt() + option.quantity_mt
+    leg_days = max(scenario.eta_fujairah_days - scenario.eta_singapore_days, 0.0)
+    leg_fuel = leg_days * scenario.daily_consumption_mt
+    reserve = scenario.effective_safety_reserve_mt()
+    on_arrival = on_departure - leg_fuel
+    if on_arrival < reserve:
         return (
             False,
-            "P1",
+            "F4",
             (
-                f"Required fuel grade ({scenario.fuel_grade.value}) is explicitly "
-                f"unavailable at {port}. Option removed."
+                f"After taking {option.quantity_mt:,.0f} MT in Singapore the vessel departs with "
+                f"{on_departure:,.1f} MT. The {leg_days:,.1f}-day leg to Fujairah burns {leg_fuel:,.1f} MT, "
+                f"so it would arrive with {on_arrival:,.1f} MT, below the safety reserve ({reserve:,.1f} MT). "
+                f"Shortfall: {reserve - on_arrival:,.1f} MT."
             ),
         )
     return True, "", ""
@@ -311,6 +346,29 @@ def _schedule_check(
     return True, "", "", False, ""
 
 
+# Common practice keeps several days' consumption in reserve. The default
+# (larger of 10% of fuel on board or 24 hours of consumption) can be far less,
+# so a reserve under this many days of consumption is flagged, not changed.
+THIN_RESERVE_DAYS = 3.0
+
+
+def _thin_reserve_warning(
+    option: BunkeringOption,
+    scenario: BunkeringScenario,
+) -> Tuple[bool, str]:
+    """Warning: the safety reserve in use is under THIN_RESERVE_DAYS of consumption."""
+    reserve = scenario.effective_safety_reserve_mt()
+    days = reserve / scenario.daily_consumption_mt if scenario.daily_consumption_mt else 0.0
+    if days < THIN_RESERVE_DAYS:
+        source = "entered" if scenario.safety_reserve_mt is not None else "default"
+        return True, (
+            f"The {source} safety reserve ({reserve:,.1f} MT) covers only {days:,.1f} days of consumption, "
+            f"less than the {THIN_RESERVE_DAYS:.0f} days many operators keep. Check it against company "
+            "policy (SMS); a larger reserve can make options infeasible."
+        )
+    return False, ""
+
+
 def _departure_reserve_warning(
     option: BunkeringOption,
     scenario: BunkeringScenario,
@@ -360,6 +418,7 @@ def run_constraint_engine(
             _min_stem_check(option, scenario),
             _max_stem_check(option, scenario),
             _fuel_grade_check(option, scenario),
+            _split_leg_check(option, scenario),
             _sulphur_check(option, scenario),
         ]
 
@@ -383,12 +442,13 @@ def run_constraint_engine(
                 option.is_warning = True
                 warnings.append(warn_msg)
 
-        # ── F3 departure reserve warning ──────────────────────────────────────
+        # ── F3 departure reserve warning, and the thin-reserve warning ────────
         if option.is_feasible:
-            is_warn, warn_msg = _departure_reserve_warning(option, scenario)
-            if is_warn:
-                option.is_warning = True
-                warnings.append(warn_msg)
+            for is_warn, warn_msg in (_departure_reserve_warning(option, scenario),
+                                      _thin_reserve_warning(option, scenario)):
+                if is_warn:
+                    option.is_warning = True
+                    warnings.append(warn_msg)
 
         # ── R2 / R3 regulatory warnings ───────────────────────────────────────
         if option.is_feasible:

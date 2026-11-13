@@ -211,7 +211,7 @@ def write_summaries(payload: dict, client=None, model: str = MODEL) -> tuple:
         return {}, report
     if client is None:
         report.status = "no_model"
-        report.detail = "no API key configured: news is published as headline and link only"
+        report.detail = "no language model in use: news is published as headline and link only"
         report.withheld = {i["id"]: [Problem("no_model", report.detail).to_dict()] for i in items}
         return {}, report
 
@@ -352,9 +352,12 @@ def render_brief(payload: dict, accepted: dict, previous_payload: Optional[dict]
         previous_figs = {f["id"]: f for f in _figures(previous_payload)}
     s = payload["sections"]
     out = [f"# BrokerBrief Morning Brief: {payload['brief_date_display']}", "",
-           f"> **{payload['trial_notice']}.** A student portfolio project. Figures are copied from public sources by "
-           "code; news summaries are written by a language model from feed headlines and excerpts and checked by "
-           "code before publishing. Not investment or trading advice.", ""]
+           f"> **{payload['trial_notice']}.** A student portfolio project. " + (
+               "Figures are copied from public sources by code; news summaries are written by a language model "
+               "from feed headlines and excerpts and checked by code before publishing."
+               if accepted else
+               "Everything here is written by code from public sources; no language model is used.")
+           + " Not investment or trading advice.", ""]
 
     def section(heading: str, key: str):
         out.extend([heading, "", f"*{CADENCE_NOTES[key]}*", ""])
@@ -374,7 +377,7 @@ def render_brief(payload: dict, accepted: dict, previous_payload: Optional[dict]
         out.append("")
 
     section("## 4. Sale & Purchase", "sale_and_purchase")
-    section("## 5. Events and why they matter", "events")
+    section("## 5. Events", "events")
 
     out.extend(["## Sources", ""])
     for source in payload["sources"]:

@@ -146,7 +146,6 @@ def build(archive_root: Path, readme: Path, out: Path) -> dict:
 
 WRITER_STATUS_WORDS = {
     "partial": "; some news summaries were held back by the checks",
-    "no_model": "; news as headlines only (no model configured)",
     "model_unavailable": "; news as headlines only (model unavailable)",
 }
 
