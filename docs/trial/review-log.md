@@ -7,7 +7,7 @@ One row per day. About five minutes a day:
    - an EIA price, when one is shown (eia.gov spot prices table);
    - one MPA bunker figure (data.gov.sg dataset page);
    - one PortWatch figure (portwatch.imf.org).
-3. Read two summaries against their linked articles.
+3. Read two summaries against their linked articles (only if the language model has been switched on; it is off by default).
 4. Note anything misfiled.
 
 Mark each check ✔ or ✘. Under "Corrections", write what was fixed, with the commit, if anything was. Dates are day-month-year; times are Singapore time.

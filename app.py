@@ -645,7 +645,8 @@ elif "Bunkering" in page:
                 (f"Safety reserve of {reserve:,.0f} MT is "
                  + ("as entered." if scenario.safety_reserve_mt is not None
                     else "the default: the larger of 10% of fuel on board or 24 hours of consumption.")),
-                "The split stem's Singapore-to-Fujairah leg is checked (rule F4) using the entered ETAs and consumption.",
+                "The split stem's Singapore-to-Fujairah leg is checked (rule F4) from the two ETAs and the daily "
+                "consumption; fuel burned while waiting and bunkering at Singapore is assumed to be within the ETAs.",
             ] + [f"Congestion at {port} is unknown, so an 8-hour wait is assumed."
                  for port in ("Singapore", "Fujairah")
                  if market_data["congestion_signals"].get(port) not in CONGESTION_WAIT_HOURS]

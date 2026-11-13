@@ -19,7 +19,7 @@ Five jobs, each holding only the permissions it needs:
 | Job | Permissions | What it does |
 |---|---|---|
 | keepalive | re-enable workflows | Calls GitHub's "enable workflow" API for both scheduled workflows (see "The 60-day rule"). |
-| build | read only | Reads the archive; skips if today's brief already exists (this makes the fallback run safe); builds the payload; writes and checks the brief. Holds the API keys and cannot push. A feed that fails leaves its section marked "No verified data today" with the reason; it never stops the run. If the final checks fail, nothing is published (the gate's exit code 3). |
+| build | read only | Reads the archive; skips if today's brief already exists (this makes the fallback run safe); builds the payload; writes and checks the brief. Holds the EIA key (and the model key, only if the model is switched on) and cannot push. A feed that fails leaves its section marked "No verified data today" with the reason; it never stops the run. If the final checks fail, nothing is published (the gate's exit code 3). |
 | archive | write to the repository | Commits the day to `briefs/YYYY/MM/DD/` on the `briefs` branch. A rejected push is retried four times; if all fail, the job fails. |
 | site | deploy Pages | Builds the site from the archive and deploys it. If the archive cannot be read, the job fails rather than deploying an empty site. |
 | alert | write issues | Runs last, whatever happened, and sees every other job's result; each of its steps runs even after a cancellation. Opens, comments on or closes the alert issue. A run that skipped because today's brief already exists reports nothing. If this job itself fails, the run shows as failed in the Actions tab; see "Notifications" below for who is e-mailed. |
@@ -64,16 +64,16 @@ Streamlit Community Cloud puts an app to sleep after 12 hours without traffic; t
 
 ## Language model (off)
 
-The brief runs **without a language model** (Decision Batch 2, 13/11/2026: no spending). Every word is written by code; news items are headline, publisher, date and link. Nothing calls a paid API, and no API key is needed apart from the free EIA key.
+The brief runs **without a language model** (Decision Batch 2, 13/11/2026: no spending). Figures, dates and changes are written by code; headlines are copied from the publishers' feeds; news items are headline, publisher, date and link. Nothing calls a paid API, and no API key is needed apart from the free EIA key.
 
 The model path is kept in the code and tested, so it can be switched on later without code changes:
 
-1. Choose a provider and key, and set a spend limit.
+1. Create an Anthropic API key and set a spend limit in the Anthropic Console (the writer uses the Anthropic SDK; another provider would need code changes).
 2. GitHub → repository → Settings → Secrets and variables → Actions → Secrets → `ANTHROPIC_API_KEY`.
 3. Same page → Variables → `BRIEF_USE_MODEL` = `true`.
 4. Optionally restore the model-trial workflow from `_archive/workflows/` first, to measure cost and quality.
 
-With the variable unset, the workflow passes no key to the writer, whatever secrets exist.
+With the variable unset, the workflow passes no key, and `write.py` itself refuses to create a model client, whatever keys are in the environment or `.env`.
 
 ## Rotate the EIA key
 

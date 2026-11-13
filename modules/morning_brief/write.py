@@ -5,9 +5,11 @@ Write and check the morning brief from a payload.
     python -m modules.morning_brief.write --payload payload.json --out-dir out/ --previous yesterday.json
     python -m modules.morning_brief.write --payload payload.json --out-dir out/ --no-model
 
-Reads ANTHROPIC_API_KEY from the environment (or .env if python-dotenv is
-installed). Without a key, or with --no-model, news is published as headline
-and link only and the report says so.
+The language model is OFF unless the environment variable BRIEF_USE_MODEL
+is "true" (Decision Batch 2: no spending). Only then is ANTHROPIC_API_KEY read
+(from the environment, or .env if python-dotenv is installed). Otherwise, or
+with --no-model, news is published as headline and link only, and no API is
+called whatever keys are present.
 
 Writes, in --out-dir:
 - validation.json  always: what was written, withheld or refused, and why;
@@ -60,7 +62,8 @@ def main(argv=None) -> int:
     # A brief.md left from an earlier run must never be mistaken for today's.
     for stale in ("brief.md", "validation.json", "payload.json"):
         (out / stale).unlink(missing_ok=True)
-    client = None if args.no_model else make_client(os.environ.get("ANTHROPIC_API_KEY"))
+    use_model = os.environ.get("BRIEF_USE_MODEL", "").strip().lower() == "true" and not args.no_model
+    client = make_client(os.environ.get("ANTHROPIC_API_KEY")) if use_model else None
 
     def save(report: dict) -> None:
         (out / "validation.json").write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

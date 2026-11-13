@@ -355,9 +355,9 @@ class SplitStemAndTopUpRules(unittest.TestCase):
     def test_thin_reserve_warns_and_removes_nothing(self):
         options = constrained(scenario())                        # default reserve: 90 MT = 2 days
         self.assertTrue(all(o.is_feasible for o in options))
-        self.assertTrue(all("covers only 2.0 days" in (o.warning_message or "") for o in options))
+        self.assertTrue(all("covers 2.00 days" in (o.warning_message or "") for o in options))
         thick = constrained(scenario(safety_reserve_mt=180.0))  # 4 days
-        self.assertFalse(any("covers only" in (o.warning_message or "") for o in thick))
+        self.assertFalse(any("BrokerBrief flags reserves" in (o.warning_message or "") for o in thick))
 
 
 class ReadmeFiguresMatchCode(unittest.TestCase):
@@ -399,3 +399,33 @@ class ReadmeFiguresMatchCode(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SplitStemEdgeCases(unittest.TestCase):
+    def test_fujairah_eta_not_after_singapore_removes_the_split(self):
+        options = constrained(scenario(eta_singapore_days=3.0, eta_fujairah_days=2.0))
+        split = next(o for o in options if o.is_partial)
+        self.assertEqual(split.infeasible_rule, "F4")
+        self.assertIn("not after the Singapore ETA", split.infeasible_reason)
+
+    def test_running_out_is_said_in_days_not_negative_tonnes(self):
+        options = constrained(scenario(fuel_remaining_mt=300.0, daily_consumption_mt=40.0, eta_singapore_days=3.0,
+                                       eta_fujairah_days=20.0, required_quantity_mt=800.0))
+        split = next(o for o in options if o.is_partial)
+        self.assertEqual(split.infeasible_rule, "F4")
+        self.assertIn("run out of fuel about", split.infeasible_reason)
+        self.assertNotIn("arrive with -", split.infeasible_reason)
+
+    def test_thin_reserve_text_names_it_as_brokerbriefs_own_threshold(self):
+        message = constrained(scenario())[0].warning_message
+        self.assertIn("its own threshold, not a regulation", message)
+        self.assertNotIn("many operators", message)
+
+    def test_congestion_caveat_only_when_a_signal_was_used(self):
+        sc = scenario()
+        known = assemble_market_data(load_data("sample"), demo_eia_data(), demo_portwatch_data())
+        note = score_options(constrained(sc), sc, known)[0]._score_breakdown["operational_risk"]["note"]
+        self.assertIn("measures traffic, not queues or waiting time", note)
+        unknown = assemble_market_data(load_data("sample"), demo_eia_data(), None)
+        note = score_options(constrained(sc), sc, unknown)[0]._score_breakdown["operational_risk"]["note"]
+        self.assertNotIn("measures traffic", note)

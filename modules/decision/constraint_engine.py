@@ -183,20 +183,34 @@ def _split_leg_check(
     """
     if not option.is_partial or option.top_up_port != "Fujairah" or option.port != "Singapore":
         return True, "", ""
+    if scenario.eta_fujairah_days <= scenario.eta_singapore_days:
+        return (
+            False,
+            "F4",
+            (
+                f"A split stem calls at Singapore first, but the Fujairah ETA ({scenario.eta_fujairah_days:,.1f} days) "
+                f"is not after the Singapore ETA ({scenario.eta_singapore_days:,.1f} days). Check the ETAs."
+            ),
+        )
     on_departure = scenario.fuel_remaining_mt - scenario.fuel_to_reach_singapore_mt() + option.quantity_mt
-    leg_days = max(scenario.eta_fujairah_days - scenario.eta_singapore_days, 0.0)
+    leg_days = scenario.eta_fujairah_days - scenario.eta_singapore_days
     leg_fuel = leg_days * scenario.daily_consumption_mt
     reserve = scenario.effective_safety_reserve_mt()
     on_arrival = on_departure - leg_fuel
     if on_arrival < reserve:
+        if on_arrival < 0:
+            short_days = -on_arrival / scenario.daily_consumption_mt
+            outcome = f"so it would run out of fuel about {short_days:,.1f} days before Fujairah"
+        else:
+            outcome = (f"so it would arrive with {on_arrival:,.1f} MT, below the safety reserve "
+                       f"({reserve:,.1f} MT)")
         return (
             False,
             "F4",
             (
                 f"After taking {option.quantity_mt:,.0f} MT in Singapore the vessel departs with "
                 f"{on_departure:,.1f} MT. The {leg_days:,.1f}-day leg to Fujairah burns {leg_fuel:,.1f} MT, "
-                f"so it would arrive with {on_arrival:,.1f} MT, below the safety reserve ({reserve:,.1f} MT). "
-                f"Shortfall: {reserve - on_arrival:,.1f} MT."
+                f"{outcome}. Shortfall against the reserve: {reserve - on_arrival:,.1f} MT."
             ),
         )
     return True, "", ""
@@ -346,9 +360,10 @@ def _schedule_check(
     return True, "", "", False, ""
 
 
-# Common practice keeps several days' consumption in reserve. The default
-# (larger of 10% of fuel on board or 24 hours of consumption) can be far less,
-# so a reserve under this many days of consumption is flagged, not changed.
+# A threshold chosen by this project, not a regulation or a charter-party
+# term: the default reserve (larger of 10% of fuel on board or 24 hours of
+# consumption) is often one or two days, so a reserve under this many days of
+# consumption is flagged for the user to check against company policy.
 THIN_RESERVE_DAYS = 3.0
 
 
@@ -358,13 +373,16 @@ def _thin_reserve_warning(
 ) -> Tuple[bool, str]:
     """Warning: the safety reserve in use is under THIN_RESERVE_DAYS of consumption."""
     reserve = scenario.effective_safety_reserve_mt()
-    days = reserve / scenario.daily_consumption_mt if scenario.daily_consumption_mt else 0.0
+    if scenario.daily_consumption_mt <= 0:
+        return False, ""
+    days = reserve / scenario.daily_consumption_mt
     if days < THIN_RESERVE_DAYS:
         source = "entered" if scenario.safety_reserve_mt is not None else "default"
         return True, (
-            f"The {source} safety reserve ({reserve:,.1f} MT) covers only {days:,.1f} days of consumption, "
-            f"less than the {THIN_RESERVE_DAYS:.0f} days many operators keep. Check it against company "
-            "policy (SMS); a larger reserve can make options infeasible."
+            f"The {source} safety reserve ({reserve:,.1f} MT) covers {days:,.2f} days of consumption. "
+            f"BrokerBrief flags reserves under {THIN_RESERVE_DAYS:.0f} days (its own threshold, not a regulation "
+            "or charter-party term): check it against company policy (SMS) and the charter party. A larger "
+            "reserve can make options infeasible."
         )
     return False, ""
 

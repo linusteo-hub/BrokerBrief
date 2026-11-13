@@ -48,12 +48,12 @@ These rules are objective. They are not commercial opinions. An option that brea
 | F1 | Can the vessel reach the port and still hold its safety reserve? The reserve defaults to the larger of 10% of fuel on board or 24 hours of consumption. | Remove, showing the shortfall in MT |
 | F2 / C1 | Is the stem within the port's minimum and maximum stem size? | Remove |
 | P1 | Is the required fuel grade available at every port the option uses, including a split stem's top-up port? Unknown keeps the option and lowers confidence. Confirmed unavailable removes it. | Remove or flag |
-| F4 | Can a split stem, after its Singapore part, cover the Singapore–Fujairah leg and still arrive with its safety reserve? | Remove, showing the shortfall in MT |
+| F4 | Can a split stem, after its Singapore part, cover the Singapore–Fujairah leg and still arrive with its safety reserve? A Fujairah ETA that is not after the Singapore ETA also removes the split. | Remove, showing the shortfall in MT |
 | R1 | Is the fuel HSFO (above 0.50% sulphur) on a vessel with no scrubber? MARPOL Annex VI regulation 14.1 prohibits using it, or carrying it for use, without an approved equivalent (regulation 4.1). The rule is about the ship, so it applies at every port. | Remove every option |
 | S1 | Do waiting plus bunkering hours exceed the schedule when there is zero flexibility? | Remove |
 | Tight-schedule warning | Do port hours exceed the available flexibility? | Warn |
 | F3 | Would the vessel depart below its safety reserve? | Warn |
-| Thin-reserve warning | Is the safety reserve in use under three days of consumption? The default (the larger of 10% of fuel on board or 24 hours of consumption) often is. | Warn |
+| Thin-reserve warning | Is the safety reserve in use under three days of consumption? The three days are BrokerBrief's own threshold, not a regulation or charter-party term. The default reserve (the larger of 10% of fuel on board or 24 hours of consumption) is often under it. | Warn |
 | R2 | Is HSFO being burned through an open-loop scrubber at Singapore or Fujairah? Both ports prohibit open-loop wash-water discharge in port waters. | Warn |
 | R3 | Does the voyage enter an emission control area? Fuel used inside must not exceed 0.10% sulphur (regulation 14.4). Without a scrubber approved as equivalent to 0.10% fuel, a VLSFO or HSFO stem cannot be burned on that leg. | Warn |
 
@@ -72,7 +72,7 @@ Each surviving option is scored 0–100 on three criteria. The weights depend on
 | Schedule risk | 25% | 25% | 15% |
 
 - **Expected cost** compares the price of the selected fuel grade at the two ports; another grade's price is never substituted. It then adjusts for the direction of crude: rising Brent favours bunkering now, softening Brent favours waiting. A port with no price gets a neutral score.
-- **Operational risk** follows port-call trends from IMF PortWatch. The congestion signal compares port calls at the start and end of PortWatch's latest window: a rough guide to waiting time, not a count of ships waiting.
+- **Operational risk** follows port-call trends from IMF PortWatch. The congestion signal compares PortWatch port calls on the latest and earliest days of the last 14 days. It measures traffic, not queues or waiting time; the waiting hours below are an indicative assumption.
 - **Schedule risk** measures the buffer left after the estimated port time. More than 12 hours of buffer scores highest.
 - **Split stems carry an explicit penalty on every criterion**, because two port calls mean extra coordination, extra exposure to price moves and extra exposure to delay.
 

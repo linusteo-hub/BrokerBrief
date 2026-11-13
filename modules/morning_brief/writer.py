@@ -356,7 +356,7 @@ def render_brief(payload: dict, accepted: dict, previous_payload: Optional[dict]
                "Figures are copied from public sources by code; news summaries are written by a language model "
                "from feed headlines and excerpts and checked by code before publishing."
                if accepted else
-               "Everything here is written by code from public sources; no language model is used.")
+               "Figures and headlines are copied from public sources by code; no model-written text appears.")
            + " Not investment or trading advice.", ""]
 
     def section(heading: str, key: str):

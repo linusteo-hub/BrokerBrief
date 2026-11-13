@@ -35,7 +35,7 @@ Small decisions (Claude, reported 12/11/2026): Singapore Offshore Oil Terminal 1
 | E2 | Four decision-engine fixes. **F4** removes a split stem that would reach Fujairah below its reserve. **P1** also checks the top-up port. A warning flags a safety reserve under three days of consumption. The congestion signal's limits are stated. |
 | E3 | Cruise and leisure stories are left out of the brief (`off_topic`). |
 | E4 | Container rates stay `not_covered` until Linus shares the scope of Drewry's reply. |
-| E5, D9 changed | **No language model and no spending.** The brief runs with every word written by code; news is headline and link. The model path stays in the code, switched off by the repository variable `BRIEF_USE_MODEL`. The model-trial workflow is moved to `_archive/`. GitHub Models, a free option considered, was retired by GitHub on 30/07/2026. Other free options (a small open model on the runner, other providers' free tiers) may be revisited later. |
+| E5, D9 changed | **No language model and no spending.** The brief runs with every word written by code; news is headline and link. The model path stays in the code, switched off by the repository variable `BRIEF_USE_MODEL`. The model-trial workflow is moved to `_archive/`. GitHub Models, a free option considered, has been retired: GitHub's documentation (docs.github.com/en/github-models, read 13/11/2026) says "As of July 30, 2026, GitHub Models has been fully retired". Other free options (a small open model on the runner, other providers' free tiers) may be revisited later. |
 
 ### Source policy (Linus, 12/11/2026)
 
@@ -370,7 +370,9 @@ Built in `modules/morning_brief/`: `writer.py` (renderer, model call, retry and 
 
 Basis, **estimated, not measured**: input about 1,200 tokens on the fixture payload and about 4,100 in the worst case (23 news items with full excerpts), counted at about four characters per token; output up to about 3,300 tokens including the model's thinking at "low" effort; one retry of a few items adds about 20 %. Every run records actual tokens and cost in `validation.json`, so the trial will replace these estimates with measurements.
 
-**Recommendation: Claude Haiku 5.5**, provisionally. It has **not** yet been run against the gate: there is no API key in this environment. `python -m modules.morning_brief.model_trial --runs 3` compares Haiku 5.5 with Sonnet 5.5 on the fixture payload and names the cheapest that passes every run; it is the first thing to run once the key exists (Decision Batch 2). If Haiku withholds more than an occasional item, switch to Sonnet 5.5; even then the month costs under the USD 5 spend limit.
+**Superseded on 13/11/2026 by Decision Batch 2 (E5): no language model, no spending.** The text below is kept as the record.
+
+**Recommendation (12/11/2026): Claude Haiku 5.5**, provisionally. It has **not** yet been run against the gate: there is no API key in this environment. `python -m modules.morning_brief.model_trial --runs 3` compares Haiku 5.5 with Sonnet 5.5 on the fixture payload and names the cheapest that passes every run; it is the first thing to run once the key exists (Decision Batch 2). If Haiku withholds more than an occasional item, switch to Sonnet 5.5; even then the month costs under the USD 5 spend limit.
 
 ## Phase 3 results — automation and publishing (12/11/2026; schedule not enabled)
 

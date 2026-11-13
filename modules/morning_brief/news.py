@@ -92,11 +92,23 @@ DROP_REASONS = {
     "over_limit": "section already full",
 }
 MAIN_DROP_CODES = ("banned_source", "digit_in_freight_headline")
-# Stories outside a shipbroking reader's scope (Decision Batch 2, E3). Matched
-# on the headline only. Cruise lines' newbuilding orders are also left out:
-# passenger shipping is not part of the brief.
-OFF_TOPIC = re.compile(r"\b(cruises?|cruising|cruise (ship|line)s?|super-?yachts?|yachts?|yachting|"
-                       r"marinas?|sail(ing)? race|regatta)\b", re.IGNORECASE)
+# Stories outside a shipbroking reader's scope (Decision Batch 2, E3): passenger
+# cruising and leisure boating. Matched on the headline, in the leisure sense
+# only, and never when the headline also names merchant shipping, an attack or
+# a port matter: "cruise missile strikes bulk carrier", "cruise ship collides
+# with tanker" and a tanker named Marina all stay in.
+OFF_TOPIC = re.compile(r"\b(cruise (ship|line|liner|operator|passenger|season|terminal|call)s?|cruise lines?|"
+                       r"cruises|cruise holidays?|super-?yachts?|regattas?|sail(ing)? races?|"
+                       r"yacht (race|show|charter|club)s?)\b", re.IGNORECASE)
+KEEP_ANYWAY = re.compile(r"\b(tankers?|bulkers?|bulk carriers?|container|boxships?|cargo|lng|lpg|bunker\w*|"
+                         r"freight|missiles?|attack\w*|strikes?|collid\w*|collision|sank|sinks|sinking|"
+                         r"detain\w*|seiz\w*|port|strait|canal|shipyards?|newbuild\w*|orders?)\b", re.IGNORECASE)
+
+
+def is_off_topic(title: str) -> bool:
+    return bool(OFF_TOPIC.search(title)) and not KEEP_ANYWAY.search(title)
+
+
 SAFE_LINK = re.compile(r"https://[A-Za-z0-9\-._~:/?#@!$&*+,;=%]+")
 
 
@@ -259,8 +271,6 @@ def build_item(entry: dict, source_id: str, now: datetime) -> tuple[Optional[dic
         return None, "unsafe_link"
     if re.search(r"https?://|www\.", title, re.I):
         return None, "link_in_headline"
-    if OFF_TOPIC.search(title):
-        return None, "off_topic"
     excerpt = strip_html(entry.get("excerpt_html", ""))
     if mentions_banned_source(title) or mentions_banned_source(excerpt):
         return None, "banned_source"
@@ -273,6 +283,10 @@ def build_item(entry: dict, source_id: str, now: datetime) -> tuple[Optional[dic
         return None, "outside_window"
     if section == "freight" and re.search(r"\d", title):
         return None, "digit_in_freight_headline"
+    # After the banned-name and window checks: a banned item must be dropped as
+    # banned (its link is then not recorded), and old stories stay unlisted.
+    if is_off_topic(title):
+        return None, "off_topic"
 
     agency = wire_agency(entry, excerpt)
     byline = BYLINE.match(excerpt)

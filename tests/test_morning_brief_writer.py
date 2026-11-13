@@ -408,6 +408,15 @@ def test_request_serialises_through_the_real_sdk_and_a_real_message_parses():
 
 def test_the_notice_says_whether_a_model_wrote_anything():
     no_model = render_brief(payload(), {})
-    assert "no language model is used" in no_model and "written by a language model" not in no_model
+    assert "no model-written text appears" in no_model and "written by a language model" not in no_model
     with_model, _ = build_brief(payload(), FakeClient(GOOD))
     assert "written by a language model" in with_model
+
+
+def test_write_cli_never_calls_a_model_unless_switched_on(tmp_path):
+    """A key in the environment (or .env) is not enough: BRIEF_USE_MODEL must be true."""
+    result = run("-m", "modules.morning_brief.write", "--payload", str(FIXTURES / "payload/from_fixtures.json"),
+                 "--out-dir", str(tmp_path), env={"ANTHROPIC_API_KEY": "sk-test-not-real"})
+    assert result.returncode == 0, result.stderr
+    report = json.loads((tmp_path / "validation.json").read_text())
+    assert report["writer"]["status"] == "no_model" and report["writer"]["attempts"] == []

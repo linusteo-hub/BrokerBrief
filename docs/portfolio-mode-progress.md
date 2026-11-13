@@ -256,3 +256,20 @@ Commit `6fd19eb` (model-trial workflow) was committed while one test failed. The
 ### Verified how
 
 - `pytest -q`: 317 passed. Validator: 22 of 22 cases. actionlint clean.
+
+### Step 5b — Fixes from the fresh-context review of Batch 2 (13/11/2026)
+
+- **Blocker fixed:** the first cruise filter dropped core shipping news ("Houthi cruise missile strikes bulk carrier", any ship named *Marina*, Singapore's Marina South anchorage). It now matches the leisure sense only, and never when the headline also names merchant shipping, an attack or a port matter. Those headlines are tests. It runs after the banned-name and time-window checks, so a banned item is still dropped as banned with its link withheld.
+- **The model is now off in the code, not only in the workflow:** `write.py` creates a model client only when `BRIEF_USE_MODEL=true`, so a key in `.env` cannot spend money by accident (tested).
+- **Thin-reserve warning:** "many operators keep" (unsourced) replaced by "BrokerBrief's own threshold, not a regulation or charter-party term".
+- **Congestion wording:** says what the signal measures (traffic on two days), shown only when a signal was used.
+- **F4:**
+  - a Fujairah ETA that is not after the Singapore ETA removes the split;
+  - running dry is said in days, not as negative tonnes;
+  - the assumption about fuel burned at Singapore is listed.
+- **Wording:** "no model-written text appears" (headlines are the publishers'). Stale model and cost text corrected in `docs/operations.md`, the trial criteria and the review log. The GitHub Models retirement is now cited.
+- **Left for Decision Batch 3** (engine behaviour):
+  - the split option's description can contradict F4 when the 60 % cap binds;
+  - F2 does not check the top-up quantity at Fujairah: below a stem of about 500 MT, the top-up is under Fujairah's 200 MT minimum;
+  - an HSFO-without-scrubber split shows F4 or P1 rather than R1. It is removed either way.
+- Tests: 317 → 323. Validator 22 of 22. actionlint clean.

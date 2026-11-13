@@ -6,6 +6,7 @@ News fetcher, run on fixture feeds through a stand-in getter — no network.
 with excerpts replaced by placeholder text; the other fixtures are hand-made.
 """
 
+import json
 import re
 from datetime import datetime, timezone
 
@@ -230,13 +231,34 @@ def test_deal_words_and_commands_are_told_apart():
 
 
 def test_cruise_and_leisure_stories_are_left_out():
-    """Decision Batch 2, E3. Headlines from the live feeds of 12-11-2026."""
-    from modules.morning_brief.news import OFF_TOPIC
+    """Decision Batch 2, E3. Leisure stories go; shipping news that happens to
+    use the same words stays (the first version of this filter dropped them)."""
+    from modules.morning_brief.news import is_off_topic
     for title in ("MSC Cruises Makes History in Miami with Record 4 Ships Sailing this Winter",
-                  "MSC Cruise Ship Ordered Back to Texas with Report of Suspected Homicide",
-                  "Superyacht builder posts record year"):
-        assert OFF_TOPIC.search(title), title
-    for title in ("Tanker Ablaze Off UAE as More Attacks Rattle Gulf Shipping",
-                  "Seanergy lines up four more bulkers in $855m fleet push",
-                  "Owners rush to order car carriers"):
-        assert not OFF_TOPIC.search(title), title
+                  "Superyacht builder posts record year", "Cruise line adds new Caribbean itinerary"):
+        assert is_off_topic(title), title
+    for title in ("Houthi cruise missile strikes bulk carrier in Red Sea",
+                  "Anti-ship cruise missiles threaten tankers in Gulf of Aden",
+                  "Cruise ship collides with tanker off Singapore",
+                  "Tanker Marina sold to Greek buyers", "Product tanker Marina Star detained in Fujairah",
+                  "Singapore's Marina South bunkering anchorage expanded",
+                  "Container ship maintains cruising speed through the strait",
+                  "Ocean Marinas expands Fujairah offshore marine services",
+                  "Tanker Ablaze Off UAE as More Attacks Rattle Gulf Shipping",
+                  "Seanergy lines up four more bulkers in $855m fleet push"):
+        assert not is_off_topic(title), title
+
+
+def test_off_topic_is_checked_after_banned_names_so_banned_links_are_never_listed():
+    from datetime import datetime, timezone
+    from modules.morning_brief.news import build_item
+    now = datetime(2026, 10, 12, 12, tzinfo=timezone.utc)
+    # A banned name, read from the banned-sources fixture (only files named
+    # banned* may contain one; see the verify skill).
+    banned_text = json.loads((FIXTURES / "banned_sources.json").read_text())["texts_that_must_match"][0]
+    entry = {"title": "Cruise line adds new Caribbean itinerary", "link": "https://gcaptain.com/cruise-story/",
+             "published": now, "categories": [], "excerpt_html": banned_text + ".",
+             "author": "", "credit_fields": []}
+    assert build_item(entry, "gcaptain", now)[1] == "banned_source"
+    old = {**entry, "excerpt_html": "Plain words.", "published": datetime(2026, 9, 1, tzinfo=timezone.utc)}
+    assert build_item(old, "gcaptain", now)[1] == "outside_window"

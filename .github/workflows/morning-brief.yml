@@ -8,14 +8,15 @@ name: Morning brief
 # Jobs, each with only the permissions it needs:
 #   keepalive  actions: write   re-enable the scheduled workflows (60-day rule)
 #   build      contents: read   fetch, check and write; holds the EIA key; cannot push
+
+#   archive    contents: write  commit the result to the briefs branch
+#   site       pages: write     build and deploy GitHub Pages from the archive
+#   alert      issues: write    sees every other job's result; runs whatever happened
 #
 # NO LANGUAGE MODEL by default (Decision Batch 2, 13/11/2026: no spending).
 # News is published as headline and link only. The model path stays in the
 # code; to switch it on later, set the repository variable BRIEF_USE_MODEL to
 # "true" and add the ANTHROPIC_API_KEY secret (docs/operations.md).
-#   archive    contents: write  commit the result to the briefs branch
-#   site       pages: write     build and deploy GitHub Pages from the archive
-#   alert      issues: write    sees every other job's result; runs whatever happened
 #
 # SCHEDULE: not enabled. Decision Batch 3 proposes adding, under `on:`:
 #   schedule:
@@ -146,7 +147,9 @@ jobs:
       - name: Write and check the brief
         if: steps.skip.outputs.skip != 'true'
         env:
-          # Empty unless the model has been switched on, so no API is called.
+          # Empty unless the model has been switched on, so no API is called;
+          # write.py also checks BRIEF_USE_MODEL itself.
+          BRIEF_USE_MODEL: ${{ vars.BRIEF_USE_MODEL }}
           ANTHROPIC_API_KEY: ${{ vars.BRIEF_USE_MODEL == 'true' && inputs.no_model != true && secrets.ANTHROPIC_API_KEY || '' }}
         run: |
           prev=$(python -m modules.morning_brief.archive previous --archive archive --payload work/payload.json)
