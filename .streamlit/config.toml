@@ -1,0 +1,9 @@
+# BrokerBrief theme — values from the BrokerBrief design system tokens.
+# Streamlit uses these for widgets it draws itself (tab underline, focus, sliders, data frames).
+[theme]
+base = "dark"
+primaryColor = "#f0a500"
+backgroundColor = "#0e1722"
+secondaryBackgroundColor = "#1b2d47"
+textColor = "#e6edf3"
+font = "sans serif"

@@ -32,111 +32,21 @@ from modules.decision.evaluation_engine import score_options, WEIGHT_SETS
 from modules.decision.confidence_model import compute_confidence
 from modules.decision.market_data import assemble_market_data
 from modules.provenance import Freshness, Provenance, SAMPLE_LABEL
+from modules import ui, whatif
+from dataclasses import replace
+from html import escape
+from pathlib import Path
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="BrokerBrief",
-    page_icon="⚓",
+    page_icon=str(Path(__file__).resolve().parent / "assets" / "brokerbrief-anchor.png"),
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# ── CSS ───────────────────────────────────────────────────────────────────────
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
-:root {
-    --black:#0D1117; --surface:#161B22; --surface2:#1C2330; --bdr:#30363D;
-    --text:#E6EDF3; --muted:#8B949E; --amber:#F0A500; --amber-dim:#7A5300;
-    --blue:#58A6FF; --red:#FF6B6B; --green:#3FB950;
-    --font-head:'Space Grotesk',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
-}
-html,body,[data-testid="stAppViewContainer"]{background:var(--black)!important;font-family:var(--font-body);color:var(--text);}
-[data-testid="stHeader"]{background:rgba(13,17,23,0.85)!important;}
-[data-testid="stSidebar"]{background:var(--surface)!important;border-right:1px solid var(--bdr);}
-[data-testid="stSidebar"] *{color:var(--muted)!important;}
-[data-testid="stSidebar"] .stRadio label p{color:var(--text)!important;font-family:var(--font-body);font-size:.9rem;}
-.sidebar-brand{font-family:var(--font-head);font-size:1.25rem;font-weight:600;color:var(--text)!important;letter-spacing:-.3px;padding:.5rem 0 .15rem;}
-.sidebar-brand span{color:var(--amber)!important;}
-.sidebar-tagline{font-family:var(--font-mono);font-size:.62rem;color:var(--amber)!important;letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.5rem;}
-.page-title{font-family:var(--font-head);font-weight:600;font-size:1.9rem;color:var(--text);letter-spacing:-.5px;margin-bottom:.25rem;}
-.page-subtitle{font-family:var(--font-mono);font-size:.7rem;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.75rem;}
-.home-hero{font-family:var(--font-head);font-weight:700;font-size:2.4rem;color:var(--text);letter-spacing:-1px;line-height:1.15;margin:1rem 0 .75rem;}
-.home-hero em{color:var(--amber);font-style:normal;}
-.home-sub{font-size:1.05rem;color:var(--muted);margin-bottom:2rem;line-height:1.65;max-width:640px;}
-.module-card{background:var(--surface);border:1px solid var(--bdr);border-radius:8px;padding:1.5rem 1.75rem;margin-bottom:1rem;}
-.module-card-active{border-left:3px solid var(--amber);}
-.module-card-soon{opacity:.5;}
-.module-title{font-family:var(--font-head);font-weight:600;font-size:1.05rem;color:var(--text);margin-bottom:.35rem;}
-.module-desc{font-size:.85rem;color:var(--muted);line-height:1.65;}
-.module-desc strong{color:var(--text);}
-.soon-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:var(--surface2);color:var(--muted);border:1px solid var(--bdr);border-radius:4px;padding:.15rem .5rem;margin-left:.5rem;vertical-align:middle;}
-.live-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:rgba(63,185,80,.12);color:var(--green);border:1px solid rgba(63,185,80,.35);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;}
-.manual-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:rgba(240,165,0,.1);color:var(--amber);border:1px solid var(--amber-dim);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;}
-.missing-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:rgba(255,107,107,.1);color:var(--red);border:1px solid rgba(255,107,107,.35);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;}
-.user-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:rgba(88,166,255,.1);color:var(--blue);border:1px solid rgba(88,166,255,.35);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;}
-.stale-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:rgba(255,107,107,.22);color:var(--red);border:1px solid var(--red);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;font-weight:600;}
-.unknown-badge{display:inline-block;font-family:var(--font-mono);font-size:.6rem;background:var(--surface2);color:var(--muted);border:1px solid var(--bdr);border-radius:4px;padding:.15rem .45rem;margin-left:.5rem;vertical-align:middle;}
-.rec-card{background:var(--surface2);border:1px solid var(--amber-dim);border-left:3px solid var(--amber);border-radius:8px;padding:1.75rem 2rem;margin-bottom:1.25rem;}
-.rec-label{font-family:var(--font-mono);font-size:.62rem;color:var(--amber);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.5rem;}
-.rec-title{font-family:var(--font-head);font-weight:600;font-size:1.3rem;color:var(--text);margin-bottom:.4rem;}
-.rec-body{font-size:.9rem;color:var(--muted);line-height:1.65;}
-.alt-card{background:var(--surface);border:1px solid var(--bdr);border-radius:8px;padding:1.25rem 1.5rem;margin-bottom:1rem;}
-.alt-title{font-family:var(--font-head);font-weight:600;font-size:1rem;color:var(--text);margin-bottom:.3rem;}
-.infeasible-card{background:var(--surface);border:1px solid rgba(255,107,107,.3);border-left:3px solid var(--red);border-radius:8px;padding:1.1rem 1.4rem;margin-bottom:.85rem;}
-.infeasible-title{font-family:var(--font-head);font-weight:600;font-size:.95rem;color:var(--red);margin-bottom:.3rem;}
-.infeasible-reason{font-size:.8rem;color:var(--muted);line-height:1.6;}
-.rule-tag{display:inline-block;font-family:var(--font-mono);font-size:.62rem;background:rgba(255,107,107,.12);color:var(--red);border:1px solid rgba(255,107,107,.3);border-radius:4px;padding:.1rem .45rem;margin-right:.5rem;}
-.warn-strip{background:rgba(240,165,0,.07);border:1px solid var(--amber-dim);border-radius:6px;padding:.6rem .9rem;font-size:.78rem;color:var(--amber);margin:.5rem 0;line-height:1.55;}
-.score-pill{display:inline-block;font-family:var(--font-mono);font-weight:500;font-size:1rem;color:var(--amber);}
-.conf-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem;}
-.conf-label{font-family:var(--font-mono);font-size:.68rem;color:var(--muted);width:180px;flex-shrink:0;}
-.conf-bar-wrap{flex:1;background:var(--surface2);border-radius:3px;height:7px;}
-.conf-bar-fill{height:7px;border-radius:3px;background:var(--amber);}
-.conf-val{font-family:var(--font-mono);font-size:.68rem;color:var(--text);width:44px;text-align:right;}
-.info-card{background:var(--surface);border-radius:8px;padding:1.25rem 1.5rem;margin-bottom:1rem;border:1px solid var(--bdr);}
-.info-card-title{font-family:var(--font-mono);font-weight:500;font-size:.72rem;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.65rem;}
-.data-note{font-family:var(--font-mono);font-size:.65rem;color:var(--muted);border-top:1px solid var(--bdr);padding-top:.75rem;margin-top:1.5rem;line-height:1.7;}
-.assumption-item{font-size:.8rem;color:var(--muted);padding:.25rem 0;line-height:1.6;}
-.provenance-row{font-family:var(--font-mono);font-size:.72rem;color:var(--muted);padding:.35rem 0;border-bottom:1px solid var(--surface2);}
-.tone-badge{display:inline-block;font-family:var(--font-mono);font-weight:500;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .8rem;border-radius:4px;margin-bottom:.75rem;border:1px solid;}
-.tone-bullish{background:rgba(63,185,80,.1);color:var(--green);border-color:rgba(63,185,80,.35);}
-.tone-cautious{background:rgba(240,165,0,.1);color:var(--amber);border-color:var(--amber-dim);}
-.tone-mixed{background:var(--surface2);color:var(--muted);border-color:var(--bdr);}
-.tone-bearish{background:rgba(255,107,107,.1);color:var(--red);border-color:rgba(255,107,107,.35);}
-.tone-neutral{background:rgba(88,166,255,.1);color:var(--blue);border-color:rgba(88,166,255,.35);}
-.tone-soft{background:rgba(240,165,0,.06);color:var(--amber);border-color:var(--amber-dim);}
-.brief-card{background:var(--surface);border:1px solid var(--bdr);border-radius:10px;padding:2rem 2.25rem 1.75rem;margin-bottom:1.5rem;border-left:3px solid var(--amber);}
-.brief-card-label{font-family:var(--font-mono);font-size:.62rem;color:var(--amber);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.45rem;}
-.brief-card-value{font-size:.95rem;color:var(--text);line-height:1.65;margin-bottom:1rem;}
-.brief-card-headline{font-family:var(--font-head);font-weight:600;font-size:1.2rem;color:var(--text);line-height:1.45;margin-bottom:.5rem;}
-.brief-card-talking{font-size:.9rem;font-style:italic;color:var(--muted);border-left:2px solid var(--amber);padding-left:.9rem;margin:1rem 0;line-height:1.6;}
-.brief-card-risk{font-family:var(--font-mono);font-size:.72rem;color:var(--amber);margin-top:1rem;}
-.stat-pill-row{display:flex;gap:.75rem;flex-wrap:wrap;margin:1rem 0;}
-.stat-pill{background:var(--surface2);border:1px solid var(--bdr);border-radius:6px;padding:.5rem .85rem;min-width:112px;}
-.stat-pill-label{font-family:var(--font-mono);font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
-.stat-pill-value{font-family:var(--font-mono);font-weight:500;font-size:.95rem;color:var(--text);}
-.dir-up{color:var(--red)!important;} .dir-down{color:var(--green)!important;} .dir-flat{color:var(--blue)!important;}
-.dir-rising{color:var(--amber)!important;} .dir-easing{color:var(--green)!important;} .dir-stable{color:var(--blue)!important;}
-.dir-unknown{color:var(--muted)!important;}
-.report-block{background:var(--surface);border:1px solid var(--bdr);border-radius:8px;padding:1.25rem 1.5rem;font-family:var(--font-mono);font-size:.76rem;color:var(--text);white-space:pre-wrap;line-height:1.7;}
-h1,h2,h3,h4{font-family:var(--font-head)!important;color:var(--text)!important;}
-p,li,span,label{color:var(--text);}
-[data-testid="stMarkdownContainer"] p{color:var(--text);}
-.stButton>button{background:var(--amber)!important;color:#000!important;border:none!important;border-radius:6px!important;font-family:var(--font-head)!important;font-weight:500!important;}
-.stButton>button:hover{opacity:.88;}
-[data-testid="stExpander"]{background:var(--surface)!important;border:1px solid var(--bdr)!important;border-radius:8px!important;}
-[data-testid="stExpander"] summary{color:var(--text)!important;}
-div[data-baseweb="input"],div[data-baseweb="select"]{background:var(--surface2)!important;border-color:var(--bdr)!important;}
-div[data-baseweb="input"] input,div[data-baseweb="select"] div{color:var(--text)!important;}
-[data-testid="stNumberInput"] input{color:var(--text)!important;background:var(--surface2)!important;}
-[data-testid="stDataFrame"]{background:var(--surface)!important;border:1px solid var(--bdr)!important;border-radius:8px;}
-[data-testid="stAlert"]{background:var(--surface)!important;border:1px solid var(--bdr)!important;color:var(--text)!important;border-radius:8px!important;}
-[data-testid="stTabs"] button{color:var(--muted)!important;font-family:var(--font-head)!important;}
-[data-testid="stTabs"] button[aria-selected="true"]{color:var(--amber)!important;}
-hr{border-color:var(--bdr)!important;}
-</style>
-""", unsafe_allow_html=True)
+# ── CSS ── (BrokerBrief design system: styles/tokens.css, components.css, streamlit.css)
+st.markdown(ui.stylesheet_html(), unsafe_allow_html=True)
 
 # ── Session state ─────────────────────────────────────────────────────────────
 _defaults = {
@@ -162,51 +72,196 @@ def _clear_demo_data():
     st.session_state["data_source"] = "none"
     st.session_state["decision_result"] = None
 
-# ── Sidebar ───────────────────────────────────────────────────────────────────
-with st.sidebar:
-    st.markdown('<div class="sidebar-brand">⚓ Broker<span>Brief</span></div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-tagline">Commercial Decision Support</div>', unsafe_allow_html=True)
+def _on_eia_key():
+    st.session_state["eia_key"] = st.session_state["eia_key_input"]
+    st.session_state["eia_data"] = None
 
-    page = st.radio("Navigation", [
-        "🏠  Home",
-        "🧭  Bunkering Strategy",
-        "📈  Market Intelligence",
-        "📂  Data Input",
-        "🔌  Live Data",
-    ], label_visibility="collapsed")
 
-    st.markdown("---")
-    st.markdown('<div style="font-family:JetBrains Mono,monospace;font-size:0.65rem;color:#8B949E;margin-bottom:4px;">EIA API KEY</div>', unsafe_allow_html=True)
-    eia_key_input = st.text_input("EIA Key", value=st.session_state["eia_key"],
-                                   type="password", label_visibility="collapsed",
-                                   placeholder="Paste EIA key here")
-    if eia_key_input != st.session_state["eia_key"]:
-        st.session_state["eia_key"] = eia_key_input
-        st.session_state["eia_data"] = None
+def _refresh_live():
+    st.session_state["eia_data"] = None
+    st.session_state["portwatch_data"] = None
 
-    if st.button("↺  Refresh Live Data"):
-        st.session_state["eia_data"] = None
-        st.session_state["portwatch_data"] = None
-        st.rerun()
 
-    if is_sample(st.session_state["df"]).any():
-        st.button("✕  Clear demo data", on_click=_clear_demo_data)
-    else:
-        st.button("Load demo data (invented values)", on_click=_load_demo_data, key="demo_sidebar",
-                  help="Invented bunker, freight and congestion rows for trying the "
-                       "Bunkering Strategy page. Never used in Market Intelligence.")
+# ── Bunkering strategy: scenario state ───────────────────────────────────────
+# Step inputs live in st.session_state["bk"], not only in widget keys: Streamlit
+# drops a widget's value when the widget isn't drawn on a run, and each step draws
+# only its own inputs. Widgets use "bkw_<field>" keys, seeded from bk when absent.
+GRADES = [g.value for g in FuelGrade]
+PROFILES = [r.value for r in RiskProfile]
+AVAIL = [a.value for a in FuelAvailability]
+BK_DEFAULTS = dict(vessel="MV Demo Trader", loc="Colombo", dest="Rotterdam", grade=GRADES[0],
+                   fuel=900.0, cons=45.0, qty=1000.0, reserve=0.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0,
+                   risk=PROFILES[1], sg_avail=AVAIL[2], fuj_avail=AVAIL[2], sim_fuj_missing=False)
+# The README demo scenarios (tests/test_demo_mode.py mirrors these).
+PRESETS = {
+    "Both ports feasible":    dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=False),
+    "Fujairah unreachable":   dict(fuel=280.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=False),
+    "Fujairah price missing": dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=True),
+}
+STEPS = {1: "1 · Vessel", 2: "2 · Route", 3: "3 · Preferences"}
+STEP_COPY = {
+    1: ("Vessel and fuel", "What the vessel carries, burns and needs."),
+    2: ("Route and schedule", "Where it is, where it's going, and how much time it can spare."),
+    3: ("Preferences", "Optional. Each answer raises confidence; blanks are assumed and shown."),
+}
+PORT_CODE = {"Singapore": "SIN", "Fujairah": "FUJ"}
+if "bk" not in st.session_state:
+    st.session_state["bk"] = dict(BK_DEFAULTS)
 
-    st.markdown("---")
-    st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:0.65rem;color:#8B949E;">Date: {date.today().strftime("%d %b %Y")}</div>', unsafe_allow_html=True)
-    st.markdown('<div style="font-family:JetBrains Mono,monospace;font-size:0.6rem;color:#6B7480;line-height:1.6;margin-top:.75rem;">BrokerBrief v0.3<br>No source, no certainty.<br>The decision belongs to you.</div>', unsafe_allow_html=True)
+
+def _set_bk(values: dict):
+    st.session_state["bk"].update(values)
+    for field in values:
+        st.session_state.pop(f"bkw_{field}", None)   # re-seeded from bk on the next draw
+
+
+def _apply_preset(name: str):
+    # The documented scenario results rely on demo prices, so a preset loads demo
+    # data (and its banner) if it isn't loaded yet, replacing any uploaded CSV.
+    if not is_sample(st.session_state["df"]).any():
+        _load_demo_data()
+    _set_bk(PRESETS[name])
+    st.session_state.pop("bk_selected", None)
+
+
+def _bk_input(widget, label, field, **kw):
+    key = f"bkw_{field}"
+    if key not in st.session_state:
+        st.session_state[key] = st.session_state["bk"][field]
+    st.session_state["bk"][field] = widget(label, key=key, **kw)
+
+
+def _goto_step(n: int):
+    st.session_state["bk_step"] = n
+    st.session_state["bk_step_last"] = n
+
+
+def _keep_step():
+    # Clicking the active segment deselects it; keep the user on their step instead.
+    if st.session_state["bk_step"] is None:
+        st.session_state["bk_step"] = st.session_state.get("bk_step_last", 1)
+    st.session_state["bk_step_last"] = st.session_state["bk_step"]
+
+
+def _keep_risk():
+    if st.session_state["bkw_risk"] is None:
+        st.session_state["bkw_risk"] = st.session_state["bk"]["risk"]
+
+
+def _toggle_detail(option_id: str):
+    st.session_state["bk_selected"] = None if st.session_state.get("bk_selected") == option_id else option_id
+
+
+def _apply_whatif():
+    _set_bk(dict(fuel=st.session_state["wif_fuel"], eta_fuj=st.session_state["wif_eta"],
+                 flex=st.session_state["wif_flex"]))
+
+
+def _scenario_from(bk: dict) -> BunkeringScenario:
+    return BunkeringScenario(
+        vessel_name=bk["vessel"], current_location=bk["loc"], destination=bk["dest"],
+        fuel_remaining_mt=bk["fuel"], daily_consumption_mt=bk["cons"], required_quantity_mt=bk["qty"],
+        fuel_grade=FuelGrade(bk["grade"]),
+        eta_singapore_days=bk["eta_sg"], eta_fujairah_days=bk["eta_fuj"],
+        schedule_flexibility_hours=bk["flex"],
+        safety_reserve_mt=bk["reserve"] if bk["reserve"] > 0 else None,
+        singapore_vlsfo_available=FuelAvailability(bk["sg_avail"]),
+        fujairah_vlsfo_available=FuelAvailability(bk["fuj_avail"]),
+        risk_profile=RiskProfile(bk["risk"]),
+    )
+
+
+def _bars(o):
+    bd = getattr(o, "_score_breakdown", {})
+    return [(name, bd.get(key, {}).get("score", 0)) for key, name in ui.CRITERIA]
+
+
+def _route_backdrop_for(scenario, feasible, infeasible, bk) -> str:
+    """Port states and the fuel reach for the background route.
+
+    Reach uses the same quantities as rule F1: usable fuel = fuel on board minus the
+    safety reserve in effect, burned at the daily consumption. If that runs out before
+    the Fujairah ETA, the arc is solid only for that share of the leg.
+    """
+    states = {"Singapore": ("feasible", ""), "Fujairah": ("feasible", "")}
+    for o in infeasible:
+        if o.port in states and not o.is_partial:
+            states[o.port] = ("removed", f"REMOVED · {o.infeasible_rule}")
+    if feasible:
+        best = feasible[0]
+        for port in (best.port, best.top_up_port):
+            if port in states:
+                states[port] = ("recommended", "RECOMMENDED")
+    if bk.get("sim_fuj_missing") and states["Fujairah"][0] != "removed":
+        states["Fujairah"] = ("missing", "PRICE MISSING")
+    usable = scenario.fuel_remaining_mt - scenario.effective_safety_reserve_mt()
+    reach_days = max(0.0, usable) / scenario.daily_consumption_mt
+    reach = reach_days / scenario.eta_fujairah_days if scenario.eta_fujairah_days else None
+    label = f"Reserve reached · day {reach_days:.1f} of {scenario.eta_fujairah_days:.1f}"
+    return ui.route_backdrop(port_states=states, reach_fraction=reach, reach_label=label)
+
+
+def _route(o):
+    first = PORT_CODE.get(o.port, o.port)
+    return f"{first} then {PORT_CODE.get(o.top_up_port, o.top_up_port)}" if o.top_up_port else f"full stem at {first}"
+
 
 # ── Fetch live data (cached per session) ──────────────────────────────────────
+# Fetched before the sidebar is drawn, so the sidebar can show each feed's status.
+# The EIA key arrives through a callback, which runs before this script, so a new
+# key is fetched on the same click.
 if st.session_state["eia_key"] and st.session_state["eia_data"] is None:
     with st.spinner("Fetching EIA data..."):
         st.session_state["eia_data"] = eia_fetch_all(st.session_state["eia_key"])
 if st.session_state["portwatch_data"] is None:
     with st.spinner("Fetching Portwatch data..."):
         st.session_state["portwatch_data"] = fetch_port_activity()
+
+
+def _feed_status(result: "dict | None") -> tuple:
+    """(css state, word) for a feed result: live, stale, age unknown, or error."""
+    if not result or not result.get("success"):
+        return "error", "error"
+    prov = result.get("provenance")
+    fresh = prov.freshness() if prov is not None else Freshness.UNKNOWN
+    if fresh is Freshness.STALE:
+        return "stale", "stale"
+    if fresh is Freshness.UNKNOWN:
+        return "off", "age unknown"
+    return "live", "live"
+
+
+# ── Sidebar: brand, a quiet page list, then data status and controls ─────────
+NAV = ["Home", "Bunkering strategy", "Market intelligence", "Data input", "Live data"]
+with st.sidebar:
+    st.markdown(ui.sidebar_brand(tagline=False), unsafe_allow_html=True)
+    page = st.radio("Navigation", NAV, label_visibility="collapsed")
+
+    st.markdown("---")
+    demo_on = bool(is_sample(st.session_state["df"]).any())
+    eia_state = (("off", "no key") if not st.session_state["eia_key"]
+                 else _feed_status((st.session_state["eia_data"] or {}).get("spot")))
+    pw_state = _feed_status(st.session_state["portwatch_data"])
+    st.markdown('<div class="side-label">Data &amp; connections</div>'
+                + ui.feed_row("EIA Brent", *eia_state)
+                + ui.feed_row("IMF PortWatch", *pw_state)
+                + ui.feed_row("Demo data", *(("on", "on") if demo_on else ("off", "off"))),
+                unsafe_allow_html=True)
+    with st.expander("Manage data"):
+        if "eia_key_input" not in st.session_state:
+            st.session_state["eia_key_input"] = st.session_state["eia_key"]
+        st.text_input("EIA API key", key="eia_key_input", type="password",
+                      placeholder="Paste EIA key here", on_change=_on_eia_key)
+        st.button("Refresh live data", on_click=_refresh_live, key="refresh_live")
+        if demo_on:
+            st.button("Clear demo data", on_click=_clear_demo_data, key="demo_clear")
+        else:
+            st.button("Load demo data (invented values)", on_click=_load_demo_data, key="demo_sidebar",
+                      help="Invented bunker, freight and congestion rows for trying the "
+                           "Bunkering strategy page. Never used in Market intelligence.")
+    today = date.today()
+    st.markdown(f'<div class="side-foot" style="margin-top:1.5rem;">{today.day} {today:%B %Y} · v0.3<br>No source, no certainty.</div>',
+                unsafe_allow_html=True)
 
 df             = st.session_state["df"]
 eia_data       = st.session_state["eia_data"]
@@ -221,56 +276,47 @@ if is_sample(df).any():
         "and congestion values in place of the live feeds; Market Intelligence ignores them. "
         "Clear them from the sidebar."
     )
+    st.markdown(ui.sample_chip("sample data · illustrative"), unsafe_allow_html=True)
 
 
-def _badge_for(prov: "Provenance | None") -> str:
+def _chip_for(source: str, prov: "Provenance | None") -> str:
+    """A source chip: status dot, source name, and the tier spelt out (never colour alone)."""
     if prov is None:
-        return '<span class="missing-badge">MISSING</span>'
-    if prov.source_name == SAMPLE_LABEL:
-        return f'<span class="stale-badge">{SAMPLE_LABEL}</span>'
-    label = prov.quality_tier.value.replace("_", " ")
-    fresh = prov.freshness()
-    if fresh is Freshness.STALE:
-        age_str = f"as of {prov.as_of:%Y-%m-%d}" if prov.as_of else "age unknown"
-        return f'<span class="stale-badge">{label} — STALE ({age_str})</span>'
-    if fresh is Freshness.UNKNOWN:
-        return f'<span class="unknown-badge">{label} — freshness unknown</span>'
-    css_class = {
-        "LIVE_API": "live-badge",
-        "MANUAL_ENTRY": "manual-badge",
-        "USER_OVERRIDE": "user-badge",
-    }[prov.quality_tier.value]
-    return f'<span class="{css_class}">{label}</span>'
+        state, tier = "is-missing", "MISSING"
+    elif prov.source_name == SAMPLE_LABEL:
+        state, tier = "is-stale", SAMPLE_LABEL
+    else:
+        tier = prov.quality_tier.value.replace("_", " ")
+        fresh = prov.freshness()
+        if fresh is Freshness.STALE:
+            age = f"as of {prov.as_of.day} {prov.as_of:%b %Y}" if prov.as_of else "age unknown"
+            state, tier = "is-stale", f"{tier} · STALE ({age})"
+        elif fresh is Freshness.UNKNOWN:
+            state, tier = "is-unknown", f"{tier} · freshness unknown"
+        else:
+            state = {"LIVE_API": "is-live", "MANUAL_ENTRY": "is-manual",
+                     "USER_OVERRIDE": "is-user"}[prov.quality_tier.value]
+    return f'<span class="prov-chip {state}">{escape(source)} <span class="prov-tier">{escape(tier)}</span></span>'
 
 
 # ════════════════════════════════════════════════════════════════════════════
 # PAGE: HOME — DECISION ENTRY POINT
 # ════════════════════════════════════════════════════════════════════════════
 if "Home" in page:
-    st.markdown('<div class="home-hero">What commercial decision<br>are you making <em>today?</em></div>', unsafe_allow_html=True)
-    st.markdown('<div class="home-sub">BrokerBrief evaluates your scenario against live market intelligence, removes options that don\'t work, and shows you the viable alternatives with transparent trade-offs. The final decision is always yours.</div>', unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class="module-card module-card-active">
-        <div class="module-title">🧭 Evaluate Bunkering Strategy</div>
-        <div class="module-desc">Should your vessel bunker now, wait until the next port, or split the stem?
-        BrokerBrief generates the feasible strategies, scores them transparently, and explains every trade-off.
-        <br><br><strong>→ Select "Bunkering Strategy" in the sidebar to begin.</strong></div>
-    </div>
-    <div class="module-card module-card-soon">
-        <div class="module-title">📋 Supplier Quote Evaluation <span class="soon-badge">COMING SOON</span></div>
-        <div class="module-desc">Is the quote you just received competitive? Compare against market benchmarks and recent trends.</div>
-    </div>
-    <div class="module-card module-card-soon">
-        <div class="module-title">🗺 Port Selection Analysis <span class="soon-badge">COMING SOON</span></div>
-        <div class="module-desc">Which bunkering port offers the best overall commercial outcome across your voyage?</div>
-    </div>
-    <div class="module-card">
-        <div class="module-title">📈 Market Briefing</div>
-        <div class="module-desc">Today's market tone, freight and bunker signals, and port congestion — the intelligence layer
-        that supports every decision. <strong>→ Available now under "Market Intelligence".</strong></div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="home-hero bb-reveal">What commercial decision<br>are you making <em>today?</em></div>', unsafe_allow_html=True)
+    st.markdown('<div class="home-sub bb-reveal" style="--i:1">BrokerBrief checks your scenario against live, permitted sources, removes options that can\'t work, and shows every weight and source behind the ranking. You make the call.</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="module-card module-card-active bb-reveal" style="--i:2"><div class="module-title">Evaluate bunkering strategy</div>'
+        '<div class="module-desc">Should your vessel bunker now, wait until the next port, or split the stem? BrokerBrief generates the feasible strategies, scores them transparently and explains every trade-off.'
+        '<br><br><strong>→ Open "Bunkering strategy" in the sidebar to begin.</strong></div></div>'
+        '<div class="module-card bb-reveal" style="--i:3"><div class="module-title">Market briefing</div>'
+        '<div class="module-desc">Today\'s market tone, freight and bunker signals, and port congestion: the intelligence layer behind every decision. '
+        '<strong>→ Available now under "Market intelligence".</strong></div></div>'
+        '<div class="module-card module-card-soon bb-reveal" style="--i:4"><div class="module-title">Supplier quote evaluation <span class="soon-badge">COMING SOON</span></div>'
+        '<div class="module-desc">Is the quote you just received competitive? Compare it against market benchmarks and recent trends.</div></div>'
+        '<div class="module-card module-card-soon bb-reveal" style="--i:5"><div class="module-title">Port selection analysis <span class="soon-badge">COMING SOON</span></div>'
+        '<div class="module-desc">Which bunkering port offers the best overall commercial outcome across your voyage?</div></div>',
+        unsafe_allow_html=True)
 
     st.markdown('<div class="data-note">BrokerBrief is a GPS for maritime commercial decisions. It identifies viable routes, ranks them, and explains the trade-offs. You stay in control of the wheel.</div>', unsafe_allow_html=True)
 
@@ -278,246 +324,169 @@ if "Home" in page:
 # ════════════════════════════════════════════════════════════════════════════
 # PAGE: BUNKERING STRATEGY — SCENARIO INPUT + DECISION WORKSPACE
 # ════════════════════════════════════════════════════════════════════════════
-elif "Bunkering" in page:
-    st.markdown('<div class="page-title">Bunkering Strategy</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Singapore – Fujairah corridor · Decision support module</div>', unsafe_allow_html=True)
+elif page == "Bunkering strategy":
+    head_txt, head_arc = st.columns([3, 2], vertical_alignment="center")
+    with head_txt:
+        st.markdown(ui.page_header("Where should the vessel bunker?", "Bunkering strategy · Singapore – Fujairah corridor"), unsafe_allow_html=True)
+    with head_arc:
+        st.markdown(ui.route_arc("Fujairah", "Singapore", compact=True), unsafe_allow_html=True)
+    # The large route behind the page. Its colours depend on the results, which are
+    # computed further down, so reserve the slot here and fill it once they exist.
+    backdrop_slot = st.empty()
+    bk = st.session_state["bk"]
 
-    # ── Preset demo scenarios ────────────────────────────────────────────────
-    with st.expander("📌 Load a demo scenario", expanded=False):
-        st.caption("Picking a scenario also loads demo data (invented values), replacing any uploaded CSV.")
-        c1, c2, c3 = st.columns(3)
-        preset = None
-        with c1:
-            if st.button("Scenario 1\nBoth ports feasible"):
-                preset = dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=False)
-        with c2:
-            if st.button("Scenario 2\nFujairah unreachable"):
-                preset = dict(fuel=280.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=False)
-        with c3:
-            if st.button("Scenario 3\nFujairah price missing"):
-                preset = dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=True)
-        if preset:
-            # The documented scenario results rely on demo prices, so picking a
-            # scenario loads demo data (and its banner) if it isn't loaded yet.
-            # This replaces any uploaded CSV, as the button's help text says.
-            if not is_sample(st.session_state["df"]).any():
-                _load_demo_data()
-            st.session_state["preset"] = preset
-            st.session_state["decision_result"] = None
-            st.rerun()
+    # ── Demo scenarios (they load demo data, replacing any uploaded CSV) ──────
+    st.markdown('<div class="field-label">Try a demo scenario · loads invented demo data</div>', unsafe_allow_html=True)
+    pcols = st.columns(len(PRESETS))
+    for col, name in zip(pcols, PRESETS):
+        with col:
+            st.button(name, key=f"preset_{name}", on_click=_apply_preset, args=(name,), width="stretch")
 
-    p = st.session_state.get("preset", dict(fuel=900.0, cons=45.0, qty=1000.0, eta_sg=1.0, eta_fuj=8.0, flex=36.0, sim_fuj_missing=False))
+    left, right = st.columns([5, 7], gap="large")
 
-    # ── Scenario input form ──────────────────────────────────────────────────
-    st.markdown("### Vessel Scenario")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        vessel_name  = st.text_input("Vessel name (display only)", value="MV Demo Trader")
-        current_loc  = st.text_input("Current location / last port", value="Colombo")
-        destination  = st.text_input("Destination / next major port", value="Rotterdam")
-        fuel_grade   = st.selectbox("Required fuel grade", [g.value for g in FuelGrade], index=0)
-    with col2:
-        fuel_remaining = st.number_input("Fuel remaining (MT)", min_value=0.0, value=p["fuel"], step=10.0)
-        daily_cons     = st.number_input("Daily consumption (MT/day)", min_value=1.0, value=p["cons"], step=1.0)
-        required_qty   = st.number_input("Required bunker quantity (MT)", min_value=0.0, value=p["qty"], step=50.0)
-        safety_reserve = st.number_input("Safety reserve (MT) — 0 = use default", min_value=0.0, value=0.0, step=10.0,
-                                          help="Default: max(10% of remaining fuel, 24h consumption). No universal industry standard — set per your company SMS.")
-    with col3:
-        eta_sg   = st.number_input("ETA to Singapore (days)", min_value=0.1, value=p["eta_sg"], step=0.5)
-        eta_fuj  = st.number_input("ETA to Fujairah (days)", min_value=0.1, value=p["eta_fuj"], step=0.5)
-        flex     = st.number_input("Schedule flexibility (hours)", min_value=0.0, value=p["flex"], step=6.0)
-        risk     = st.selectbox("Risk profile", [r.value for r in RiskProfile], index=1)
+    # ── Left: the scenario, in three steps ────────────────────────────────────
+    with left:
+        if "bk_step" not in st.session_state:
+            st.session_state["bk_step"] = 1
+        st.segmented_control("Step", list(STEPS), format_func=STEPS.get, key="bk_step",
+                             on_change=_keep_step, label_visibility="collapsed")
+        step = st.session_state["bk_step"] or st.session_state.get("bk_step_last", 1)
+        title, sub = STEP_COPY[step]
+        st.markdown(f'<div class="step-head">{title}</div><div class="step-sub">{sub}</div>', unsafe_allow_html=True)
+        if step == 1:
+            _bk_input(st.text_input, "Vessel name (display only)", "vessel")
+            _bk_input(st.selectbox, "Required fuel grade", "grade", options=GRADES)
+            _bk_input(st.number_input, "Fuel remaining (MT)", "fuel", min_value=0.0, step=10.0)
+            _bk_input(st.number_input, "Daily consumption (MT/day)", "cons", min_value=1.0, step=1.0)
+            _bk_input(st.number_input, "Required bunker quantity (MT)", "qty", min_value=0.0, step=50.0)
+        elif step == 2:
+            _bk_input(st.text_input, "Current location / last port", "loc")
+            _bk_input(st.text_input, "Destination / next major port", "dest")
+            _bk_input(st.number_input, "ETA to Singapore (days)", "eta_sg", min_value=0.1, step=0.5)
+            _bk_input(st.number_input, "ETA to Fujairah (days)", "eta_fuj", min_value=0.1, step=0.5)
+            _bk_input(st.number_input, "Schedule flexibility (hours)", "flex", min_value=0.0, step=6.0)
+        else:
+            _bk_input(st.number_input, "Safety reserve (MT) — 0 = use default", "reserve", min_value=0.0, step=10.0,
+                      help="Default: max(10% of remaining fuel, 24h consumption). No universal industry standard — set per your company SMS.")
+            _bk_input(st.selectbox, "Singapore fuel grade availability", "sg_avail", options=AVAIL)
+            _bk_input(st.selectbox, "Fujairah fuel grade availability", "fuj_avail", options=AVAIL)
+            _bk_input(st.checkbox, "Simulate: Fujairah price unavailable", "sim_fuj_missing",
+                      help="Demo flag — treats Fujairah VLSFO price as missing to show data-gap behaviour.")
+        back, nxt = st.columns(2)
+        with back:
+            if step > 1:
+                st.button("Back", key="step_back", on_click=_goto_step, args=(step - 1,), width="stretch")
+        with nxt:
+            if step < 3:
+                st.button("Next", key="step_next", type="primary", on_click=_goto_step, args=(step + 1,), width="stretch")
+        st.markdown('<div class="live-note">Results on the right update as you type.</div>', unsafe_allow_html=True)
 
-    with st.expander("Optional inputs — improve confidence"):
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            sg_avail = st.selectbox("Singapore fuel grade availability",
-                                     [a.value for a in FuelAvailability], index=2)
-        with c2:
-            fuj_avail = st.selectbox("Fujairah fuel grade availability",
-                                      [a.value for a in FuelAvailability], index=2)
-        with c3:
-            sim_fuj_missing = st.checkbox("Simulate: Fujairah price unavailable",
-                                           value=p["sim_fuj_missing"],
-                                           help="Demo flag — treats Fujairah VLSFO price as missing to show data-gap behaviour.")
+    # ── Right: live results ───────────────────────────────────────────────────
+    with right:
+        if "bkw_risk" not in st.session_state:
+            st.session_state["bkw_risk"] = bk["risk"]
+        st.segmented_control("Risk profile · flip it to see how the ranking changes", PROFILES,
+                             key="bkw_risk", on_change=_keep_risk)
+        bk["risk"] = st.session_state["bkw_risk"] or bk["risk"]
+        st.markdown('<div class="info-card-title" style="margin:.75rem 0 .5rem;">Ranked options</div>', unsafe_allow_html=True)
 
-    run = st.button("⚓  Evaluate Bunkering Strategy", type="primary")
-
-    if run:
-        scenario = BunkeringScenario(
-            vessel_name          = vessel_name,
-            current_location     = current_loc,
-            destination          = destination,
-            fuel_remaining_mt    = fuel_remaining,
-            daily_consumption_mt = daily_cons,
-            required_quantity_mt = required_qty,
-            fuel_grade           = FuelGrade(fuel_grade),
-            eta_singapore_days   = eta_sg,
-            eta_fujairah_days    = eta_fuj,
-            schedule_flexibility_hours = flex,
-            safety_reserve_mt    = safety_reserve if safety_reserve > 0 else None,
-            singapore_vlsfo_available = FuelAvailability(sg_avail),
-            fujairah_vlsfo_available  = FuelAvailability(fuj_avail),
-            risk_profile         = RiskProfile(risk),
-        )
-
+        scenario = _scenario_from(bk)
         # With demo data active, Brent, the forecast and congestion are fixed
         # SAMPLE values too, so demo results never depend on live feeds.
         engine_eia, engine_portwatch = engine_inputs(df, eia_data, portwatch_data)
-        market_data = assemble_market_data(
-            df, engine_eia, engine_portwatch,
-            simulate_fujairah_missing=sim_fuj_missing,
-        )
-
-        options = generate_options(scenario)
-        options = run_constraint_engine(options, scenario, market_data["congestion_signals"])
-        options = score_options(options, scenario, market_data)
-        # Ports of the options the engine scored (feasible ones, incl. top-up ports).
+        market_data = assemble_market_data(df, engine_eia, engine_portwatch,
+                                           simulate_fujairah_missing=bk["sim_fuj_missing"])
+        options = whatif.run_pipeline(scenario, market_data)
         scored_ports = {p for o in options if o.is_feasible for p in (o.port, o.top_up_port) if p}
         confidence = compute_confidence(scenario, market_data, scored_ports=scored_ports)
-
-        st.session_state["decision_result"] = {
-            "scenario": scenario, "options": options,
-            "confidence": confidence, "market_data": market_data,
-        }
-
-    # ── Decision Workspace ────────────────────────────────────────────────────
-    result = st.session_state.get("decision_result")
-    if result:
-        scenario   = result["scenario"]
-        options    = result["options"]
-        confidence = result["confidence"]
-        market_data = result["market_data"]
-
-        feasible   = sorted([o for o in options if o.is_feasible], key=lambda o: o.rank or 99)
+        feasible = sorted([o for o in options if o.is_feasible], key=lambda o: o.rank or 99)
         infeasible = [o for o in options if not o.is_feasible]
+        feasible_ids = {o.id for o in feasible}
+        selected = st.session_state.get("bk_selected") if st.session_state.get("bk_selected") in feasible_ids else None
 
-        st.markdown("---")
-        st.markdown('<div class="page-title">Decision Workspace</div>', unsafe_allow_html=True)
-
-        # 1 — SCENARIO SUMMARY
-        reserve = scenario.effective_safety_reserve_mt()
-        st.markdown(f"""
-        <div class="info-card">
-            <div class="info-card-title">1 · Scenario Summary</div>
-            <div style="font-size:.85rem;color:#8B949E;line-height:1.7;">
-            <strong>{scenario.vessel_name}</strong> — currently near {scenario.current_location}, bound for {scenario.destination}.<br>
-            Fuel remaining: <strong>{scenario.fuel_remaining_mt:,.0f} MT</strong> ·
-            Consumption: {scenario.daily_consumption_mt:,.0f} MT/day ·
-            Required stem: <strong>{scenario.required_quantity_mt:,.0f} MT {scenario.fuel_grade.value}</strong><br>
-            ETA Singapore: {scenario.eta_singapore_days:.1f} days · ETA Fujairah: {scenario.eta_fujairah_days:.1f} days ·
-            Schedule flexibility: {scenario.schedule_flexibility_hours:.0f}h<br>
-            Safety reserve in effect: <strong>{reserve:,.0f} MT</strong>
-            {"(user-defined)" if scenario.safety_reserve_mt else "(default: max of 10% remaining fuel or 24h consumption)"} ·
-            Risk profile: {scenario.risk_profile.value}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        # 2 — FEASIBILITY CHECK
-        st.markdown('<div class="info-card"><div class="info-card-title">2 · Feasibility Check</div>', unsafe_allow_html=True)
-        st.markdown(f'<div style="font-size:.82rem;color:#8B949E;">Options considered: {len(options)} · Feasible: {len(feasible)} · Removed: {len(infeasible)}</div>', unsafe_allow_html=True)
-        if infeasible:
-            for o in infeasible:
-                st.markdown(f"""
-                <div class="infeasible-card">
-                    <div class="infeasible-title">✕ {o.label}</div>
-                    <div class="infeasible-reason"><span class="rule-tag">RULE {o.infeasible_rule}</span>{o.infeasible_reason}</div>
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.markdown('<div style="font-size:.82rem;color:#3FB950;padding:.5rem 0;">✓ All generated options passed the Constraint Engine.</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        # The corridor behind the page, coloured by this scenario's result.
+        backdrop_slot.markdown(_route_backdrop_for(scenario, feasible, infeasible, bk), unsafe_allow_html=True)
 
         if not feasible:
-            st.error("No feasible bunkering options exist for this scenario. Review fuel remaining, ETAs, and schedule flexibility.")
-        else:
-            best = feasible[0]
+            st.error("ERROR — No feasible bunkering options exist for this scenario. The What if tab shows what would change that.")
+        for i, o in enumerate(feasible):
+            st.markdown(ui.option_card(
+                label=o.label, route=_route(o), score=o.score or 0, bars=_bars(o),
+                recommended=(i == 0), rank=o.rank,
+                warning=o.warning_message if o.is_warning else "",
+                selected=(o.id == selected), animate=False), unsafe_allow_html=True)
+            act1, act2, _ = st.columns([3, 2, 3])
+            with act1:
+                st.button("Hide breakdown" if o.id == selected else "Score breakdown", key=f"det_{o.id}",
+                          on_click=_toggle_detail, args=(o.id,))
+            with act2:
+                st.checkbox("Compare", key=f"cmp_{o.id}")
+            if o.id == selected:
+                st.markdown(ui.score_breakdown(label=o.label, description=o.description,
+                                               breakdown=getattr(o, "_score_breakdown", {}), score=o.score or 0,
+                                               warning=o.warning_message if o.is_warning else ""),
+                            unsafe_allow_html=True)
+        for o in infeasible:
+            st.markdown(f'<div class="no-motion">{ui.infeasible_card(label=o.label, description=o.description, rule=o.infeasible_rule, reason=o.infeasible_reason)}</div>',
+                        unsafe_allow_html=True)
 
-            # 3 — RECOMMENDED OPTION
-            warn_html = f'<div class="warn-strip">⚠ {best.warning_message}</div>' if best.is_warning else ""
-            st.markdown(f"""
-            <div class="rec-card">
-                <div class="rec-label">3 · Recommended Option ⭐ — strongest overall commercial balance based on current information</div>
-                <div class="rec-title">{best.label}</div>
-                <div class="rec-body">{best.description}</div>
-                <div style="margin-top:.75rem;"><span style="font-family:JetBrains Mono,monospace;font-size:.7rem;color:#3FB950;">COMPOSITE SCORE</span>
-                <span style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:1.3rem;color:#fff;margin-left:.75rem;">{best.score:.1f} / 100</span></div>
-            </div>
-            """, unsafe_allow_html=True)
-            if best.is_warning:
-                st.markdown(warn_html, unsafe_allow_html=True)
+        to_compare = [o for o in feasible if st.session_state.get(f"cmp_{o.id}")]
+        if len(to_compare) == 2:
+            a, b = to_compare
+            st.markdown(ui.compare_panel(
+                {"label": a.label, "score": a.score or 0, "breakdown": getattr(a, "_score_breakdown", {})},
+                {"label": b.label, "score": b.score or 0, "breakdown": getattr(b, "_score_breakdown", {})}),
+                unsafe_allow_html=True)
+        elif len(to_compare) == 1:
+            st.caption("Tick one more option to compare the two side by side.")
+        elif len(to_compare) > 2:
+            st.caption("Compare works on two options at a time. Untick one.")
 
-            # 4 — ALTERNATIVES
-            if len(feasible) > 1:
-                st.markdown('<div class="info-card"><div class="info-card-title">4 · Alternative Options</div>', unsafe_allow_html=True)
-                for o in feasible[1:]:
-                    warn = f'<div class="warn-strip">⚠ {o.warning_message}</div>' if o.is_warning else ""
-                    st.markdown(f"""
-                    <div class="alt-card">
-                        <div class="alt-title">#{o.rank} — {o.label} <span class="score-pill" style="float:right;">{o.score:.1f}</span></div>
-                        <div style="font-size:.82rem;color:#8B949E;line-height:1.55;">{o.description}</div>
-                        {warn}
-                    </div>
-                    """, unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
+        tab_wi, tab_conf, tab_src, tab_table = st.tabs(["What if", "Confidence", "Sources & assumptions", "Score table"])
 
-            # 5 — TRADE-OFF COMPARISON
-            st.markdown('<div class="info-card"><div class="info-card-title">5 · Trade-off Comparison</div>', unsafe_allow_html=True)
-            weights = WEIGHT_SETS[scenario.risk_profile]
-            st.markdown(f'<div style="font-family:JetBrains Mono,monospace;font-size:.7rem;color:#8B949E;margin-bottom:.75rem;">Scoring weights ({scenario.risk_profile.value}): Expected cost {weights["expected_cost"]:.0%} · Operational risk {weights["operational_risk"]:.0%} · Schedule risk {weights["schedule_risk"]:.0%}</div>', unsafe_allow_html=True)
-            rows = []
-            for o in feasible:
-                bd = getattr(o, "_score_breakdown", {})
-                rows.append({
-                    "Rank": o.rank, "Option": o.label,
-                    "Expected Cost": bd.get("expected_cost", {}).get("score", "–"),
-                    "Operational Risk": bd.get("operational_risk", {}).get("score", "–"),
-                    "Schedule Risk": bd.get("schedule_risk", {}).get("score", "–"),
-                    "Composite": o.score,
-                })
-            st.dataframe(pd.DataFrame(rows).set_index("Rank"), use_container_width=True)
-            with st.expander("Show scoring reasoning per option"):
-                for o in feasible:
-                    bd = getattr(o, "_score_breakdown", {})
-                    st.markdown(f"**{o.label}**")
-                    for factor in ("expected_cost", "operational_risk", "schedule_risk"):
-                        f = bd.get(factor, {})
-                        st.markdown(f"- *{factor.replace('_',' ').title()}* ({f.get('score','–')}): {f.get('note','')}")
-            st.markdown('</div>', unsafe_allow_html=True)
+        with tab_wi:
+            base = (float(bk["fuel"]), float(bk["eta_fuj"]), float(bk["flex"]))
+            if st.session_state.get("wif_base") != base:
+                st.session_state["wif_base"] = base
+                st.session_state["wif_fuel"], st.session_state["wif_eta"], st.session_state["wif_flex"] = base
+            w1, w2, w3 = st.columns(3)
+            with w1:
+                st.slider("Fuel on board (MT)", 0.0, max(3000.0, base[0] * 2), key="wif_fuel", step=5.0)
+            with w2:
+                st.slider("ETA to Fujairah (days)", 0.1, max(20.0, base[1]), key="wif_eta", step=0.1)
+            with w3:
+                st.slider("Schedule flexibility (h)", 0.0, max(120.0, base[2]), key="wif_flex", step=6.0)
+            wi_scen = replace(scenario, fuel_remaining_mt=st.session_state["wif_fuel"],
+                              eta_fujairah_days=st.session_state["wif_eta"],
+                              schedule_flexibility_hours=st.session_state["wif_flex"])
+            wi_opts = whatif.run_pipeline(wi_scen, market_data)
+            wi_items = ([(o.label, o.score or 0, None) for o in sorted([o for o in wi_opts if o.is_feasible], key=lambda o: o.rank or 99)]
+                        + [(o.label, None, o.infeasible_rule) for o in wi_opts if not o.is_feasible])
+            st.markdown('<div class="field-label">Ranking with these values</div>' + ui.whatif_list(wi_items), unsafe_allow_html=True)
+            if (st.session_state["wif_fuel"], st.session_state["wif_eta"], st.session_state["wif_flex"]) != base:
+                st.button("Apply these values to the scenario", key="wif_apply", type="primary", on_click=_apply_whatif)
+            lines = whatif.threshold_sentences(scenario, market_data["congestion_signals"], {o.id: o.label for o in options})
+            st.markdown('<div class="info-card-title" style="margin-top:1.25rem;">Where each option switches</div>'
+                        + "".join(f'<div class="threshold-line">{escape(l)}</div>' for l in lines), unsafe_allow_html=True)
 
-            # 6 — DECISION CONFIDENCE
-            st.markdown('<div class="info-card"><div class="info-card-title">6 · Decision Confidence</div>', unsafe_allow_html=True)
-            st.markdown(f'<div style="font-family:Space Grotesk,sans-serif;font-weight:700;font-size:1.8rem;color:#E6EDF3;">{confidence["overall"]:.0f}% <span style="font-size:.9rem;color:#8B949E;">({confidence["label"]})</span></div>', unsafe_allow_html=True)
+        with tab_conf:
+            conf = ui.confidence_ring(
+                data_quality=confidence["data_quality"]["score"],
+                signal_agreement=confidence["signal_agreement"]["score"],
+                completeness=confidence["scenario_completeness"]["score"],
+                overall=confidence["overall"], level=confidence["label"])
             if confidence.get("cap_reason"):
-                st.markdown(f'<div class="warn-strip">⚠ Capped at Medium (would be {confidence["uncapped_overall"]:.0f}%). {confidence["cap_reason"]}</div>', unsafe_allow_html=True)
-            for label, comp in [("Data Quality (40%)", "data_quality"),
-                                 ("Signal Agreement (30%)", "signal_agreement"),
-                                 ("Scenario Completeness (30%)", "scenario_completeness")]:
-                s = confidence[comp]["score"]
-                st.markdown(f"""
-                <div class="conf-row"><span class="conf-label">{label}</span>
-                <div class="conf-bar-wrap"><div class="conf-bar-fill" style="width:{min(100,max(0,s))}%"></div></div>
-                <span class="conf-val">{s:.0f}%</span></div>
-                """, unsafe_allow_html=True)
+                conf += ui.warn_strip(f'Capped at Medium (would be {confidence["uncapped_overall"]:.0f}%). {confidence["cap_reason"]}')
             if confidence["reductions"]:
-                st.markdown('<div style="font-family:JetBrains Mono,monospace;font-size:.68rem;color:#F0A500;margin-top:.75rem;">CONFIDENCE REDUCED BECAUSE:</div>', unsafe_allow_html=True)
-                for r in confidence["reductions"][:8]:
-                    st.markdown(f'<div style="font-size:.76rem;color:#8B949E;padding:.15rem 0;">— {r}</div>', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+                conf += ('<div class="reduction-label">Confidence reduced because:</div>'
+                         + "".join(f'<div class="reduction-item">— {escape(r)}</div>' for r in confidence["reductions"][:8]))
+            st.markdown(f'<div class="no-motion">{conf}</div>', unsafe_allow_html=True)
 
-            # 7 — WHY THIS OPTION RANKS HIGHEST
-            bd = getattr(best, "_score_breakdown", {})
-            reasoning_parts = [f.get("note", "") for f in
-                               (bd.get("expected_cost", {}), bd.get("operational_risk", {}), bd.get("schedule_risk", {}))
-                               if f.get("note")]
-            st.markdown(f"""
-            <div class="info-card"><div class="info-card-title">7 · Why This Option Ranks Highest</div>
-            <div style="font-size:.85rem;color:#8B949E;line-height:1.7;">{" ".join(reasoning_parts)}</div></div>
-            """, unsafe_allow_html=True)
-
-            # 8 — ASSUMPTIONS
+        with tab_src:
+            reserve = scenario.effective_safety_reserve_mt()
             assumptions = [
+                f"Safety reserve in effect: {reserve:,.0f} MT "
+                + ("(user-defined)." if scenario.safety_reserve_mt else "(default: max of 10% remaining fuel or 24h consumption)."),
                 "Vessel ETA remains unchanged from user input.",
                 f"Daily consumption of {scenario.daily_consumption_mt:,.0f} MT/day is accurate as provided.",
                 "Waiting times are estimated from congestion signals, not confirmed port data.",
@@ -525,21 +494,33 @@ elif "Bunkering" in page:
                 "No unexpected geopolitical or weather disruption assumed.",
                 "Minimum/maximum stem sizes use indicative POC values, not confirmed supplier data.",
             ]
-            st.markdown('<div class="info-card"><div class="info-card-title">8 · Assumptions</div>' +
-                        "".join(f'<div class="assumption-item">• {a}</div>' for a in assumptions) +
-                        '</div>', unsafe_allow_html=True)
+            chips = "".join(_chip_for(source, prov) for source, prov in market_data["provenance"].items())
+            st.markdown(f'<div class="provenance-row">{chips}</div>'
+                        '<div class="info-card-title" style="margin-top:1.25rem;">Assumptions</div>'
+                        + "".join(f'<div class="assumption-item">• {escape(a)}</div>' for a in assumptions)
+                        + '<div class="data-note" style="margin-top:1.25rem;">No source, no certainty. Missing data lowers confidence but does not remove physically feasible options. The final commercial decision remains with you — BrokerBrief cannot observe supplier relationships, internal budgets, charterparty obligations, or company risk appetite.</div>',
+                        unsafe_allow_html=True)
 
-            # 9 — DATA SOURCES
-            st.markdown('<div class="info-card"><div class="info-card-title">9 · Data Sources</div>', unsafe_allow_html=True)
-            for source, prov in market_data["provenance"].items():
-                st.markdown(f'<div class="provenance-row">{source} {_badge_for(prov)}</div>', unsafe_allow_html=True)
-            st.markdown('<div class="data-note">No source, no certainty. Missing data lowers confidence but does not remove physically feasible options. The final commercial decision remains with you — BrokerBrief cannot observe supplier relationships, internal budgets, charterparty obligations, or company risk appetite.</div></div>', unsafe_allow_html=True)
+        with tab_table:
+            weights = WEIGHT_SETS[scenario.risk_profile]
+            st.markdown(f'<div class="field-label">Scoring weights ({scenario.risk_profile.value}): Expected cost {weights["expected_cost"]:.0%} · '
+                        f'Operational risk {weights["operational_risk"]:.0%} · Schedule risk {weights["schedule_risk"]:.0%}</div>',
+                        unsafe_allow_html=True)
+            if feasible:
+                rows = []
+                for o in feasible:
+                    bd = getattr(o, "_score_breakdown", {})
+                    rows.append({
+                        "Rank": o.rank, "Option": o.label,
+                        "Expected Cost": bd.get("expected_cost", {}).get("score", "–"),
+                        "Operational Risk": bd.get("operational_risk", {}).get("score", "–"),
+                        "Schedule Risk": bd.get("schedule_risk", {}).get("score", "–"),
+                        "Composite": o.score,
+                    })
+                st.dataframe(pd.DataFrame(rows).set_index("Rank"), width="stretch")
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# PAGE: MARKET INTELLIGENCE (repositioned dashboard)
-# ════════════════════════════════════════════════════════════════════════════
-elif "Market Intelligence" in page:
+elif page == "Market intelligence":
     # Demo rows are invented: Market Intelligence must never be generated from
     # them, so everything on this page works from real rows only.
     mi_df = real_rows(df)
@@ -572,53 +553,40 @@ elif "Market Intelligence" in page:
     missing_msg = (f"No real {' or '.join(missing_parts)} data loaded, so no brief is generated. "
                    "Demo data is never used here.")
 
-    st.markdown('<div class="page-title">Market Intelligence</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Supporting evidence layer — informs every decision module</div>', unsafe_allow_html=True)
+    st.markdown(ui.page_header("What moved overnight?", "Market intelligence · the evidence behind every decision"), unsafe_allow_html=True)
 
     tab_brief, tab_signals, tab_bunker, tab_reports = st.tabs(
-        ["📋 Today's Brief", "📡 Signal Engine", "⛽ Bunker Spread Watch", "📄 Reports"])
+        ["Today's brief", "Signal engine", "Bunker spread watch", "Reports"])
 
     with tab_brief:
-        dir_color = {"Up": "dir-up", "Down": "dir-down", "Flat": "dir-flat",
-                     "Rising": "dir-rising", "Easing": "dir-easing", "Stable": "dir-stable",
-                     "Unknown": "dir-unknown"}
-        def _pill(label, value):
-            return (f'<div class="stat-pill"><div class="stat-pill-label">{label}</div>'
-                    f'<div class="stat-pill-value {dir_color.get(value,"")}">{value}</div></div>')
-        pills = (_pill("Freight", signals.freight_direction if has_freight else "MISSING")
-                 + _pill("Bunkers", signals.bunker_direction if has_bunker else "MISSING")
-                 + _pill("Congestion", signals.congestion_direction if has_congestion else "MISSING"))
-        brent_pill = ""
+        pills = (ui.stat_pill("Freight", signals.freight_direction if has_freight else "MISSING")
+                 + ui.stat_pill("Bunkers", signals.bunker_direction if has_bunker else "MISSING")
+                 + ui.stat_pill("Congestion", signals.congestion_direction if has_congestion else "MISSING"))
         if eia_data and eia_data.get("spot", {}).get("success"):
             spot = eia_data["spot"]
-            brent_pill = (f'<div class="stat-pill"><div class="stat-pill-label">Brent Crude</div>'
-                          f'<div class="stat-pill-value {dir_color.get(spot["direction"],"")}">${spot["current_value"]:.2f}/bbl</div></div>')
+            pills += ui.stat_pill("Brent crude", f'${spot["current_value"]:.2f}/bbl', direction=spot["direction"])
+        today = date.today()
+        brief_top = ('<div class="brief-card-top"><div class="brief-card-label" style="margin:0;">Morning brief</div>'
+                     f'<div class="brief-card-date">{today.day} {today:%B %Y}</div></div>')
         if not brief_ready:
-            st.markdown(f"""
-            <div class="brief-card">
-                <div class="brief-card-label">Main Headline <span class="missing-badge">MISSING</span></div>
-                <div class="brief-card-value">{missing_msg}</div>
-                <div class="stat-pill-row">{pills}{brent_pill}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f'<div class="brief-card bb-sweep">{brief_top}<div class="brief-field">Main headline</div>'
+                        f'<span class="brief-missing">{ui.sig("Missing")}{escape(missing_msg)}</span>'
+                        f'<div class="stat-pill-row">{pills}</div></div>', unsafe_allow_html=True)
         else:
             brief = generate_brief(signals)
             tone_css = {"Bullish": "tone-bullish", "Cautiously Bullish": "tone-cautious",
                         "Mixed": "tone-mixed", "Bearish": "tone-bearish",
                         "Neutral": "tone-neutral", "Soft Demand / Mixed": "tone-soft"}.get(signals.market_tone, "tone-mixed")
-            st.markdown(f'<span class="tone-badge {tone_css}">Market Tone: {signals.market_tone}</span>', unsafe_allow_html=True)
-            st.markdown(f"""
-            <div class="brief-card">
-                <div class="brief-card-label">Main Headline</div>
-                <div class="brief-card-headline">{brief["headline"]}</div>
-                <div class="stat-pill-row">{pills}{brent_pill}</div>
-                <div class="brief-card-label" style="margin-top:1rem;">Key Route to Watch</div>
-                <div class="brief-card-value">{signals.key_route}</div>
-                <div class="brief-card-label">Suggested Talking Point</div>
-                <div class="brief-card-talking">"{brief["talking_point"]}"</div>
-                <div class="brief-card-risk">⚠ {brief["risk_note"]}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(f'<span class="tone-badge {tone_css}">Market tone: {escape(signals.market_tone)}</span>', unsafe_allow_html=True)
+            sources_line = f'<div class="brief-sources">Sources: {escape(" · ".join(brief_sources))}</div>' if brief_sources else ""
+            st.markdown(
+                f'<div class="brief-card bb-sweep">{brief_top}'
+                f'<div class="brief-field">Main headline</div><div class="brief-line bb-line">{escape(brief["headline"])}</div>'
+                f'<div class="stat-pill-row">{pills}</div>'
+                f'<div class="brief-field">Key route to watch</div><div class="brief-card-value">{escape(signals.key_route)}</div>'
+                f'<div class="brief-field">Suggested talking point</div><div class="brief-card-talking">"{escape(brief["talking_point"])}"</div>'
+                f'<div class="brief-card-risk">{ui.sig("Risk")}{escape(brief["risk_note"])}</div>{sources_line}</div>',
+                unsafe_allow_html=True)
         if unknown_congestion:
             st.caption("Congestion unknown (not counted in the Congestion pill): "
                        + " ".join(f"{p}: {r}" for p, r in unknown_congestion.items()))
@@ -627,13 +595,12 @@ elif "Market Intelligence" in page:
         if signals.signal_table:
             table_df = pd.DataFrame(signals.signal_table)
             def _colour_dir(val):
-                return {"Up":"color:#FF6B6B;font-weight:600","Down":"color:#FF6B6B;font-weight:600",
-                        "Flat":"color:#58A6FF;font-weight:600","Rising":"color:#F0A500;font-weight:600",
-                        "Easing":"color:#3FB950;font-weight:600","Stable":"color:#58A6FF;font-weight:600"}.get(val,"")
+                hexes = ui.DIRECTION_HEX.get(val)
+                return f"color:{hexes};font-weight:600" if hexes else ""
             styled = (table_df.style.applymap(_colour_dir, subset=["Direction"])
                       .format({"Pct Change": "{:+.2f}%", "Confidence": "{:.0%}"})
                       .hide(axis="index"))
-            st.dataframe(styled, use_container_width=True, height=420)
+            st.dataframe(styled, width="stretch", height=420)
         else:
             st.warning("MISSING — no real freight, bunker or congestion rows loaded. Demo data is never shown here.")
         if portwatch_data and portwatch_data.get("success"):
@@ -653,9 +620,9 @@ elif "Market Intelligence" in page:
                 spread = info["spread"]
                 st.markdown(f"""
                 <div class="info-card"><div class="info-card-title">{fuel_type}</div>
-                <div style="font-size:.85rem;color:#8B949E;line-height:1.6;">
-                Cheapest: <strong style="color:#3FB950;">{info["cheapest_port"]} — USD {info["cheapest_price"]:,.0f}/MT</strong> ·
-                Most expensive: <strong style="color:#FF6B6B;">{info["most_expensive_port"]} — USD {info["most_expensive_price"]:,.0f}/MT</strong><br>
+                <div class="ws-body">
+                Cheapest: <strong class="dir-down">{info["cheapest_port"]} — USD {info["cheapest_price"]:,.0f}/MT</strong> ·
+                Most expensive: <strong class="dir-up">{info["most_expensive_port"]} — USD {info["most_expensive_price"]:,.0f}/MT</strong><br>
                 Spread: USD {spread:,.0f}/MT → theoretical 1,000 MT stem difference of <strong>USD {spread*1000:,.0f}</strong>
                 before operational, credit, supplier, and timing considerations.</div></div>
                 """, unsafe_allow_html=True)
@@ -665,27 +632,26 @@ elif "Market Intelligence" in page:
             st.warning(f"MISSING — {missing_msg}")
         else:
             brief = generate_brief(signals)
-            r1, r2, r3 = st.tabs(["✉️ Email", "📄 PDF", "💼 LinkedIn"])
+            r1, r2, r3 = st.tabs(["Email", "PDF", "LinkedIn"])
             with r1:
                 email_text = generate_email(signals, brief)
                 st.markdown(f'<div class="report-block">{email_text}</div>', unsafe_allow_html=True)
-                st.download_button("⬇ Download .txt", email_text.encode(), f"brokerbrief_email_{date.today()}.txt", "text/plain")
+                st.download_button("Download .txt", email_text.encode(), f"brokerbrief_email_{date.today()}.txt", "text/plain")
             with r2:
                 if st.button("Generate PDF"):
                     pdf_bytes = generate_pdf_bytes(signals, brief, brief_sources)
-                    st.download_button("📄 Download PDF", pdf_bytes, f"brokerbrief_{date.today()}.pdf", "application/pdf")
+                    st.download_button("Download PDF", pdf_bytes, f"brokerbrief_{date.today()}.pdf", "application/pdf")
             with r3:
                 linkedin_text = generate_linkedin(signals, brief)
                 st.markdown(f'<div class="report-block">{linkedin_text}</div>', unsafe_allow_html=True)
-                st.download_button("⬇ Download .txt", linkedin_text.encode(), f"brokerbrief_linkedin_{date.today()}.txt", "text/plain")
+                st.download_button("Download .txt", linkedin_text.encode(), f"brokerbrief_linkedin_{date.today()}.txt", "text/plain")
 
 
 # ════════════════════════════════════════════════════════════════════════════
 # PAGE: DATA INPUT
 # ════════════════════════════════════════════════════════════════════════════
-elif "Data Input" in page:
-    st.markdown('<div class="page-title">Data Input</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Upload a CSV, or load demo data (invented values) for the Bunkering Strategy page</div>', unsafe_allow_html=True)
+elif page == "Data input":
+    st.markdown(ui.page_header("Bring your own data", "Data input · upload a CSV, or load demo data (invented values)"), unsafe_allow_html=True)
 
     col_a, col_b = st.columns([3, 1])
     with col_a:
@@ -694,7 +660,7 @@ elif "Data Input" in page:
     with col_b:
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("Load demo data (invented values)", on_click=_load_demo_data, key="demo_page"):
-            st.success("Demo data loaded — invented values, used by Bunkering Strategy only.")
+            st.success("LOADED — Demo data (invented values), used by Bunkering Strategy only.")
 
     if uploaded is not None:
         try:
@@ -707,11 +673,11 @@ elif "Data Input" in page:
                 st.session_state["data_source"] = "uploaded"
                 st.success(f"CSV loaded: {len(uploaded_df)} rows.")
         except Exception as exc:
-            st.error(f"Could not read file: {exc}")
+            st.error(f"ERROR — Could not read file: {exc}")
 
     st.markdown("---")
     st.markdown("**Data Preview**")
-    st.dataframe(st.session_state["df"], use_container_width=True)
+    st.dataframe(st.session_state["df"], width="stretch")
 
     st.markdown("**Validation Report**")
     if st.session_state["df"].empty:
@@ -721,49 +687,48 @@ elif "Data Input" in page:
         if field in df_display.columns:
             missing_n = df_display[field].isna().sum() + (df_display[field].astype(str).str.strip() == "").sum()
             if missing_n == 0:
-                st.markdown(f"✅ `{field}` — all {len(df_display)} rows populated")
+                st.markdown(f'<div class="pass-note">{ui.sig("Passed")}<code>{field}</code> — all {len(df_display)} rows populated</div>',
+                            unsafe_allow_html=True)
             else:
-                st.warning(f"⚠️ `{field}` — {missing_n} rows missing or blank")
+                st.warning(f"MISSING — `{field}`: {missing_n} rows missing or blank")
         else:
-            st.error(f"❌ `{field}` column not found")
+            st.error(f"MISSING — `{field}` column not found")
 
 
 # ════════════════════════════════════════════════════════════════════════════
 # PAGE: LIVE DATA
 # ════════════════════════════════════════════════════════════════════════════
-elif "Live Data" in page:
-    st.markdown('<div class="page-title">Live Data</div>', unsafe_allow_html=True)
-    st.markdown('<div class="page-subtitle">Status of all live API connections</div>', unsafe_allow_html=True)
+elif page == "Live data":
+    st.markdown(ui.page_header("Only sources it may share", "Live data · status of every live connection"), unsafe_allow_html=True)
 
     st.markdown("### EIA Crude Oil API")
     if not st.session_state["eia_key"]:
-        st.warning("No EIA API key entered. Add your key in the sidebar. Register free at https://www.eia.gov/opendata/")
+        st.warning("MISSING — No EIA API key entered. Add your key in the sidebar. Register free at https://www.eia.gov/opendata/")
     elif eia_data:
         spot  = eia_data.get("spot", {})
         fcast = eia_data.get("forecast", {})
         if spot.get("success"):
-            st.success(f"✅ Brent spot: ${spot['current_value']:.2f}/bbl ({spot['latest_date']}) — {spot['pct_change']:+.2f}% — {spot['direction']}")
+            st.success(f"CONNECTED — Brent spot: ${spot['current_value']:.2f}/bbl ({spot['latest_date']}) — {spot['pct_change']:+.2f}% — {spot['direction']}")
         else:
-            st.error(f"❌ Spot fetch failed: {spot.get('error')}")
+            st.error(f"ERROR — Spot fetch failed: {spot.get('error')}")
         if fcast.get("success"):
-            st.success(f"✅ Forecast: ${fcast['nearest_value']:.2f}/bbl for {fcast['nearest_month']}")
-            st.dataframe(pd.DataFrame(fcast["forecast_rows"]), use_container_width=True)
+            st.success(f"CONNECTED — Forecast: ${fcast['nearest_value']:.2f}/bbl for {fcast['nearest_month']}")
+            st.dataframe(pd.DataFrame(fcast["forecast_rows"]), width="stretch")
         else:
-            st.error(f"❌ Forecast fetch failed: {fcast.get('error')}")
+            st.error(f"ERROR — Forecast fetch failed: {fcast.get('error')}")
 
     st.markdown("---")
     st.markdown("### IMF Portwatch API")
     if portwatch_data and portwatch_data.get("success"):
-        st.success(f"✅ Connected — {len(portwatch_data['ports'])} port activity rows fetched")
+        st.success(f"CONNECTED — {len(portwatch_data['ports'])} port activity rows fetched")
         reasons = portwatch_data.get("congestion_reasons", {})
         for port, sig in portwatch_data["congestion_signals"].items():
-            colour = {"Rising": "🔴", "Stable": "🔵", "Easing": "🟢"}.get(sig, "⚪")
             text = f"Unknown — {reasons.get(port, 'No reason recorded.')}" if sig == "Unknown" else sig
-            st.markdown(f"{colour} **{port}**: {text}")
+            st.markdown(f"- **{port}**: {text}")
         with st.expander("Show raw port data"):
-            st.dataframe(pd.DataFrame(portwatch_data["ports"]), use_container_width=True)
+            st.dataframe(pd.DataFrame(portwatch_data["ports"]), width="stretch")
     else:
         err = portwatch_data.get("error", "Unknown error") if portwatch_data else "Not fetched"
-        st.error(f"❌ Portwatch: {err}")
+        st.error(f"ERROR — Portwatch: {err}")
 
-    st.markdown('<div class="data-note">Live data is cached per session. Click "↺ Refresh Live Data" in the sidebar to force a fresh fetch. EIA publishes its daily spot prices in a weekly release, so the latest value can be up to about 9 days old; it is marked stale after 10 days. IMF PortWatch publishes in weekly batches about 8–10 days behind.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="data-note">Live data is cached per session. Click "Refresh live data" in the sidebar to force a fresh fetch. EIA publishes its daily spot prices in a weekly release, so the latest value can be up to about 9 days old; it is marked stale after 10 days. IMF PortWatch publishes in weekly batches about 8–10 days behind.</div>', unsafe_allow_html=True)

@@ -1,0 +1,29 @@
+/* BrokerBrief — Streamlit glue. Points Streamlit's own widgets at the design-system tokens.
+   Lives apart from components.css because these selectors target Streamlit's markup, which can change between releases. */
+[data-testid="stMain"],[data-testid="stAppViewBlockContainer"],[data-testid="stBottomBlockContainer"],.main{background:transparent!important;}
+:where([data-testid="stAppViewContainer"],[data-testid="stSidebar"]) :where(p,li,label,input,textarea,button,h1,h2,h3,h4,h5,h6,[data-baseweb="select"] div,[data-testid="stMarkdownContainer"]){font-family:var(--font-body);}
+h1,h2,h3,h4{font-family:var(--font-head)!important;color:var(--text)!important;font-weight:500!important;letter-spacing:-.01em;}
+p,li,label{color:var(--text);}
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p,[data-testid="stSidebar"] label p{color:var(--muted);}
+[data-testid="stSidebar"] .stRadio label p{color:var(--text)!important;font-size:.95rem;}
+[data-testid="stExpander"] details{background:var(--glass)!important;backdrop-filter:blur(var(--blur-glass));border:1px solid var(--bdr)!important;border-radius:var(--radius-card)!important;}
+[data-testid="stExpander"] summary,[data-testid="stExpander"] summary p{color:var(--text)!important;}
+div[data-baseweb="input"],div[data-baseweb="select"]>div,div[data-baseweb="textarea"]{background:var(--surface2)!important;border-color:var(--bdr)!important;border-radius:var(--radius-control)!important;}
+div[data-baseweb="input"] input,div[data-baseweb="select"] div,[data-testid="stNumberInput"] input{color:var(--text)!important;background:transparent!important;}
+[data-testid="stWidgetLabel"] p{font-family:var(--font-mono)!important;font-size:.8rem!important;color:var(--muted)!important;}
+[data-testid="stDataFrame"],[data-testid="stTable"]{background:var(--glass)!important;border:1px solid var(--bdr)!important;border-radius:var(--radius-card);overflow:hidden;}
+[data-testid="stAlert"]>div{background:var(--glass)!important;border:1px solid var(--bdr)!important;border-radius:var(--radius-card)!important;}
+[data-testid="stAlert"] p{color:var(--text)!important;}
+[data-testid="stTabs"] [role="tab"] p{font-family:var(--font-head)!important;color:var(--muted)!important;}
+[data-testid="stTabs"] [role="tab"][aria-selected="true"] p{color:var(--amber)!important;}
+[data-testid="stCaptionContainer"],[data-testid="stCaptionContainer"] p{font-family:var(--font-mono);color:var(--muted)!important;font-size:.8rem;}
+[data-testid="stFileUploaderDropzone"]{background:var(--glass)!important;border:1px dashed var(--bdr)!important;border-radius:var(--radius-card)!important;}
+.stDownloadButton>button{background:var(--glass)!important;color:var(--text)!important;border:1px solid var(--bdr)!important;border-radius:var(--radius-control)!important;font-family:var(--font-head)!important;}
+.stDownloadButton>button:focus-visible{outline:var(--border-focus) solid var(--focus);outline-offset:2px;}
+hr{border-color:var(--bdr)!important;}
+/* Every st.button is the amber primary, including ones wrapped in a help tooltip (hence descendant, not child),
+   and its label paragraph must stay black: the sidebar's muted paragraph colour would otherwise reach it. */
+.stButton button{background:var(--amber)!important;color:var(--on-amber)!important;border:none!important;border-radius:var(--radius-control)!important;box-shadow:var(--shadow-chip);}
+.stButton button p,.stButton button div{color:var(--on-amber)!important;font-family:var(--font-head)!important;font-weight:600!important;}
+.stButton button:hover{opacity:var(--opacity-hover);}
+.stButton button:focus-visible{outline:var(--border-focus) solid var(--focus);outline-offset:2px;}
