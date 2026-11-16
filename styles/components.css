@@ -189,3 +189,85 @@
 @media (prefers-reduced-motion:reduce){
   .bb-reveal,.bb-line,.bb-sweep::before,.conf-bar-fill,.ring-arc,.route-path,.bb-ground::before,[data-testid="stAppViewContainer"]::before{animation:none!important;}
   .bb-dim{transition:none;}}
+
+/* ── Interaction patterns (added 17-11-2026 from the app's Bunkering page) ──
+   Plain classes. In the app, styles/app.css maps Streamlit's own widgets (radio, segmented control,
+   secondary button) onto the same look; these classes are what a non-Streamlit page uses. */
+.no-motion,.no-motion *{animation:none!important;transition:none!important;}
+/* Sidebar: quiet page list, feed status, footer */
+.bb-nav{display:grid;gap:2px;}
+.bb-nav-item{position:relative;display:block;padding:.55rem .8rem .55rem 1.1rem;border-radius:var(--radius-control);border:1px solid transparent;font-family:var(--font-body);font-size:.95rem;color:var(--muted);text-decoration:none;cursor:pointer;}
+.bb-nav-item:hover{background:var(--glass);color:var(--text);}
+.bb-nav-item.is-active,.bb-nav-item[aria-current="page"]{background:var(--glass);border-color:var(--bdr);color:var(--text);font-weight:500;}
+.bb-nav-item.is-active::before,.bb-nav-item[aria-current="page"]::before{content:"";position:absolute;left:.45rem;top:28%;bottom:28%;width:3px;border-radius:var(--radius-chip);background:var(--amber);}
+.bb-nav-item:focus-visible{outline:var(--border-focus) solid var(--focus);outline-offset:1px;}
+.side-label{font-family:var(--font-mono);font-weight:500;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:.25rem 0 .5rem;}
+.feed-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;font-family:var(--font-mono);font-size:.8rem;color:var(--text);padding:.32rem 0;}
+.feed-name{display:inline-flex;align-items:center;gap:.55rem;}
+.feed-name::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.feed-state{color:var(--muted);}
+.feed-row.is-live .feed-name::before{background:var(--green);} .feed-row.is-live .feed-state{color:var(--green);}
+.feed-row.is-stale .feed-name::before,.feed-row.is-error .feed-name::before{background:var(--red);}
+.feed-row.is-stale .feed-state,.feed-row.is-error .feed-state{color:var(--red);}
+.feed-row.is-on .feed-name::before{background:var(--amber);} .feed-row.is-on .feed-state{color:var(--amber);}
+.side-foot{font-family:var(--font-mono);font-size:.75rem;color:var(--muted);line-height:1.6;}
+/* Secondary button: a quiet glass ghost. Amber stays for the one primary action. */
+.stButton>button.is-ghost,.bb-btn-ghost{background:var(--glass)!important;-webkit-backdrop-filter:blur(var(--blur-glass));backdrop-filter:blur(var(--blur-glass));color:var(--text)!important;border:1px solid var(--bdr)!important;box-shadow:none!important;font-weight:500!important;}
+.stButton>button.is-ghost:hover,.bb-btn-ghost:hover{background:var(--surface2)!important;border-color:var(--muted)!important;opacity:1;}
+/* Segmented control: the step bar and the risk-profile switch */
+.bb-seg{display:inline-flex;}
+.bb-seg button{font-family:var(--font-body);font-weight:500;font-size:.9rem;color:var(--muted);background:var(--glass);-webkit-backdrop-filter:blur(var(--blur-glass));backdrop-filter:blur(var(--blur-glass));border:1px solid var(--bdr);padding:.4rem .95rem;margin-left:-1px;cursor:pointer;white-space:nowrap;}
+.bb-seg button:first-child{border-radius:var(--radius-control) 0 0 var(--radius-control);margin-left:0;}
+.bb-seg button:last-child{border-radius:0 var(--radius-control) var(--radius-control) 0;}
+.bb-seg button:hover{color:var(--text);}
+.bb-seg button[aria-checked="true"]{position:relative;color:var(--amber);border-color:var(--amber-dim);background:linear-gradient(var(--amber-tint),var(--amber-tint)),var(--black);}
+.bb-seg button:focus-visible{outline:var(--border-focus) solid var(--focus);outline-offset:2px;position:relative;}
+/* Scenario steps: heading, sub-line, live note */
+.step-head{font-family:var(--font-head);font-weight:500;font-size:1.35rem;color:var(--text);margin:.5rem 0 .2rem;}
+.step-sub{font-size:.9rem;color:var(--muted);margin-bottom:1rem;line-height:1.5;}
+.live-note{font-family:var(--font-mono);font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:.5rem;margin:.25rem 0 .75rem;}
+.live-note::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);}
+/* Selected option card */
+.rec-card.is-selected,.alt-card.is-selected{border-color:var(--amber)!important;box-shadow:var(--shadow-card),0 0 0 1px var(--amber);}
+/* Score breakdown */
+.detail-card{border-color:var(--amber-dim);}
+.bd-row{padding:.75rem 0;border-top:1px solid var(--bdr);}
+.bd-head{display:flex;align-items:baseline;gap:.75rem;margin-bottom:.45rem;}
+.bd-name{font-family:var(--font-head);font-weight:600;font-size:1rem;color:var(--text);}
+.bd-weight{font-family:var(--font-mono);font-size:.75rem;color:var(--muted);}
+.bd-points{margin-left:auto;font-family:var(--font-mono);font-size:.8rem;color:var(--muted);}
+.bd-points b{color:var(--text);font-weight:600;}
+.bd-note{font-size:.88rem;color:var(--muted);line-height:1.55;margin-top:.45rem;}
+.bd-total{border-top:1px solid var(--bdr);padding-top:.75rem;font-family:var(--font-mono);font-size:.8rem;color:var(--muted);}
+.bd-total b{color:var(--white);font-family:var(--font-head);font-size:1.2rem;margin:0 .2rem;}
+/* Compare */
+.cmp-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:.85rem;}
+.cmp-table th,.cmp-table td{padding:.6rem .5rem;border-bottom:1px solid var(--bdr);text-align:right;color:var(--muted);font-weight:400;}
+.cmp-table th:first-child{text-align:left;color:var(--text);}
+.cmp-table thead th{font-family:var(--font-head);font-size:.9rem;color:var(--text);font-weight:600;vertical-align:bottom;}
+.cmp-table td.is-lead{color:var(--amber);font-weight:600;}
+.cmp-table .cmp-total th,.cmp-table .cmp-total td{border-bottom:none;padding-top:.8rem;}
+.cmp-diff{color:var(--muted);}
+/* What if */
+.wi-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.6rem .9rem;margin-bottom:.4rem;border:1px solid var(--bdr);border-radius:var(--radius-control);background:var(--glass);font-size:.92rem;color:var(--text);}
+.wi-row.is-removed{border-color:var(--red-line);color:var(--muted);}
+.wi-row.is-removed .sig-label{color:var(--red);}
+.wi-score{font-family:var(--font-head);font-weight:700;font-size:1.15rem;color:var(--white);}
+.threshold-line{font-size:.9rem;color:var(--text);line-height:1.55;padding:.45rem 0;border-bottom:1px solid var(--bdr);}
+.bb-range{width:100%;accent-color:var(--amber);}
+/* Route backdrop: the corridor as faded art fixed behind a page, coloured by the scenario's result.
+   z-index -1 inside the .bb-ground stacking context: above the glows, under all content. No text. */
+.route-backdrop{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.45;}
+.route-backdrop svg{width:100%;height:100%;display:block;}
+.bd-arc{fill:none;stroke-width:5;stroke-linecap:round;opacity:.9;}
+.bd-arc.is-short{stroke:var(--red);stroke-dasharray:3 9;opacity:.8;}
+.bd-stop.is-recommended{stop-color:var(--amber);} .bd-stop.is-feasible{stop-color:var(--blue);}
+.bd-stop.is-removed{stop-color:var(--red);} .bd-stop.is-missing{stop-color:var(--blue);}
+.bd-end{stroke-width:2.5;}
+.bd-end.is-recommended{fill:var(--amber);filter:drop-shadow(0 0 22px var(--amber));}
+.bd-end.is-feasible,.bd-end.is-missing{fill:var(--blue);}
+.bd-end.is-removed{fill:var(--black);stroke:var(--red);}
+.bd-reach{fill:var(--black);stroke:var(--red);stroke-width:2.5;}
+/* Small route at the top of a page, in a narrow column: larger SVG text so it renders at 0.75rem or more */
+.route-arc.is-compact .route-port{font-size:26px;}
+.route-arc.is-compact .route-coord{font-size:21px;}
