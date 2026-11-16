@@ -1,0 +1,92 @@
+/* BrokerBrief — app-specific patterns built on the design-system tokens: sidebar nav and feed status,
+   the bunkering stepper, selectable option cards, score breakdown, comparison and what-if.
+   Candidates to fold back into the design system once they settle. */
+
+/* ── Sidebar: quiet page list ──
+   Streamlit 1.67 markup: [role=radiogroup] > div > label[data-testid=stRadioOption] > (hidden input, div > (circle, text)). */
+[data-testid="stSidebar"] [data-testid="stSidebarUserContent"]{padding-top:1.25rem;}
+[data-testid="stSidebar"] [role="radiogroup"]{gap:2px!important;flex-direction:column;}
+[data-testid="stSidebar"] [role="radiogroup"]>div{width:100%;}
+[data-testid="stSidebar"] [data-testid="stRadioOption"]{position:relative;display:flex;width:100%;margin:0!important;padding:.55rem .8rem .55rem 1.1rem!important;border-radius:var(--radius-control);border:1px solid transparent;cursor:pointer;transition:background .15s var(--ease-bb);box-sizing:border-box;}
+[data-testid="stSidebar"] [data-testid="stRadioOption"]>div>div:first-child:not([data-testid="stMarkdownContainer"]){display:none!important;}
+[data-testid="stSidebar"] [data-testid="stRadioOption"] p{font-family:var(--font-body)!important;font-size:.95rem!important;color:var(--muted)!important;}
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:hover{background:var(--glass);}
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:hover p{color:var(--text)!important;}
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:has(input:checked){background:var(--glass);border-color:var(--bdr);}
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:has(input:checked) p{color:var(--text)!important;font-weight:500;}
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:has(input:checked)::before{content:"";position:absolute;left:.45rem;top:28%;bottom:28%;width:3px;border-radius:var(--radius-chip);background:var(--amber);}
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:has(input:focus-visible){outline:var(--border-focus) solid var(--focus);outline-offset:1px;}
+[data-testid="stSidebar"] hr{margin:1.25rem 0!important;}
+.side-label{font-family:var(--font-mono);font-weight:500;font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:.25rem 0 .5rem;}
+.feed-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;font-family:var(--font-mono);font-size:.8rem;color:var(--text);padding:.32rem 0;}
+.feed-name{display:inline-flex;align-items:center;gap:.55rem;}
+.feed-name::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.feed-state{color:var(--muted);}
+.feed-row.is-live .feed-name::before{background:var(--green);} .feed-row.is-live .feed-state{color:var(--green);}
+.feed-row.is-stale .feed-name::before,.feed-row.is-error .feed-name::before{background:var(--red);}
+.feed-row.is-stale .feed-state,.feed-row.is-error .feed-state{color:var(--red);}
+.feed-row.is-on .feed-name::before{background:var(--amber);} .feed-row.is-on .feed-state{color:var(--amber);}
+.side-foot{font-family:var(--font-mono);font-size:.75rem;color:var(--muted);line-height:1.6;}
+/* ── Buttons: amber only for the one primary action; everything else is a quiet ghost ── */
+.stButton button[data-testid="stBaseButton-secondary"],.stButton button[kind="secondary"]{background:var(--glass)!important;-webkit-backdrop-filter:blur(var(--blur-glass));backdrop-filter:blur(var(--blur-glass));border:1px solid var(--bdr)!important;box-shadow:none!important;}
+.stButton button[data-testid="stBaseButton-secondary"] p,.stButton button[kind="secondary"] p{color:var(--text)!important;font-weight:500!important;}
+.stButton button[data-testid="stBaseButton-secondary"]:hover,.stButton button[kind="secondary"]:hover{background:var(--surface2)!important;border-color:var(--muted)!important;opacity:1;}
+/* ── Segmented controls: the step bar and the risk-profile switch (selected = aria-checked) ── */
+[data-testid="stButtonGroup"] button{background:var(--glass)!important;-webkit-backdrop-filter:blur(var(--blur-glass));backdrop-filter:blur(var(--blur-glass));border:1px solid var(--bdr)!important;box-shadow:none!important;}
+[data-testid="stButtonGroup"] button p{color:var(--muted)!important;font-family:var(--font-body)!important;font-weight:500!important;white-space:nowrap;}
+[data-testid="stButtonGroup"] button:hover p{color:var(--text)!important;}
+[data-testid="stButtonGroup"] button[aria-checked="true"]{background:linear-gradient(var(--amber-tint),var(--amber-tint)),var(--black)!important;border-color:var(--amber-dim)!important;}
+[data-testid="stButtonGroup"] button[aria-checked="true"] p{color:var(--amber)!important;}
+[data-testid="stButtonGroup"] button:focus-visible{outline:var(--border-focus) solid var(--focus);outline-offset:2px;}
+/* ── Bunkering: the input column stays in view while the results scroll ── */
+[data-testid="stHorizontalBlock"]:has(.step-head){align-items:flex-start;}
+[data-testid="stColumn"]:has(.step-head){position:sticky;top:4.5rem;}
+/* ── Bunkering: step panel and results ── */
+.step-head{font-family:var(--font-head);font-weight:500;font-size:1.35rem;color:var(--text);margin:.5rem 0 .2rem;}
+.step-sub{font-size:.9rem;color:var(--muted);margin-bottom:1rem;line-height:1.5;}
+.live-note{font-family:var(--font-mono);font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:.5rem;margin:.25rem 0 .75rem;}
+.live-note::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--green);}
+.rec-card.is-selected,.alt-card.is-selected{border-color:var(--amber)!important;box-shadow:var(--shadow-card),0 0 0 1px var(--amber);}
+.rec-card,.alt-card{margin-bottom:.5rem!important;}
+.no-motion,.no-motion *{animation:none!important;transition:none!important;}
+.detail-card{border-color:var(--amber-dim);}
+.bd-row{padding:.75rem 0;border-top:1px solid var(--bdr);}
+.bd-head{display:flex;align-items:baseline;gap:.75rem;margin-bottom:.45rem;}
+.bd-name{font-family:var(--font-head);font-weight:600;font-size:1rem;color:var(--text);}
+.bd-weight{font-family:var(--font-mono);font-size:.75rem;color:var(--muted);}
+.bd-points{margin-left:auto;font-family:var(--font-mono);font-size:.8rem;color:var(--muted);}
+.bd-points b{color:var(--text);font-weight:600;}
+.bd-total{border-top:1px solid var(--bdr);padding-top:.75rem;font-family:var(--font-mono);font-size:.8rem;color:var(--muted);}
+.bd-total b{color:var(--white);font-family:var(--font-head);font-size:1.2rem;margin:0 .2rem;}
+.cmp-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:.85rem;}
+.cmp-table th,.cmp-table td{padding:.6rem .5rem;border-bottom:1px solid var(--bdr);text-align:right;color:var(--muted);font-weight:400;}
+.cmp-table th:first-child{text-align:left;color:var(--text);}
+.cmp-table thead th{font-family:var(--font-head);font-size:.9rem;color:var(--text);font-weight:600;vertical-align:bottom;}
+.cmp-table td.is-lead{color:var(--amber);font-weight:600;}
+.cmp-table .cmp-total th,.cmp-table .cmp-total td{border-bottom:none;padding-top:.8rem;}
+.cmp-diff{color:var(--muted);}
+.wi-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.6rem .9rem;margin-bottom:.4rem;border:1px solid var(--bdr);border-radius:var(--radius-control);background:var(--glass);font-size:.92rem;color:var(--text);}
+.wi-row.is-removed{border-color:var(--red-line);color:var(--muted);}
+.wi-row.is-removed .sig-label{color:var(--red);}
+.wi-score{font-family:var(--font-head);font-weight:700;font-size:1.15rem;color:var(--white);}
+.threshold-line{font-size:.9rem;color:var(--text);line-height:1.55;padding:.45rem 0;border-bottom:1px solid var(--bdr);}
+/* Sidebar: rows span the full width; a little air under the brand */
+[data-testid="stSidebar"] [role="radiogroup"] *:has(>[data-testid="stRadioOption"]){width:100%;}
+[data-testid="stSidebar"] .sidebar-brand{margin-bottom:1rem;}
+/* ── Route backdrop: the corridor as faded art fixed behind the whole page, partly hidden by the cards ──
+   z-index -1 inside the app container's stacking context: above the glows, under all content.
+   Faded to 45% so text that crosses it stays readable. */
+.route-backdrop{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.45;}
+.route-backdrop svg{width:100%;height:100%;display:block;}
+/* The small route at the top, beside the title: larger SVG text so it renders at 0.75rem or more */
+.route-arc.is-compact .route-port{font-size:26px;}
+.route-arc.is-compact .route-coord{font-size:21px;}
+.bd-arc{fill:none;stroke-width:5;stroke-linecap:round;opacity:.9;}
+.bd-arc.is-short{stroke:var(--red);stroke-dasharray:3 9;opacity:.8;}
+.bd-stop.is-recommended{stop-color:var(--amber);} .bd-stop.is-feasible{stop-color:var(--blue);}
+.bd-stop.is-removed{stop-color:var(--red);} .bd-stop.is-missing{stop-color:var(--blue);}
+.bd-end{stroke-width:2.5;}
+.bd-end.is-recommended{fill:var(--amber);filter:drop-shadow(0 0 22px var(--amber));}
+.bd-end.is-feasible,.bd-end.is-missing{fill:var(--blue);}
+.bd-end.is-removed{fill:var(--black);stroke:var(--red);}
+.bd-reach{fill:var(--black);stroke:var(--red);stroke-width:2.5;}
