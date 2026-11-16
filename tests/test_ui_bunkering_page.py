@@ -112,6 +112,15 @@ class BunkeringPage(unittest.TestCase):
         self.assertIn("No VLSFO price for Fujairah", text)
         self.assertIn("DEMO DATA ACTIVE", text)
 
+    def test_a_demo_scenario_clears_typed_prices(self):
+        # The documented demo results rely on the demo prices, so a typed price must not survive a preset.
+        at = go_to_step(bunkering_page(), 3)
+        number(at, "Singapore VLSFO price (USD/MT)").set_value(600.0).run()
+        at = click(at, "Both ports feasible")
+        # Step 3 is still showing, so the field is redrawn at once: back to 0 (not provided), not 600.
+        self.assertEqual(at.session_state["bk"].get("sg_price_VLSFO", 0.0), 0.0)
+        self.assertEqual(number(go_to_step(at, 3), "Singapore VLSFO price (USD/MT)").value, 0.0)
+
     def test_hsfo_without_scrubber_shows_r1_for_every_option(self):
         at = bunkering_page()
         next(s for s in at.selectbox if s.label == "Required fuel grade").set_value("HSFO").run()
@@ -153,7 +162,7 @@ class LiveFetchCaching(unittest.TestCase):
         self.assertEqual(len(at.exception), 0)
         fetch_all.assert_called_once_with(secret)
         self.assertEqual([t.label for t in at.sidebar.text_input], [])        # no key box
-        self.assertFalse(any(b.label.startswith("↺") for b in at.sidebar.button))
+        self.assertNotIn("Refresh live data", [b.label for b in at.sidebar.button])   # no refresh when the key is server-side
         self.assertNotEqual(at.session_state["eia_key"], secret)
         self.assertNotIn(secret, page_text(at))
 

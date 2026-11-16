@@ -195,6 +195,11 @@ def _apply_preset(name: str):
     # data (and its banner) if it isn't loaded yet, replacing any uploaded CSV.
     if not is_sample(st.session_state["df"]).any():
         _load_demo_data()
+    # Typed bunker prices would override the demo prices the documented results rely on.
+    typed = [k for k in st.session_state["bk"] if k.startswith(("sg_price_", "fuj_price_"))]
+    for k in typed:
+        st.session_state["bk"].pop(k)
+        st.session_state.pop(f"bkw_{k}", None)
     _set_bk(PRESETS[name])
     st.session_state.pop("bk_selected", None)
 
@@ -295,7 +300,7 @@ if SERVER_EIA_KEY:
 elif st.session_state["eia_key"] and st.session_state["eia_data"] is None:
     with st.spinner("Fetching EIA data..."):
         st.session_state["eia_data"] = eia_fetch_all(st.session_state["eia_key"])
-with st.spinner("Fetching Portwatch data..."):
+with st.spinner("Fetching PortWatch data..."):
     st.session_state["portwatch_data"] = _live_portwatch()
 
 def _feed_status(result: "dict | None") -> tuple:
@@ -621,7 +626,11 @@ elif page == "Bunkering strategy":
                 + f' · licence: {escape(str(prov.licence))}</div>'
                 for source, prov in market_data["provenance"].items() if prov is not None)
             chips = "".join(_chip_for(source, prov) for source, prov in market_data["provenance"].items())
-            st.markdown(f'<div class="provenance-row">{chips}</div><div style="margin-top:.75rem;">{details}</div>'
+            # PortWatch data drives the waiting times here, and its licence asks for this credit.
+            pw_credit = (f'<div class="field-label" style="margin:.4rem 0 0;">{escape(PORTWATCH_CREDIT)}</div>'
+                         if any(p is not None and "portwatch" in p.source_name.lower()
+                                for p in market_data["provenance"].values()) else "")
+            st.markdown(f'<div class="provenance-row">{chips}</div><div style="margin-top:.75rem;">{details}{pw_credit}</div>'
                         '<div class="info-card-title" style="margin-top:1.25rem;">Assumptions</div>'
                         + "".join(f'<div class="assumption-item">• {escape(a)}</div>' for a in assumptions)
                         + '<div class="data-note" style="margin-top:1.25rem;">No source, no certainty. Missing data lowers confidence but does not remove physically feasible options. The final commercial decision remains with you — BrokerBrief cannot observe supplier relationships, internal budgets, charterparty obligations, or company risk appetite.</div>',
@@ -733,7 +742,7 @@ elif page == "Market intelligence":
         else:
             st.warning("MISSING — no real freight, bunker or congestion rows loaded. Demo data is never shown here.")
         if portwatch_data and portwatch_data.get("success"):
-            st.markdown("**Live Portwatch Congestion Signals**")
+            st.markdown("**Live PortWatch congestion signals**")
             for port, sig in portwatch_data["congestion_signals"].items():
                 if sig == "Unknown":
                     st.markdown(f"- **{port}**: Unknown — {unknown_congestion.get(port, 'No reason recorded.')}")
@@ -850,7 +859,7 @@ elif page == "Live data":
             st.error(f"ERROR — Forecast fetch failed: {fcast.get('error')}")
 
     st.markdown("---")
-    st.markdown("### IMF Portwatch API")
+    st.markdown("### IMF PortWatch API")
     if portwatch_data and portwatch_data.get("success"):
         st.success(f"CONNECTED — {len(portwatch_data['ports'])} port activity rows fetched")
         reasons = portwatch_data.get("congestion_reasons", {})
@@ -862,6 +871,6 @@ elif page == "Live data":
         st.caption(PORTWATCH_CREDIT)
     else:
         err = portwatch_data.get("error", "Unknown error") if portwatch_data else "Not fetched"
-        st.error(f"ERROR — Portwatch: {err}")
+        st.error(f"ERROR — PortWatch: {err}")
 
     st.markdown('<div class="data-note">On the deployed app, live data is fetched automatically, shared by all visitors and refetched every 3 hours; a failed fetch is retried after 5 minutes. EIA publishes its daily spot prices in a weekly release, so the latest value can be up to about 9 days old; it is marked stale after 10 days. IMF PortWatch publishes in weekly batches about 8–10 days behind.</div>', unsafe_allow_html=True)

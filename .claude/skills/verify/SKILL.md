@@ -27,8 +27,8 @@ The fixtures include cases that are meant to fail. Those must be caught. Report 
 ## 3. Secrets
 
 Check the staged changes (`git diff --cached --name-only` and `git diff --cached`):
-- `.env` and `calibration.yaml` must not be staged;
-- both must be listed in `.gitignore`;
+- `.env`, `calibration.yaml` and `.streamlit/secrets.toml` must not be staged;
+- all three must be listed in `.gitignore`;
 - the staged diff must not contain anything resembling an API key (e.g. strings starting `sk-ant-`, or `ANTHROPIC_API_KEY=` followed by a value).
 
 Report the file and line if you find one, but never print the key itself.
