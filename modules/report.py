@@ -42,15 +42,13 @@ def generate_email(signals: SignalResult, brief: dict) -> str:
 
 def generate_linkedin(signals: SignalResult, brief: dict) -> str:
     today_str = date.today().strftime("%d %B %Y")
-    freight_emoji = {"Up": "📈", "Down": "📉", "Flat": "➡️"}.get(signals.freight_direction, "➡️")
-    bunker_emoji  = {"Up": "🔺", "Down": "🔻", "Flat": "🔹"}.get(signals.bunker_direction, "🔹")
-    cong_emoji    = {"Rising": "⚠️", "Easing": "✅", "Stable": "🔷", "Unknown": "❔"}.get(signals.congestion_direction, "❔")
+    # No emoji (BrokerBrief design system): each direction is printed as a word.
     lines = [
         f"Maritime market signals — {today_str}", "",
         f"Market tone: {signals.market_tone}", "",
-        f"{freight_emoji} Freight: {signals.freight_direction}",
-        f"{bunker_emoji} Bunkers: {signals.bunker_direction}",
-        f"{cong_emoji} Port congestion: {signals.congestion_direction}", "",
+        f"Freight: {signals.freight_direction}",
+        f"Bunkers: {signals.bunker_direction}",
+        f"Port congestion: {signals.congestion_direction}", "",
         brief["headline"], "",
         "Worth watching:", brief["watch_risk"], "",
         "These are directional signals drawn from source-backed data — not predictions. "

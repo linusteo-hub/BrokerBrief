@@ -37,6 +37,16 @@ def click(at, label_start):
     return at
 
 
+def go_to_step(at, n):
+    """The scenario form is in three steps (1 Vessel, 2 Route, 3 Prices); results update live."""
+    at.session_state["bk_step"] = n
+    return at.run()
+
+
+def number(at, label_start):
+    return next(n for n in at.number_input if n.label.startswith(label_start))
+
+
 def page_text(at):
     return " ".join(str(m.value) for m in list(at.markdown) + list(at.caption) + list(at.warning)
                     + list(at.error) + list(at.info) + list(at.success))
@@ -51,28 +61,26 @@ class BunkeringPage(unittest.TestCase):
     def test_defaults_are_the_documented_voyage(self):
         at = bunkering_page()
         self.assertEqual(len(at.exception), 0)
+        self.assertEqual(number(at, "Daily consumption (MT/day)").value, 45.0)       # step 1
+        at = go_to_step(at, 2)
         values = {t.label: t.value for t in at.text_input}
         self.assertEqual(values["Current location / last port"], "South China Sea, ex Zhoushan (in ballast)")
         self.assertEqual(values["Destination / next major port"], "Ras Tanura")
-        numbers = {n.label: n.value for n in at.number_input}
-        self.assertEqual(numbers["ETA to Singapore (days)"], 1.0)
-        self.assertEqual(numbers["ETA to Fujairah (days)"], 11.5)
-        self.assertEqual(numbers["Daily consumption (MT/day)"], 45.0)
+        self.assertEqual(number(at, "ETA to Singapore (days)").value, 1.0)
+        self.assertEqual(number(at, "ETA to Fujairah (days)").value, 11.5)
 
     def test_evaluating_with_no_prices_reads_low_and_says_why(self):
-        at = click(bunkering_page(), "⚓")
+        at = bunkering_page()                                  # results are live: no button to press
         self.assertEqual(len(at.exception), 0)
         text = page_text(at)
         self.assertIn("cannot weigh cost", text)
-        self.assertIn("59% <span", text)                      # headline
-        self.assertIn("(Low)", text)
-        self.assertIn("⚠ Capped at Low (would be", text)       # the strip names the level it capped at
+        self.assertIn("Confidence Low, 59%", text)             # the confidence ring's label
+        self.assertIn("Capped at Low (would be", text)         # the strip names the level it capped at
         self.assertNotIn("Capped at Medium", text)
 
     def test_one_typed_price_caps_at_medium_only_if_the_cap_bites(self):
-        at = bunkering_page()
-        next(n for n in at.number_input if n.label == "Singapore VLSFO price (USD/MT)").set_value(600.0).run()
-        at = click(at, "⚓")
+        at = go_to_step(bunkering_page(), 3)
+        number(at, "Singapore VLSFO price (USD/MT)").set_value(600.0).run()
         text = page_text(at)
         self.assertIn("No VLSFO price for Fujairah", text)
         self.assertNotIn("Capped at Low", text)
@@ -80,26 +88,25 @@ class BunkeringPage(unittest.TestCase):
         self.assertIn("A cap applies, but the score was already below it.", text)
 
     def test_a_price_typed_for_one_grade_is_not_used_for_another(self):
-        at = bunkering_page()
-        next(n for n in at.number_input if n.label == "Singapore VLSFO price (USD/MT)").set_value(600.0).run()
-        next(n for n in at.number_input if n.label == "Fujairah VLSFO price (USD/MT)").set_value(590.0).run()
+        at = go_to_step(bunkering_page(), 3)
+        number(at, "Singapore VLSFO price (USD/MT)").set_value(600.0).run()
+        number(at, "Fujairah VLSFO price (USD/MT)").set_value(590.0).run()
+        at = go_to_step(at, 1)
         next(s for s in at.selectbox if s.label == "Required fuel grade").set_value("MGO").run()
-        labels = {n.label: n.value for n in at.number_input}
-        self.assertEqual(labels["Singapore MGO price (USD/MT)"], 0.0)
-        at = click(at, "⚓")
+        at = go_to_step(at, 3)
+        self.assertEqual(number(at, "Singapore MGO price (USD/MT)").value, 0.0)
         text = page_text(at)
         self.assertIn("No MGO price for any port", text)
         self.assertNotIn("$600", text)
 
     def test_data_sources_show_source_date_and_licence(self):
-        at = click(click(bunkering_page(), "Scenario 1"), "⚓")
+        at = click(bunkering_page(), "Both ports feasible")
         text = page_text(at)
         self.assertIn("licence: SAMPLE — not real data", text)
         self.assertRegex(text, r"as of \d{2}-\d{2}-\d{4}")
 
     def test_demo_scenario_three_reads_medium(self):
-        at = click(bunkering_page(), "Scenario 3")
-        at = click(at, "⚓")
+        at = click(bunkering_page(), "Fujairah price missing")
         self.assertEqual(len(at.exception), 0)
         text = page_text(at)
         self.assertIn("No VLSFO price for Fujairah", text)
@@ -108,7 +115,6 @@ class BunkeringPage(unittest.TestCase):
     def test_hsfo_without_scrubber_shows_r1_for_every_option(self):
         at = bunkering_page()
         next(s for s in at.selectbox if s.label == "Required fuel grade").set_value("HSFO").run()
-        at = click(at, "⚓")
         self.assertEqual(len(at.exception), 0)
         text = page_text(at)
         self.assertIn("regulation 14.1", text)
@@ -169,7 +175,7 @@ class MarketIntelligencePage(unittest.TestCase):
             at.session_state["df"] = pd.DataFrame(rows, columns=REQUIRED_COLUMNS)
             at.session_state["data_source"] = "csv"
             radio = at.sidebar.radio[0]
-            radio.set_value(next(o for o in radio.options if "Market Intelligence" in o)).run()
+            radio.set_value(next(o for o in radio.options if "Market intelligence" in o)).run()
         self.assertEqual(len(at.exception), 0)
         self.assertGreaterEqual(len(at.dataframe), 1)
 

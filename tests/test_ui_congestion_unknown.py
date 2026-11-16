@@ -7,8 +7,8 @@ PortWatch patched (no network).
 """
 
 import unittest
-from pathlib import Path
 from datetime import datetime, timezone
+from pathlib import Path
 from unittest import mock
 
 from streamlit.testing.v1 import AppTest
@@ -16,6 +16,7 @@ from streamlit.testing.v1 import AppTest
 from modules import portwatch
 from modules.provenance import stamp
 
+APP = Path(__file__).resolve().parent.parent / "app.py"
 REASON = "Only 1 day of PortWatch data for Fujairah in the last 14 days; at least 2 are needed to compare."
 FAKE = {
     "success": True, "ports": [], "source_name": "IMF Portwatch", "source_url": "https://portwatch.imf.org",
@@ -27,7 +28,8 @@ FAKE = {
 
 def open_page(name):
     with mock.patch.object(portwatch, "fetch_port_activity", return_value=FAKE):
-        at = AppTest.from_file(str(Path(__file__).resolve().parent.parent / "app.py"), default_timeout=60).run()
+        # Absolute path: newer Streamlit resolves a relative path against this test file, not the repo root.
+        at = AppTest.from_file(str(APP), default_timeout=60).run()
         radio = at.sidebar.radio[0]
         radio.set_value(next(o for o in radio.options if name in o)).run()
     return at
@@ -39,7 +41,7 @@ def texts(at):
 
 class UnknownCongestionShownTests(unittest.TestCase):
     def test_market_intelligence_shows_unknown_with_reason(self):
-        at = open_page("Market Intelligence")
+        at = open_page("Market intelligence")
         self.assertEqual(len(at.exception), 0)
         shown = texts(at)
         self.assertIn(f"- **Fujairah**: Unknown — {REASON}", shown)
@@ -48,9 +50,9 @@ class UnknownCongestionShownTests(unittest.TestCase):
         self.assertIn(portwatch.PORTWATCH_CREDIT, shown)   # IMF credit kept alongside Unknown handling
 
     def test_live_data_shows_unknown_with_reason(self):
-        at = open_page("Live Data")
+        at = open_page("Live data")
         self.assertEqual(len(at.exception), 0)
-        self.assertIn(f"⚪ **Fujairah**: Unknown — {REASON}", texts(at))
+        self.assertIn(f"- **Fujairah**: Unknown — {REASON}", texts(at))
         self.assertIn(portwatch.PORTWATCH_CREDIT, texts(at))
 
 
