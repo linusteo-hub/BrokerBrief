@@ -340,7 +340,7 @@ elif page == "Bunkering strategy":
     pcols = st.columns(len(PRESETS))
     for col, name in zip(pcols, PRESETS):
         with col:
-            st.button(name, key=f"preset_{name}", on_click=_apply_preset, args=(name,), use_container_width=True)
+            st.button(name, key=f"preset_{name}", on_click=_apply_preset, args=(name,), width="stretch")
 
     left, right = st.columns([5, 7], gap="large")
 
@@ -375,10 +375,10 @@ elif page == "Bunkering strategy":
         back, nxt = st.columns(2)
         with back:
             if step > 1:
-                st.button("Back", key="step_back", on_click=_goto_step, args=(step - 1,), use_container_width=True)
+                st.button("Back", key="step_back", on_click=_goto_step, args=(step - 1,), width="stretch")
         with nxt:
             if step < 3:
-                st.button("Next", key="step_next", type="primary", on_click=_goto_step, args=(step + 1,), use_container_width=True)
+                st.button("Next", key="step_next", type="primary", on_click=_goto_step, args=(step + 1,), width="stretch")
         st.markdown('<div class="live-note">Results on the right update as you type.</div>', unsafe_allow_html=True)
 
     # ── Right: live results ───────────────────────────────────────────────────
@@ -517,7 +517,7 @@ elif page == "Bunkering strategy":
                         "Schedule Risk": bd.get("schedule_risk", {}).get("score", "–"),
                         "Composite": o.score,
                     })
-                st.dataframe(pd.DataFrame(rows).set_index("Rank"), use_container_width=True)
+                st.dataframe(pd.DataFrame(rows).set_index("Rank"), width="stretch")
 
 
 elif page == "Market intelligence":
@@ -600,7 +600,7 @@ elif page == "Market intelligence":
             styled = (table_df.style.applymap(_colour_dir, subset=["Direction"])
                       .format({"Pct Change": "{:+.2f}%", "Confidence": "{:.0%}"})
                       .hide(axis="index"))
-            st.dataframe(styled, use_container_width=True, height=420)
+            st.dataframe(styled, width="stretch", height=420)
         else:
             st.warning("MISSING — no real freight, bunker or congestion rows loaded. Demo data is never shown here.")
         if portwatch_data and portwatch_data.get("success"):
@@ -677,7 +677,7 @@ elif page == "Data input":
 
     st.markdown("---")
     st.markdown("**Data Preview**")
-    st.dataframe(st.session_state["df"], use_container_width=True)
+    st.dataframe(st.session_state["df"], width="stretch")
 
     st.markdown("**Validation Report**")
     if st.session_state["df"].empty:
@@ -713,7 +713,7 @@ elif page == "Live data":
             st.error(f"ERROR — Spot fetch failed: {spot.get('error')}")
         if fcast.get("success"):
             st.success(f"CONNECTED — Forecast: ${fcast['nearest_value']:.2f}/bbl for {fcast['nearest_month']}")
-            st.dataframe(pd.DataFrame(fcast["forecast_rows"]), use_container_width=True)
+            st.dataframe(pd.DataFrame(fcast["forecast_rows"]), width="stretch")
         else:
             st.error(f"ERROR — Forecast fetch failed: {fcast.get('error')}")
 
@@ -726,7 +726,7 @@ elif page == "Live data":
             text = f"Unknown — {reasons.get(port, 'No reason recorded.')}" if sig == "Unknown" else sig
             st.markdown(f"- **{port}**: {text}")
         with st.expander("Show raw port data"):
-            st.dataframe(pd.DataFrame(portwatch_data["ports"]), use_container_width=True)
+            st.dataframe(pd.DataFrame(portwatch_data["ports"]), width="stretch")
     else:
         err = portwatch_data.get("error", "Unknown error") if portwatch_data else "Not fetched"
         st.error(f"ERROR — Portwatch: {err}")
