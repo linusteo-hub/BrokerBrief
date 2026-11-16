@@ -167,7 +167,7 @@ class LiveFetchCaching(unittest.TestCase):
         self.assertNotIn(secret, page_text(at))
 
 
-class MarketIntelligencePage(unittest.TestCase):
+class DataInputSignals(unittest.TestCase):
     def test_signal_table_renders_with_real_rows(self):
         import pandas as pd
         from modules.data import REQUIRED_COLUMNS
@@ -184,7 +184,7 @@ class MarketIntelligencePage(unittest.TestCase):
             at.session_state["df"] = pd.DataFrame(rows, columns=REQUIRED_COLUMNS)
             at.session_state["data_source"] = "csv"
             radio = at.sidebar.radio[0]
-            radio.set_value(next(o for o in radio.options if "Market intelligence" in o)).run()
+            radio.set_value("Data input").run()   # the signal table moved here, beside the CSV upload
         self.assertEqual(len(at.exception), 0)
         self.assertGreaterEqual(len(at.dataframe), 1)
 

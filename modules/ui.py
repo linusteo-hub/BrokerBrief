@@ -327,3 +327,92 @@ def route_backdrop(*, port_states: dict, reach_fraction: float | None = None, re
             f'<defs><linearGradient id="bd-grad" gradientUnits="userSpaceOnUse" x1="{sg[0]:.0f}" y1="{sg[1]:.0f}" x2="{fj[0]:.0f}" y2="{fj[1]:.0f}">'
             f'<stop offset="0" class="bd-stop is-{sg_state}"/><stop offset="1" class="bd-stop is-{fj_state}"/></linearGradient></defs>'
             f'{"".join(parts)}</svg></div>')
+
+
+# ── Morning brief (Market intelligence page) ─────────────────────────────────
+# Render the morning brief's payload. Every figure, change and date arrives as a
+# finished display string from modules/morning_brief, so nothing here calculates,
+# rounds or converts. News is headline, publisher, date and link only: feed
+# excerpts can quote licensed figures, so they are never shown.
+
+_DIR_WORD = {"up": "Up", "down": "Down", "flat": "Flat"}
+# Prices are coloured from the buyer's view (a rising price is red). Volumes and
+# counts (bunker sales, transits) get the word only: a colour would imply good or bad.
+_PRICE_DIR_CLASS = {"up": "dir-up", "down": "dir-down", "flat": "dir-flat"}
+
+
+def _tag(item_or_source) -> str:
+    tag = item_or_source.get("source_tag") or item_or_source.get("tag")
+    return f'<span class="mb-tag">[{escape(tag)}]</span>' if tag else ""
+
+
+def brief_header(payload: dict) -> str:
+    notice = payload.get("trial_notice")
+    chip = f'<span class="manual-badge" style="margin:0;">{escape(notice)}</span>' if notice else ""
+    return (f'<div class="mb-head"><div><div class="mb-date">Morning brief · {escape(payload.get("brief_date_display", ""))}</div>'
+            '<div class="mb-meta">Built from free, permitted sources only · every figure carries its source tag</div></div>'
+            f'{chip}</div>')
+
+
+def _status_line(section: dict) -> str:
+    status = section.get("status")
+    if status == "missing":
+        return f'<div class="mb-reason"><span class="missing-badge">MISSING</span>{escape(section.get("reason") or "No reason recorded.")}</div>'
+    if status == "not_covered":
+        return f'<div class="mb-reason"><span class="unknown-badge">NOT COVERED</span>{escape(section.get("reason") or "")}</div>'
+    return ""
+
+
+def brief_figures(items: list, *, prices: bool = False) -> str:
+    """One row per figure: label, value, each comparison in words, as-of date and source tag."""
+    rows = []
+    for it in items:
+        changes = []
+        for ch in it.get("changes") or []:
+            direction = ch.get("direction", "")
+            word = _DIR_WORD.get(direction, direction.capitalize())
+            cls = f'mb-dir {_PRICE_DIR_CLASS.get(direction, "")}' if prices else "mb-dir"
+            amount = "" if direction == "flat" else f'{escape(ch.get("abs_display", ""))} · {escape(ch.get("pct_display", ""))} · '
+            changes.append(f'<div class="mb-change"><span class="{cls}">{escape(word)}</span>{amount}'
+                           f'vs {escape(ch.get("compared_with", ""))} ({escape(ch.get("basis", ""))})</div>')
+        rows.append(f'<div class="mb-fig"><div class="mb-fig-label">{escape(it.get("label", ""))}</div>'
+                    f'<div class="mb-fig-value">{escape(it.get("display", ""))}</div>{"".join(changes)}'
+                    f'<div class="mb-fig-meta">as of {escape(it.get("as_of_display", ""))}{_tag(it)}</div></div>')
+    return "".join(rows)
+
+
+def brief_news(items: list) -> str:
+    """Headline (linked), publisher, wire agency or author when named, date, source tag. No excerpt."""
+    rows = []
+    for it in items:
+        credit = [escape(it.get("publisher", ""))]
+        if it.get("wire_agency"):
+            credit.append(f'via {escape(it["wire_agency"])}')
+        if it.get("author"):
+            credit.append(f'by {escape(it["author"])}')
+        if it.get("published_display"):
+            credit.append(escape(it["published_display"]))
+        rows.append(f'<div class="mb-news"><a href="{escape(it.get("link", ""))}" target="_blank" rel="noopener noreferrer">'
+                    f'{escape(it.get("headline", ""))}</a><div class="mb-news-meta">{" · ".join(credit)}{_tag(it)}</div></div>')
+    return "".join(rows)
+
+
+def brief_section(section: dict, body: str = "") -> str:
+    """A section card: title, cadence, its state (ok / MISSING / NOT COVERED with the reason), then the body."""
+    return (f'<div class="info-card no-motion"><div class="mb-sec-head"><div class="info-card-title">{escape(section.get("title", ""))}</div>'
+            f'<div class="mb-cadence">{escape(section.get("cadence") or "")}</div></div>{_status_line(section)}{body}</div>')
+
+
+def brief_subsection(section: dict, body: str = "") -> str:
+    return f'<div class="mb-sub">{escape(section.get("title", ""))}</div>{_status_line(section)}{body}'
+
+
+def brief_sources(sources: list) -> str:
+    rows = "".join(
+        f'<div class="mb-src"><span class="mb-tag" style="margin:0;">[{escape(s.get("tag", ""))}]</span>'
+        f'<div><b>{escape(s.get("name", ""))}</b> · {escape(s.get("publisher", ""))}<br>'
+        f'Licence: {escape(s.get("licence", ""))}. {escape(s.get("credit", ""))} '
+        f'<a href="{escape(s.get("url", ""))}" target="_blank" rel="noopener noreferrer">Source</a> · '
+        f'<a href="{escape(s.get("terms_url", ""))}" target="_blank" rel="noopener noreferrer">Terms</a></div></div>'
+        for s in sources)
+    return f'<div class="info-card no-motion"><div class="info-card-title">Sources</div>{rows}</div>'

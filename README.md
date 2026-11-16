@@ -118,7 +118,7 @@ BrokerBrief is built on two principles. **No source, no certainty:** every value
 | EIA Short-Term Energy Outlook | Forward Brent forecast. Fetched from the EIA API. |
 | IMF PortWatch | Daily port calls (total, tanker, dry bulk) over 14 days for Singapore, Fujairah, Rotterdam, Houston and Port Hedland. A change of more than ±5% reads as rising or easing. Fetched from PortWatch. |
 | User input or uploaded CSV | Port bunker prices, tagged as user override or manual entry |
-| Built-in demo data | Invented values, labelled "SAMPLE — not real data" everywhere they appear. Loaded only on request (a demo scenario, or the "Load demo data" buttons), and never used by Market Intelligence or the morning brief. |
+| Built-in demo data | Invented values, labelled "SAMPLE — not real data" everywhere they appear. Loaded only on request (a demo scenario, or the "Load demo data" buttons), and never used by Market intelligence or the morning brief. |
 
 When an EIA key is configured on the server (Streamlit secrets or the `EIA_API_KEY` variable), the app fetches EIA and PortWatch data itself, shares each result across visitors for up to three hours, and holds a failed fetch for five minutes before retrying. The key never reaches the browser. Without a server key, a local user can paste one in the sidebar.
 
@@ -139,5 +139,11 @@ Licensed market data or paid sources are never used in the deployed app.
   | 3. Fujairah price missing | 900 MT | Full Singapore ranks first (69.0), ahead of full Fujairah (67.0) | Medium, 79 (85 before the missing-price cap) |
 
 - These results are pinned by `tests/test_demo_mode.py`. The rules, the grade-specific prices, the freshness limits and the caps are covered by `tests/test_decision_rules.py`, and the page itself by `tests/test_ui_bunkering_page.py`. Run `pytest -q` to check every figure above.
-- A Market Intelligence view (crude, port activity and bunker signals) with email, PDF and LinkedIn report formats.
-- **In development:** a daily public morning brief, built from free and redistributable sources only.
+- **Market intelligence** shows the morning brief, built live in the app by the same code and checks as the scheduled brief, with no language model:
+  - Brent and diesel prices (EIA), Singapore bunker sales (MPA), and ship activity (IMF PortWatch), each with its comparisons, date and source tag exactly as the source data gives them;
+  - sale-and-purchase and events headlines from gCaptain, Splash247 and The Maritime Executive, shown as headline, publisher, date and link only;
+  - a section with no verified data is marked missing, or not covered (container freight rates, which no free source may republish), with the reason.
+
+  Shared by every visitor and rebuilt every 3 hours. Covered by `tests/test_ui_market_intelligence.py`.
+- **Data input** takes your own CSV of freight and bunker rows and turns it into a signal table, bunker spreads, and email, PDF and LinkedIn reports.
+- **Built, switched off:** the scheduled daily brief, archived and published to GitHub Pages (Decision Batch 3 switches it on).

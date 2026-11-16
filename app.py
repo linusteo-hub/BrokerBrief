@@ -21,7 +21,9 @@ from modules.brief import generate_brief
 from modules.report import generate_email, generate_linkedin
 from modules.pdf_export import generate_pdf_bytes
 from modules.bunker import compute_bunker_spreads
-from modules.eia import fetch_all as eia_fetch_all
+from modules.eia import fetch_all as eia_fetch_all, _redact
+from modules.morning_brief.payload import fetch_and_build
+from datetime import datetime, timezone
 from modules.portwatch import PORTWATCH_CREDIT, fetch_port_activity
 
 from modules.decision.scenario import (
@@ -117,6 +119,25 @@ def _live_portwatch() -> dict:
     return _live("portwatch", _cached_portwatch, lambda d: d.get("success"))
 
 
+@st.cache_data(ttl=LIVE_TTL_SECONDS, show_spinner=False)
+def _cached_brief(eia_key: str) -> dict:
+    """The morning brief's payload, built by the same fetchers and final gate as the
+    scheduled workflow (modules/morning_brief), with no language model. A rule
+    breach raises inside build_payload, so only a gated payload is ever shown."""
+    try:
+        return {"success": True, "payload": fetch_and_build(eia_api_key=eia_key or None)}
+    except Exception as exc:          # show the reason rather than take the page down
+        message = _redact(f"{type(exc).__name__}: {exc}")
+        return {"success": False, "error": message.replace(eia_key, "<redacted>") if eia_key else message}
+
+
+def _live_brief(eia_key: str) -> dict:
+    def fetch() -> dict:
+        return _cached_brief(eia_key)
+    fetch.clear = _cached_brief.clear
+    return _live("brief", fetch, lambda d: d.get("success"))
+
+
 # ── Session state ─────────────────────────────────────────────────────────────
 _defaults = {
     "df": None, "data_source": "none", "eia_key": "", "eia_data": None,
@@ -148,6 +169,7 @@ def _on_eia_key():
 
 def _refresh_live():
     _cached_portwatch.clear()
+    _cached_brief.clear()
     _recent_failures().clear()
     st.session_state["eia_data"] = None
     st.session_state["portwatch_data"] = None
@@ -656,6 +678,98 @@ elif page == "Bunkering strategy":
 
 
 elif page == "Market intelligence":
+    st.markdown(ui.page_header("What moved overnight?", "Market intelligence · the morning brief, from free and permitted sources"),
+                unsafe_allow_html=True)
+    with st.spinner("Building the morning brief..."):
+        brief_result = _live_brief(SERVER_EIA_KEY or st.session_state["eia_key"])
+    if not brief_result.get("success"):
+        st.error(f"ERROR — The morning brief could not be built: {brief_result.get('error')} "
+                 f"It is retried automatically after {FAILURE_RETRY_SECONDS // 60} minutes.")
+    else:
+        payload = brief_result["payload"]
+        sec = payload["sections"]
+        freight = sec["freight"]
+        subs = freight.get("subsections", {})
+        activity_body = ui.brief_figures(subs.get("activity", {}).get("items") or [])
+        if subs.get("activity", {}).get("items"):
+            activity_body += f'<div class="field-label" style="margin-top:.6rem;">{escape(PORTWATCH_CREDIT)}</div>'
+        freight_body = "".join([
+            ui.brief_subsection(subs["container_rates"]) if "container_rates" in subs else "",
+            ui.brief_subsection(subs["rate_direction"], ui.brief_news(subs["rate_direction"].get("items") or []))
+            if "rate_direction" in subs else "",
+            ui.brief_subsection(subs["activity"], activity_body) if "activity" in subs else "",
+        ])
+        st.markdown(ui.brief_header(payload), unsafe_allow_html=True)
+        col_figs, col_news = st.columns([7, 5], gap="large")
+        with col_figs:
+            st.markdown(
+                ui.brief_section(sec["prices"], ui.brief_figures(sec["prices"].get("items") or [], prices=True))
+                + ui.brief_section(sec["bunker_sales"], ui.brief_figures(sec["bunker_sales"].get("items") or []))
+                + ui.brief_section(freight, freight_body),
+                unsafe_allow_html=True)
+        with col_news:
+            st.markdown(
+                ui.brief_section(sec["sale_and_purchase"], ui.brief_news(sec["sale_and_purchase"].get("items") or []))
+                + ui.brief_section(sec["events"], ui.brief_news(sec["events"].get("items") or []))
+                + ui.brief_sources(payload.get("sources") or []),
+                unsafe_allow_html=True)
+        built = datetime.fromisoformat(payload["generated_at"]).astimezone(timezone.utc)
+        st.markdown(
+            f'<div class="data-note">Built {built.day} {built:%B %Y, %H:%M} UTC and shared by every visitor; rebuilt every '
+            f'{LIVE_TTL_SECONDS // 3600} hours. Every figure is written by code from the source data, with its comparison '
+            'and date as published; no language model is used. News is shown as headline, publisher, date and link only. '
+            'A section with no verified data says so, with the reason, rather than being filled in. No source, no certainty.</div>',
+            unsafe_allow_html=True)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# PAGE: DATA INPUT
+# ════════════════════════════════════════════════════════════════════════════
+elif page == "Data input":
+    st.markdown(ui.page_header("Bring your own data", "Data input · upload a CSV for signals, spreads and reports, or load demo data"), unsafe_allow_html=True)
+
+    col_a, col_b = st.columns([5, 2])
+    with col_a:
+        uploaded = st.file_uploader("Upload market data CSV", type=["csv"],
+                                     help="Must include: " + ", ".join(REQUIRED_COLUMNS))
+    with col_b:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("Load demo data (invented values)", on_click=_load_demo_data, key="demo_page"):
+            st.success("LOADED — Demo data (invented values), used by Bunkering Strategy only.")
+
+    if uploaded is not None:
+        try:
+            uploaded_df = pd.read_csv(uploaded)
+            missing_cols = [c for c in REQUIRED_COLUMNS if c not in uploaded_df.columns]
+            if missing_cols:
+                st.error(f"Missing required columns: {', '.join(missing_cols)}")
+            else:
+                st.session_state["df"] = uploaded_df
+                st.session_state["data_source"] = "uploaded"
+                st.success(f"CSV loaded: {len(uploaded_df)} rows.")
+        except Exception as exc:
+            st.error(f"ERROR — Could not read file: {exc}")
+
+    st.markdown("---")
+    st.markdown("**Data Preview**")
+    st.dataframe(st.session_state["df"], width="stretch")
+
+    st.markdown("**Validation Report**")
+    if st.session_state["df"].empty:
+        st.info("No market rows loaded.")
+    # A column check on zero rows proves nothing, so the checks run only when there are rows.
+    for field in ([] if st.session_state["df"].empty else ["source_name", "source_url", "updated_at", "confidence"]):
+        df_display = st.session_state["df"]
+        if field in df_display.columns:
+            missing_n = df_display[field].isna().sum() + (df_display[field].astype(str).str.strip() == "").sum()
+            if missing_n == 0:
+                st.markdown(f'<div class="pass-note">{ui.sig("Passed")}<code>{field}</code> — all {len(df_display)} rows populated</div>',
+                            unsafe_allow_html=True)
+            else:
+                st.warning(f"MISSING — `{field}`: {missing_n} rows missing or blank")
+        else:
+            st.error(f"MISSING — `{field}` column not found")
+
     # Demo rows are invented: Market Intelligence must never be generated from
     # them, so everything on this page works from real rows only.
     mi_df = real_rows(df)
@@ -689,45 +803,11 @@ elif page == "Market intelligence":
     missing_msg = (f"No real {' or '.join(missing_parts)} data loaded, so no brief is generated. "
                    "Demo data is never used here.")
 
-    st.markdown(ui.page_header("What moved overnight?", "Market intelligence · the evidence behind every decision"), unsafe_allow_html=True)
-
-    tab_brief, tab_signals, tab_bunker, tab_reports = st.tabs(
-        ["Today's brief", "Signal engine", "Bunker spread watch", "Reports"])
-
-    with tab_brief:
-        pills = (ui.stat_pill("Freight", signals.freight_direction if has_freight else "MISSING")
-                 + ui.stat_pill("Bunkers", signals.bunker_direction if has_bunker else "MISSING")
-                 + ui.stat_pill("Congestion", signals.congestion_direction if has_congestion else "MISSING"))
-        if eia_data and eia_data.get("spot", {}).get("success"):
-            spot = eia_data["spot"]
-            pills += ui.stat_pill("Brent crude", f'${spot["current_value"]:.2f}/bbl', direction=spot["direction"])
-        today = date.today()
-        brief_top = ('<div class="brief-card-top"><div class="brief-card-label" style="margin:0;">Morning brief</div>'
-                     f'<div class="brief-card-date">{today.day} {today:%B %Y}</div></div>')
-        if not brief_ready:
-            st.markdown(f'<div class="brief-card bb-sweep">{brief_top}<div class="brief-field">Main headline</div>'
-                        f'<span class="brief-missing">{ui.sig("Missing")}{escape(missing_msg)}</span>'
-                        f'<div class="stat-pill-row">{pills}</div></div>', unsafe_allow_html=True)
-        else:
-            brief = generate_brief(signals)
-            tone_css = {"Bullish": "tone-bullish", "Cautiously Bullish": "tone-cautious",
-                        "Mixed": "tone-mixed", "Bearish": "tone-bearish",
-                        "Neutral": "tone-neutral", "Soft Demand / Mixed": "tone-soft"}.get(signals.market_tone, "tone-mixed")
-            st.markdown(f'<span class="tone-badge {tone_css}">Market tone: {escape(signals.market_tone)}</span>', unsafe_allow_html=True)
-            sources_line = f'<div class="brief-sources">Sources: {escape(" · ".join(brief_sources))}</div>' if brief_sources else ""
-            st.markdown(
-                f'<div class="brief-card bb-sweep">{brief_top}'
-                f'<div class="brief-field">Main headline</div><div class="brief-line bb-line">{escape(brief["headline"])}</div>'
-                f'<div class="stat-pill-row">{pills}</div>'
-                f'<div class="brief-field">Key route to watch</div><div class="brief-card-value">{escape(signals.key_route)}</div>'
-                f'<div class="brief-field">Suggested talking point</div><div class="brief-card-talking">"{escape(brief["talking_point"])}"</div>'
-                f'<div class="brief-card-risk">{ui.sig("Risk")}{escape(brief["risk_note"])}</div>{sources_line}</div>',
-                unsafe_allow_html=True)
-        if portwatch_data and portwatch_data.get("success"):
-            st.caption(PORTWATCH_CREDIT)
-        if unknown_congestion:
-            st.caption("Congestion unknown (not counted in the Congestion pill): "
-                       + " ".join(f"{p}: {r}" for p, r in unknown_congestion.items()))
+    st.markdown("---")
+    st.markdown('<div class="info-card-title">From your data · signals, bunker spreads and reports</div>'
+                '<div class="field-label">These use the real rows in your CSV (demo rows are never used here), '
+                'plus IMF PortWatch congestion.</div>', unsafe_allow_html=True)
+    tab_signals, tab_bunker, tab_reports = st.tabs(["Signal engine", "Bunker spread watch", "Reports"])
 
     with tab_signals:
         if signals.signal_table:
@@ -748,6 +828,9 @@ elif page == "Market intelligence":
                     st.markdown(f"- **{port}**: Unknown — {unknown_congestion.get(port, 'No reason recorded.')}")
                 else:
                     st.markdown(f"- **{port}**: {sig}")
+            if unknown_congestion:
+                st.caption("Congestion unknown (not counted in the congestion direction): "
+                           + " ".join(f"{p}: {r}" for p, r in unknown_congestion.items()))
             st.caption(PORTWATCH_CREDIT)
 
     with tab_bunker:
@@ -784,54 +867,6 @@ elif page == "Market intelligence":
                 linkedin_text = generate_linkedin(signals, brief)
                 st.markdown(f'<div class="report-block">{linkedin_text}</div>', unsafe_allow_html=True)
                 st.download_button("Download .txt", linkedin_text.encode(), f"brokerbrief_linkedin_{date.today()}.txt", "text/plain")
-
-
-# ════════════════════════════════════════════════════════════════════════════
-# PAGE: DATA INPUT
-# ════════════════════════════════════════════════════════════════════════════
-elif page == "Data input":
-    st.markdown(ui.page_header("Bring your own data", "Data input · upload a CSV, or load demo data (invented values)"), unsafe_allow_html=True)
-
-    col_a, col_b = st.columns([3, 1])
-    with col_a:
-        uploaded = st.file_uploader("Upload market data CSV", type=["csv"],
-                                     help="Must include: " + ", ".join(REQUIRED_COLUMNS))
-    with col_b:
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("Load demo data (invented values)", on_click=_load_demo_data, key="demo_page"):
-            st.success("LOADED — Demo data (invented values), used by Bunkering Strategy only.")
-
-    if uploaded is not None:
-        try:
-            uploaded_df = pd.read_csv(uploaded)
-            missing_cols = [c for c in REQUIRED_COLUMNS if c not in uploaded_df.columns]
-            if missing_cols:
-                st.error(f"Missing required columns: {', '.join(missing_cols)}")
-            else:
-                st.session_state["df"] = uploaded_df
-                st.session_state["data_source"] = "uploaded"
-                st.success(f"CSV loaded: {len(uploaded_df)} rows.")
-        except Exception as exc:
-            st.error(f"ERROR — Could not read file: {exc}")
-
-    st.markdown("---")
-    st.markdown("**Data Preview**")
-    st.dataframe(st.session_state["df"], width="stretch")
-
-    st.markdown("**Validation Report**")
-    if st.session_state["df"].empty:
-        st.info("No market rows loaded.")
-    for field in ["source_name", "source_url", "updated_at", "confidence"]:
-        df_display = st.session_state["df"]
-        if field in df_display.columns:
-            missing_n = df_display[field].isna().sum() + (df_display[field].astype(str).str.strip() == "").sum()
-            if missing_n == 0:
-                st.markdown(f'<div class="pass-note">{ui.sig("Passed")}<code>{field}</code> — all {len(df_display)} rows populated</div>',
-                            unsafe_allow_html=True)
-            else:
-                st.warning(f"MISSING — `{field}`: {missing_n} rows missing or blank")
-        else:
-            st.error(f"MISSING — `{field}` column not found")
 
 
 # ════════════════════════════════════════════════════════════════════════════

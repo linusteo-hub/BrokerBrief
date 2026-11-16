@@ -40,8 +40,9 @@ def texts(at):
 
 
 class UnknownCongestionShownTests(unittest.TestCase):
-    def test_market_intelligence_shows_unknown_with_reason(self):
-        at = open_page("Market intelligence")
+    def test_data_input_shows_unknown_with_reason(self):
+        # The congestion list moved from Market intelligence to Data input (beside the signal engine).
+        at = open_page("Data input")
         self.assertEqual(len(at.exception), 0)
         shown = texts(at)
         self.assertIn(f"- **Fujairah**: Unknown — {REASON}", shown)
