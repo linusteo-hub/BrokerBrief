@@ -283,10 +283,10 @@
 .mb-sub{font-family:var(--font-head);font-weight:600;font-size:1rem;color:var(--text);margin:1.1rem 0 .1rem;}
 .mb-reason{font-size:.9rem;color:var(--muted);line-height:1.55;margin:.5rem 0 .25rem;}
 .mb-reason .missing-badge,.mb-reason .unknown-badge{margin:0 .6rem 0 0;}
-.mb-fig{display:grid;grid-template-columns:1fr auto;gap:.2rem 1rem;padding:.8rem 0;border-top:1px solid var(--bdr);}
+.mb-fig{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);gap:.2rem 1rem;padding:.8rem 0;border-top:1px solid var(--bdr);}
 .mb-fig:first-of-type{border-top:none;}
 .mb-fig-label{font-size:.95rem;color:var(--text);line-height:1.4;}
-.mb-fig-value{font-family:var(--font-mono);font-weight:600;font-size:1.05rem;color:var(--white);text-align:right;white-space:nowrap;}
+.mb-fig-value{font-family:var(--font-mono);font-weight:600;font-size:1.05rem;color:var(--white);text-align:right;max-width:13rem;overflow-wrap:anywhere;}
 .mb-change{grid-column:1 / -1;font-family:var(--font-mono);font-size:.8rem;color:var(--muted);line-height:1.6;}
 .mb-change .mb-dir{font-weight:600;color:var(--text);margin-right:.35rem;}
 .mb-fig-meta{grid-column:1 / -1;font-family:var(--font-mono);font-size:.75rem;color:var(--muted);}
