@@ -1,0 +1,16 @@
+{
+  "description": "A chart point outside its figure's plausible range (chart range re-check).",
+  "check": "brief",
+  "payload": "payload/from_fixtures.json",
+  "brief": "validator/brief_ok.md",
+  "payload_edits": [
+    [
+      "sections.prices.items.0.series.points.0.value",
+      999.0
+    ]
+  ],
+  "expect": "fail",
+  "expect_codes": [
+    "chart_out_of_range"
+  ]
+}

@@ -391,42 +391,71 @@ def _chart_label(series: dict, name: str) -> str:
             f'latest {pts[-1]["display"]}')
 
 
-def line_chart(series: dict, name: str = "") -> str:
-    """One series as a line with a soft area under it. Its scale spans the series' own low to high."""
-    pts = series["points"]
+def _points(series) -> list:
+    """The series' points if every one can be drawn (a value and both display strings), else []."""
+    pts = (series or {}).get("points") or []
+    ok = all(isinstance(p.get("value"), (int, float)) and isinstance(p.get("display"), str)
+             and isinstance(p.get("date_display"), str) for p in pts)
+    return pts if ok and len(pts) >= 2 else []
+
+
+def _tip(bold: str, rest: str) -> str:
+    # aria-hidden: screen readers get the chart's aria-label (or the sr-only headline) instead.
+    return f'<span class="ch-tip" aria-hidden="true"><b>{bold}</b>{rest}</span>'
+
+
+def line_chart(series: dict, name: str = "", uid: str = "") -> str:
+    """One series as a line with a soft area under it, points placed by date (gaps such as
+    weekends and holidays stay visible). Its scale spans the series' own low to high."""
+    from datetime import date
+    pts = _points(series)
+    if not pts:
+        return ""
     values = [p["value"] for p in pts]
     lo, hi = min(values), max(values)
     pad = (hi - lo) * 0.12 or abs(hi) * 0.05 or 1.0
     lo, hi = lo - pad, hi + pad
-    n = len(pts)
-    xs = [(i / (n - 1)) * 100 for i in range(n)]
+    try:
+        days = [date.fromisoformat(p["date"]) for p in pts]
+        span = (days[-1] - days[0]).days
+        xs = [(d - days[0]).days / span * 100 for d in days] if span > 0 else None
+    except (KeyError, TypeError, ValueError):
+        xs = None
+    if xs is None:
+        xs = [i / (len(pts) - 1) * 100 for i in range(len(pts))]
     ys = [(1 - (v - lo) / (hi - lo)) * 100 for v in values]
     line = " ".join(f'{"M" if i == 0 else "L"}{x:.2f},{y:.2f}' for i, (x, y) in enumerate(zip(xs, ys)))
     area = f"{line} L100,100 L0,100 Z"
-    band = 100 / n
+    # Each point's hit band runs halfway to its neighbours.
+    edges = [0.0] + [(a + b) / 2 for a, b in zip(xs, xs[1:])] + [100.0]
     hits = "".join(
-        f'<div class="ch-pt{_edge(x)}" style="left:{max(0.0, x - band / 2):.2f}%;width:{band:.2f}%;--y:{y:.2f}%">'
-        f'<i class="ch-dot"></i><span class="ch-tip"><b>{escape(p["display"])}</b>{escape(p["date_display"])}</span></div>'
-        for x, y, p in zip(xs, ys, pts))
-    top = max(pts, key=lambda p: p["value"])
-    bottom = min(pts, key=lambda p: p["value"])
+        f'<div class="ch-pt{_edge(x)}" style="left:{edges[i]:.2f}%;width:{edges[i + 1] - edges[i]:.2f}%;'
+        f'--x:{(x - edges[i]) / max(edges[i + 1] - edges[i], 1e-9) * 100:.2f}%;--y:{y:.2f}%">'
+        f'<i class="ch-dot"></i>{_tip(escape(p["display"]), escape(p["date_display"]))}</div>'
+        for i, (x, y, p) in enumerate(zip(xs, ys, pts)))
+    i_top, i_bottom = values.index(max(values)), values.index(min(values))
+    scale = (f'<span class="ch-mark" style="top:{ys[i_top]:.2f}%">{escape(pts[i_top]["display"])}</span>'
+             f'<span class="ch-mark ch-mark-low" style="top:{ys[i_bottom]:.2f}%">{escape(pts[i_bottom]["display"])}</span>')
+    grad = "ch-fade-" + re.sub(r"[^A-Za-z0-9_-]", "", uid or str(abs(hash(line)) % 10**8))
     return (f'<div class="ch ch-line" role="img" aria-label="{escape(_chart_label(series, name))}">'
-            f'<div class="ch-scale"><span>{escape(top["display"])}</span><span>{escape(bottom["display"])}</span></div>'
             f'<div class="ch-plot"><svg class="ch-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'
-            '<defs><linearGradient id="ch-fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="ch-fade-top"/>'
+            f'<defs><linearGradient id="{grad}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="ch-fade-top"/>'
             '<stop offset="1" class="ch-fade-bottom"/></linearGradient></defs>'
-            f'<path class="ch-area" d="{area}"/><path class="ch-path" d="{line}"/></svg>'
-            f'<i class="ch-last" style="--y:{ys[-1]:.2f}%"></i>{hits}</div>'
+            f'<path class="ch-area" fill="url(#{grad})" d="{area}"/><path class="ch-path" d="{line}"/></svg>'
+            f'<i class="ch-last" style="--y:{ys[-1]:.2f}%"></i>{scale}{hits}</div>'
             f'<div class="ch-axis"><span>{escape(pts[0]["date_display"])}</span><span>{escape(pts[-1]["date_display"])}</span></div></div>')
 
 
 def bar_chart(series: dict, name: str = "", compact: bool = False) -> str:
-    """One bar per point on a zero baseline (a cut baseline would exaggerate the change)."""
-    pts = series["points"]
+    """One bar per point on a zero baseline (a cut baseline would exaggerate the change).
+    Each bar is a full-height column (its hit area stays inside the plot); ::before is the fill."""
+    pts = _points(series)
+    if not pts:
+        return ""
     hi = max(p["value"] for p in pts) or 1.0
     bars = "".join(
         f'<div class="ch-bar{_edge((i + .5) / len(pts) * 100)}" style="--h:{max(p["value"], 0) / hi * 100:.2f}%;--i:{i}">'
-        f'<span class="ch-tip"><b>{escape(p["display"])}</b>{escape(p["date_display"])}</span></div>'
+        f'{_tip(escape(p["display"]), escape(p["date_display"]))}</div>'
         for i, p in enumerate(pts))
     axis = ("" if compact else
             f'<div class="ch-axis"><span>{escape(pts[0]["date_display"])}</span><span>{escape(pts[-1]["date_display"])}</span></div>')
@@ -436,12 +465,15 @@ def bar_chart(series: dict, name: str = "", compact: bool = False) -> str:
 
 def news_timeline(lanes: list, start: str, end: str) -> str:
     """Headlines placed by publication time, one lane per section (the lane names the section, so
-    identity never rests on colour). `lanes` = [(title, items)]; `start`/`end` are ISO times."""
+    identity never rests on colour). `lanes` = [(title, items)] or [(title, items, reason)], the
+    reason shown when a lane has no headlines; `start`/`end` are ISO times."""
     from datetime import datetime, timezone
     t0, t1 = datetime.fromisoformat(start), datetime.fromisoformat(end)
     span = (t1 - t0).total_seconds() or 1.0
     rows = []
-    for title, items in lanes:
+    for lane in lanes:
+        title, items = lane[0], lane[1]
+        reason = lane[2] if len(lane) > 2 else ""
         placed = []                              # (x, row): dots closer than 5% stack into rows
         dots = []
         for it in sorted(items, key=lambda i: str(i.get("published", ""))):
@@ -455,14 +487,14 @@ def news_timeline(lanes: list, start: str, end: str) -> str:
                 row += 1
             placed.append((x, row))
             link = _https(it.get("link"))
-            tip = (f'<span class="ch-tip"><b>{_s(it, "headline")}</b>'
-                   f'{" · ".join(c for c in (_s(it, "publisher"), _s(it, "published_display")) if c)}</span>')
+            tip = _tip(_s(it, "headline"), " · ".join(c for c in (_s(it, "publisher"), _s(it, "published_display")) if c))
             tag = "a" if link else "span"
-            attrs = f' href="{link}" target="_blank" rel="noopener noreferrer"' if link else ""
+            attrs = f' href="{link}" target="_blank" rel="noopener noreferrer"' if link else ' tabindex="0"'
             dots.append(f'<{tag} class="tl-dot{_edge(x)}" style="left:{x:.2f}%;--row:{row}"{attrs}>'
                         f'<span class="sr-only">{_s(it, "headline")}</span>{tip}</{tag}>')
+        empty = f"<em>{escape(reason) if reason else 'no headlines'}</em>"
         rows.append(f'<div class="tl-lane"><div class="tl-name">{escape(title)}</div>'
-                    f'<div class="tl-track" style="--rows:{max((r for _, r in placed), default=0)}">{"".join(dots) or "<em>no headlines</em>"}</div></div>')
+                    f'<div class="tl-track" style="--rows:{max((r for _, r in placed), default=0)}">{"".join(dots) or empty}</div></div>')
     t0, t1 = t0.astimezone(timezone.utc), t1.astimezone(timezone.utc)
     fmt = lambda t: f"{t.day} {t:%b %H:%M}"
     return (f'<div class="tl">{"".join(rows)}'
@@ -486,7 +518,7 @@ def brief_figures(items: list, *, prices: bool = False, chart: str = "") -> str:
                            f'vs {_s(ch, "compared_with")} ({_s(ch, "basis")})</div>')
         graphic = ""
         if chart and it.get("series"):
-            graphic = (line_chart(it["series"], it.get("label", "")) if chart == "line"
+            graphic = (line_chart(it["series"], it.get("label", ""), uid=str(it.get("id", ""))) if chart == "line"
                        else bar_chart(it["series"], it.get("label", ""), compact=bool(rows)))
         elif chart and it.get("series_note"):
             graphic = f'<div class="mb-fig-meta ch-none">No chart: {_s(it, "series_note")}</div>'

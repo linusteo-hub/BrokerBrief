@@ -13,7 +13,7 @@ from datetime import date
 
 import pytest
 
-from modules.morning_brief import bunker_sales
+from modules.morning_brief import bunker_sales, prices
 from modules.morning_brief.figures import fmt_date, make_series, money
 from modules.morning_brief.payload import final_gate
 from tests.fixture_http import FIXTURES
@@ -83,4 +83,27 @@ def test_gate_refuses_a_chart_point_without_display():
     payload = build()
     payload["sections"]["bunker_sales"]["items"][0]["series"]["points"][0]["display"] = ""
     with pytest.raises(ValueError, match="without a value and display"):
+        final_gate(payload)
+
+
+def test_price_chart_window_drops_rows_older_than_nine_weeks():
+    rows = [{"period": f"2026-{m:02d}-{d:02d}", "value": "80"} for m in (7, 8, 9, 10) for d in (1, 15)]
+    figure, problem = prices.build_price_figure(prices.SERIES[0], rows, date(2026, 10, 16))
+    assert problem is None
+    dates = [p["date"] for p in figure["series"]["points"]]
+    assert dates == ["2026-08-15", "2026-09-01", "2026-09-15", "2026-10-01", "2026-10-15"]
+
+
+def test_summed_bunker_series_say_they_are_brokerbrief_sums():
+    by_id = {f["id"]: f for f in build()["sections"]["bunker_sales"]["items"]}
+    assert by_id["sg_bunker_total"]["series"]["label"] == "BrokerBrief sum of MPA's monthly figures"
+    assert by_id["sg_bunker_bio"]["series"]["label"] == "BrokerBrief sum of MPA's monthly figures"
+    assert by_id["sg_bunker_lsfo"]["series"]["label"] == "Monthly sales as published by MPA"
+
+
+def test_gate_refuses_a_one_point_chart():
+    payload = build()
+    series = payload["sections"]["prices"]["items"][0]["series"]
+    series["points"] = series["points"][-1:]
+    with pytest.raises(ValueError, match="fewer than two points"):
         final_gate(payload)

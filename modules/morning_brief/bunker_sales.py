@@ -156,7 +156,10 @@ def build_figures(months: dict, today: date) -> tuple[list, list]:
             if not is_complete(months.get(month)):
                 break
             history.append((month_end(month), round(sum(months[month][t] for t in types), DECIMALS)))
-        chart, chart_note = make_series(history[::-1], fmt, label="Monthly sales as published by MPA",
+        summed = len(types) > 1      # the total and the biofuel figure add MPA's types together
+        chart, chart_note = make_series(history[::-1], fmt,
+                                        label=("BrokerBrief sum of MPA's monthly figures" if summed
+                                               else "Monthly sales as published by MPA"),
                                         date_display=lambda d: d.strftime("%B %Y"),
                                         plausible_range=(low, high))
         figure = make_figure(

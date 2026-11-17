@@ -237,7 +237,7 @@ def test_write_cli_refuses_and_writes_no_brief(tmp_path):
 def test_validate_cli_catches_every_must_fail_case():
     result = run("-m", "modules.morning_brief.validate", "--cases", str(FIXTURES / "validator"))
     assert result.returncode == 0, result.stdout
-    assert "18 of 18 must-fail cases caught" in result.stdout
+    assert "19 of 19 must-fail cases caught" in result.stdout
 
 
 def test_validate_cli_fails_if_a_must_fail_case_slips_through(tmp_path):

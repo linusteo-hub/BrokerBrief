@@ -247,6 +247,37 @@ class TimelineStacking(unittest.TestCase):
         self.assertIn('style="--rows:2"', out)
 
 
+class ChartBuilders(unittest.TestCase):
+    def test_undrawable_series_render_nothing_instead_of_crashing(self):
+        from modules import ui
+        one = {"points": [{"date": "2026-10-06", "date_display": "6 October 2026", "value": 1.0, "display": "1"}]}
+        bad = {"points": [{"date": "2026-10-05", "value": 1.0, "display": "1"},
+                          {"date": "2026-10-06", "date_display": "6 October 2026", "value": 2.0, "display": 2}]}
+        for series in (one, bad, None, {}):
+            self.assertEqual(ui.line_chart(series), "")
+            self.assertEqual(ui.bar_chart(series), "")
+
+    def test_tooltips_are_hidden_from_screen_readers(self):
+        page = html(open_mi(mock.Mock(return_value=copy.deepcopy(PAYLOAD))))
+        self.assertNotIn('<span class="ch-tip">', page)
+        self.assertIn('<span class="ch-tip" aria-hidden="true">', page)
+
+    def test_line_points_are_placed_by_date_and_the_first_sits_at_the_left_edge(self):
+        from modules import ui
+        pts = [{"date": d, "date_display": d, "value": v, "display": str(v)}
+               for d, v in (("2026-10-01", 1.0), ("2026-10-02", 2.0), ("2026-10-09", 3.0))]
+        out = ui.line_chart({"points": pts}, uid="t")
+        self.assertIn("M0.00,", out)
+        self.assertIn(" L12.50,", out)                      # 1 day of 8
+        self.assertIn('id="ch-fade-t"', out)
+
+    def test_an_empty_lane_shows_its_section_reason(self):
+        from modules import ui
+        out = ui.news_timeline([("Events", [], "no events stories met the rules")],
+                               "2026-10-11T09:00:00+00:00", "2026-10-12T12:00:00+00:00")
+        self.assertIn("<em>no events stories met the rules</em>", out)
+
+
 class DataInputValidation(unittest.TestCase):
     def test_no_rows_means_no_passed_checks(self):
         # "PASSED — all 0 rows populated" was shown for every column with nothing loaded.
