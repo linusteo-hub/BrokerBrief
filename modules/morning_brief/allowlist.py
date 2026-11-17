@@ -111,6 +111,7 @@ ALLOWLIST: dict[str, AllowedSource] = {
         id="mpa_port_traffic",
         name="MPA vessel arrivals and calls (data.gov.sg)",
         publisher="Maritime and Port Authority of Singapore",
+        # Two datasets: this is Vessel Calls; each figure also carries its own `dataset_url`.
         url="https://data.gov.sg/datasets/d_48cb38d12697d3463c8cadfb22e6c61d/view",
         terms_url="https://data.gov.sg/open-data-licence",
         licence="Singapore Open Data Licence version 1.0: use, copy, distribute and adapt, "
@@ -232,11 +233,15 @@ def require_allowed_url(url: str, source_id: Optional[str] = None) -> AllowedSou
         if source_id not in ALLOWLIST:
             raise SourceNotAllowed(f"refusing to fetch for {source_id!r}: not on the morning-brief allowlist")
         candidates = [ALLOWLIST[source_id]]
-    for source in candidates:
-        for prefix in source.fetch_urls:
-            # Exact URL, or the prefix followed by a query string only.
-            if url == prefix or url.startswith(prefix + "?"):
-                return source
+    matches = [source for source in candidates
+               # Exact URL, or the prefix followed by a query string only.
+               if any(url == prefix or url.startswith(prefix + "?") for prefix in source.fetch_urls)]
+    if len(matches) > 1:
+        # A shared URL without a named source could be fetched, credited or broken under the wrong one.
+        raise SourceNotAllowed(f"refusing to fetch {url!r}: it belongs to several sources "
+                               f"({', '.join(m.id for m in matches)}); the fetcher must name its source")
+    if matches:
+        return matches[0]
     raise SourceNotAllowed(f"refusing to fetch {url!r}: not an allowlisted URL")
 
 

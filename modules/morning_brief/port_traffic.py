@@ -20,7 +20,9 @@ What is shown and what is not:
 - Gross tonnage is not used.
 - MPA marks the latest month as a preliminary estimate; every figure says so.
 
-Two small requests per run (14 months of arrivals, 14 months x 5 purposes).
+Two small requests per run (14 months of arrivals; up to 200 rows of calls, of
+which 14 months x 5 purposes are used today). A missing comparison month or an
+unreadable row is stated in the figure's notes, never dropped silently.
 """
 
 from datetime import date
@@ -38,7 +40,12 @@ ARRIVALS_RESOURCE = "d_d48c5a038904f6da3c603cd854b6c191"    # Vessel Arrivals (>
 CALLS_RESOURCE = "d_48cb38d12697d3463c8cadfb22e6c61d"       # Vessel Calls (>75 GT), Monthly
 PURPOSES = ("Cargo", "Repairs", "Bunkers", "Supplies", "Others")
 MONTHS = 14
+CALLS_ROW_LIMIT = 200       # 14 months x 5 purposes is 70; asked generously so a new purpose cannot cut months off
 CHART_MONTHS = 13
+DATASET_URLS = {
+    "arrivals": "https://data.gov.sg/datasets/d_d48c5a038904f6da3c603cd854b6c191/view",
+    "calls": "https://data.gov.sg/datasets/d_48cb38d12697d3463c8cadfb22e6c61d/view",
+}
 NOTE = "Vessels over 75 GT, Singapore only. MPA marks the latest month's figures as preliminary estimates."
 
 # (id, label, short label, dataset key, noun, plausible monthly range)
@@ -54,34 +61,38 @@ FIGURES = (
 )
 
 
-def parse_arrivals(records: list) -> dict:
-    """Rows -> {month: count}. A row with a missing or non-numeric value is skipped."""
-    out = {}
+def parse_arrivals(records: list) -> tuple:
+    """Rows -> ({month: count}, rows skipped). A row with a missing or non-numeric value is
+    skipped and counted, so the figure can say so."""
+    out, skipped = {}, 0
     for row in records:
         try:
             month, value = str(row["month"]), int(row["number_of_vessels"])
             month_end(month)
         except (KeyError, TypeError, ValueError):
+            skipped += 1
             continue
         out[month] = value
-    return out
+    return out, skipped
 
 
-def parse_calls(records: list) -> dict:
-    """Rows -> {purpose: {month: count}}."""
+def parse_calls(records: list) -> tuple:
+    """Rows -> ({purpose: {month: count}}, rows skipped)."""
     out: dict[str, dict[str, int]] = {}
+    skipped = 0
     for row in records:
         try:
             month, purpose, value = str(row["month"]), str(row["purpose_type"]), int(row["number_of_vessel_calls"])
             month_end(month)
         except (KeyError, TypeError, ValueError):
+            skipped += 1
             continue
         out.setdefault(purpose, {})[month] = value
-    return out
+    return out, skipped
 
 
 def build_figure(figure_id: str, label: str, short: str, noun: str, low_high: tuple,
-                 by_month: dict, today: date) -> tuple:
+                 by_month: dict, today: date, *, skipped: int = 0, dataset_url: str = "") -> tuple:
     """Return (figure, None) or (None, {"code", "reason"})."""
     source = require_allowed(SOURCE_ID, numeric=True)
     if not by_month:
@@ -95,12 +106,16 @@ def build_figure(figure_id: str, label: str, short: str, noun: str, low_high: tu
     problem = check_range(value, low_high[0], low_high[1], fmt(value))
     if problem:
         return None, {"code": "out_of_range", "reason": problem}
-    changes = []
+    changes, gaps = [], []
     for basis, other in (("previous month", shift_month(latest, -1)),
                          ("same month a year earlier", shift_month(latest, -12))):
         if other in by_month:
             changes.append(make_change(value, by_month[other], fmt, decimals=0,
                                        basis=basis, compared_with=month_display(other)))
+        else:                                   # say why a comparison is absent, never drop it silently
+            gaps.append(f"No {basis} comparison: MPA returned no figure for {month_display(other)}.")
+    notes = " ".join([NOTE] + gaps + ([f"{skipped} unreadable MPA row{'s' if skipped != 1 else ''} skipped."]
+                                       if skipped else []))
     history = []
     for back in range(CHART_MONTHS):          # stops at the first missing month: no silent gap
         month = shift_month(latest, -back)
@@ -111,11 +126,14 @@ def build_figure(figure_id: str, label: str, short: str, noun: str, low_high: tu
                                     date_display=lambda d: d.strftime("%B %Y"), plausible_range=low_high)
     figure = make_figure(figure_id=figure_id, label=label, unit=noun, value=value, fmt=fmt,
                          as_of=month_end(latest), source_id=SOURCE_ID, quality_tier=source.quality_tier,
-                         changes=changes, notes=NOTE, plausible_range=low_high,
+                         changes=changes, notes=notes, plausible_range=low_high,
                          series=chart, series_note=chart_note)
     figure["as_of_display"] = month_display(latest)
     figure["period"] = "month"
     figure["short_label"] = short
+    figure["preliminary"] = True          # MPA marks the latest month as a preliminary estimate
+    if dataset_url:
+        figure["dataset_url"] = dataset_url
     return figure, None
 
 
@@ -142,8 +160,8 @@ def fetch_port_traffic(today: date, get: Callable = guarded_get) -> dict:
                 "excluded": [{"id": f[0], "code": "feed_failed", "reason": error} for f in FIGURES]}
 
     try:
-        arrivals = parse_arrivals(request(ARRIVALS_RESOURCE, MONTHS))
-        calls = parse_calls(request(CALLS_RESOURCE, MONTHS * len(PURPOSES)))
+        arrivals, arrivals_skipped = parse_arrivals(request(ARRIVALS_RESOURCE, MONTHS))
+        calls, calls_skipped = parse_calls(request(CALLS_RESOURCE, CALLS_ROW_LIMIT))
     except SourceNotAllowed:
         raise
     except (KeyError, TypeError, ValueError) as error:
@@ -154,8 +172,11 @@ def fetch_port_traffic(today: date, get: Callable = guarded_get) -> dict:
 
     items, excluded = [], []
     for figure_id, label, short, key, noun, low_high in FIGURES:
-        by_month = arrivals if key == "arrivals" else calls.get(key, {})
-        figure, problem = build_figure(figure_id, label, short, noun, low_high, by_month, today)
+        dataset = "arrivals" if key == "arrivals" else "calls"
+        by_month = arrivals if dataset == "arrivals" else calls.get(key, {})
+        figure, problem = build_figure(figure_id, label, short, noun, low_high, by_month, today,
+                                       skipped=arrivals_skipped if dataset == "arrivals" else calls_skipped,
+                                       dataset_url=DATASET_URLS[dataset])
         if figure:
             items.append(figure)
         else:

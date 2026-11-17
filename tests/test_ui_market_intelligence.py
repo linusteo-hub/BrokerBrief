@@ -67,10 +67,12 @@ class MarketIntelligencePage(unittest.TestCase):
         # Bunker sales in whole tonnes (MT), with short names.
         self.assertIn('<span class="mb-chip-key">1M</span>46,290 MT · 0.97%', page)
         self.assertIn('<div class="mb-stat-value">4,726,390 MT</div>', page)
-        self.assertIn(">All fuels</div>", page)
+        self.assertIn('<span aria-hidden="true">All fuels (sum)</span>', page)
+        self.assertIn('<span class="sr-only">Singapore bunker sales, all fuel types (BrokerBrief sum of MPA&#x27;s types)</span>', page)
+        self.assertIn('<span class="mb-prelim">PRELIMINARY</span>', page)      # MPA's own flag, visible
         # The shared date and source tag are printed once per card.
-        self.assertIn('6 October 2026<span class=mb-tag>[S1]</span></span>', page)
-        self.assertIn('September 2026<span class=mb-tag>[S2]</span></span>', page)
+        self.assertIn('6 October 2026<span class="mb-tag">[S1]</span></span>', page)
+        self.assertIn('September 2026<span class="mb-tag">[S2]</span><span class="mb-prelim">PRELIMINARY</span></span>', page)
 
     def test_not_covered_section_states_its_reason(self):
         page = html(open_mi(mock.Mock(return_value=copy.deepcopy(PAYLOAD))))
@@ -248,9 +250,10 @@ class MarketIntelligenceCharts(unittest.TestCase):
 class PortCalls(unittest.TestCase):
     def test_mpa_port_calls_show_in_freight_with_bars_and_their_source(self):
         page = html(open_mi(mock.Mock(return_value=copy.deepcopy(PAYLOAD))))
-        self.assertIn("Singapore port calls (vessel counts, not rates)", page)
+        self.assertIn("Singapore vessel arrivals and calls (MPA, monthly)", page)
         self.assertIn('<div class="mb-stat-value">3,617 calls</div>', page)
-        self.assertIn(">Calls for bunkers</div>", page)
+        self.assertIn('<span aria-hidden="true">Calls for bunkers</span>', page)
+        self.assertIn('href="https://data.gov.sg/datasets/d_d48c5a038904f6da3c603cd854b6c191/view"', page)  # arrivals
         self.assertIn("MPA vessel arrivals and calls (data.gov.sg)", page)      # listed under Sources
         self.assertEqual(page.count('<div class="ch ch-bars'), 6 + 3)
 

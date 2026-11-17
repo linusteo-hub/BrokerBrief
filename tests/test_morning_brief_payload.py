@@ -106,6 +106,7 @@ def test_missing_feeds_mark_sections_missing_not_fabricated():
 def _empty_results():
     return dict(prices={"items": [], "excluded": [], "error": None},
                 bunker_sales={"items": [], "excluded": [], "error": None},
+                port_traffic={"items": [], "excluded": [], "error": None},
                 activity={"items": [], "excluded": [], "error": None},
                 news={"sections": {"freight": [], "sale_and_purchase": [], "events": []},
                       "counts": {s: {"fetched": 0, "kept": 0, "dropped": {}}

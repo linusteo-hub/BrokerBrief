@@ -65,9 +65,9 @@ FIGURES = (
 )
 # Short names for the page; the full label (with how the figure is made) stays on the figure.
 SHORT_LABELS = {
-    "sg_bunker_total": "All fuels", "sg_bunker_lsfo": "Low sulphur fuel oil",
-    "sg_bunker_mfo": "High sulphur fuel oil", "sg_bunker_lsmgo": "Low sulphur gas oil",
-    "sg_bunker_bio": "Biofuel blends", "sg_bunker_lng": "LNG",
+    "sg_bunker_total": "All fuels (sum)", "sg_bunker_lsfo": "Low sulphur fuel oil",
+    "sg_bunker_mfo": "Marine fuel oil (high sulphur)", "sg_bunker_lsmgo": "Low sulphur marine gas oil",
+    "sg_bunker_bio": "Biofuel blends (sum)", "sg_bunker_lng": "LNG",
 }
 
 CHART_MONTHS = 13               # the latest month and the 12 before it
@@ -159,12 +159,14 @@ def build_figures(months: dict, today: date) -> tuple[list, list]:
         if problem:
             excluded.append({"id": figure_id, "code": "out_of_range", "reason": problem})
             continue
-        changes = []
+        changes, gaps = [], []
         for basis, other in comparisons:
             if is_complete(months.get(other)):
                 previous = round(sum(months[other][t] for t in types), DECIMALS)
                 changes.append(make_change(to_mt(value), to_mt(previous), fmt, decimals=0,
                                            basis=basis, compared_with=month_display(other)))
+            else:                               # say why a comparison is absent, never drop it silently
+                gaps.append(f"No {basis} comparison: MPA's figures for {month_display(other)} are missing or incomplete.")
         # Chart: the latest month and up to 12 before it, complete months only (an
         # incomplete month is a gap in the line, so the chart stops there).
         history = []
@@ -183,10 +185,11 @@ def build_figures(months: dict, today: date) -> tuple[list, list]:
             figure_id=figure_id, label=label, unit=UNIT, value=to_mt(value), fmt=fmt,
             as_of=month_end(latest), source_id=SOURCE_ID, quality_tier=source.quality_tier,
             changes=changes, series=chart, series_note=chart_note,
-            notes=("Monthly total, in tonnes (MPA publishes thousand tonnes). "
-                   "MPA marks the latest month's figures as preliminary estimates."),
+            notes=" ".join(["Monthly total, in tonnes (MPA publishes thousand tonnes). "
+                            "MPA marks the latest month's figures as preliminary estimates."] + gaps),
             plausible_range=(to_mt(low), to_mt(high)))
         figure["short_label"] = SHORT_LABELS[figure_id]
+        figure["preliminary"] = True          # MPA marks the latest month as a preliminary estimate
         figure["as_of_display"] = month_display(latest)     # a month, not a day
         figure["period"] = "month"
         figures.append(figure)

@@ -410,3 +410,5 @@
 .nf-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.55rem .75rem;padding:.65rem 0;}
 .nf-row .nf-track{grid-column:1 / -1;grid-row:2;}
 .nf-axis{display:flex;justify-content:space-between;gap:.5rem;margin-top:.2rem;padding-top:.4rem;border-top:1px solid var(--bdr);font-family:var(--font-mono);font-size:.75rem;color:var(--muted);white-space:nowrap;}
+.mb-prelim{margin-left:.5rem;padding:.1rem .4rem;border:1px solid var(--amber-dim);border-radius:var(--radius-chip);font-size:.75rem;font-weight:600;letter-spacing:.06em;color:var(--amber);}
+.mb-about a{color:var(--blue)!important;}
