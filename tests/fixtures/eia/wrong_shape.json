@@ -1,0 +1,4 @@
+{
+ "_comment": "Valid JSON but wrong shape: no response.data key.",
+ "error": "invalid facet"
+}

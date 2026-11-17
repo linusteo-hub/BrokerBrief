@@ -1,0 +1,16 @@
+{
+ "description": "A source tag that is not in the sources list.",
+ "check": "brief",
+ "payload": "payload/from_fixtures.json",
+ "brief": "validator/brief_ok.md",
+ "brief_replace": [
+  [
+   "USD 125.44/bbl, as of 6 October 2026 [S1]",
+   "USD 125.44/bbl, as of 6 October 2026 [S9]"
+  ]
+ ],
+ "expect": "fail",
+ "expect_codes": [
+  "unknown_source_tag"
+ ]
+}

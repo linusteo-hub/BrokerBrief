@@ -1,0 +1,10 @@
+{
+ "description": "'Brent rose' with no amount is checked against Brent's first change, which was down.",
+ "check": "text",
+ "payload": "payload/from_fixtures.json",
+ "text": "Brent rose on the latest published day.",
+ "expect": "fail",
+ "expect_codes": [
+  "direction_mismatch"
+ ]
+}

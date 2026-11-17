@@ -1,0 +1,45 @@
+{
+ "description": "'1,234.5' matches the payload's '1234.50' after normalising separators and trailing zeros.",
+ "check": "text",
+ "payload": {
+  "brief_date": "2026-11-12",
+  "brief_date_display": "12 November 2026",
+  "sources": [
+   {
+    "tag": "S1",
+    "id": "example",
+    "credit": "Example source",
+    "url": "https://example.org"
+   }
+  ],
+  "sections": {
+   "prices": {
+    "status": "ok",
+    "items": [
+     {
+      "id": "gasoil_example",
+      "label": "Example gasoil price",
+      "display": "USD 1234.50/t",
+      "value": 1234.5,
+      "as_of": "2026-11-11",
+      "as_of_display": "11 November 2026",
+      "source_id": "example",
+      "source_tag": "S1",
+      "changes": [
+       {
+        "basis": "previous day",
+        "compared_with": "10 November 2026",
+        "abs_display": "USD 12.25/t",
+        "pct_display": "1.00%",
+        "previous_display": "USD 1222.25/t",
+        "direction": "up"
+       }
+      ]
+     }
+    ]
+   }
+  }
+ },
+ "text": "Example gasoil was USD 1,234.5/t on 11 November 2026, up USD 12.25/t.",
+ "expect": "pass"
+}

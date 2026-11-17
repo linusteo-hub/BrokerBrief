@@ -1,0 +1,10 @@
+{
+ "description": "Prose saying Brent rose, with the amount of a fall.",
+ "check": "text",
+ "payload": "payload/from_fixtures.json",
+ "text": "Brent rose USD 0.07/bbl on 6 October 2026.",
+ "expect": "fail",
+ "expect_codes": [
+  "direction_mismatch"
+ ]
+}

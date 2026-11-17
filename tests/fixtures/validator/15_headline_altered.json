@@ -1,0 +1,16 @@
+{
+ "description": "Headlines are published verbatim; an edited one is refused.",
+ "check": "brief",
+ "payload": "payload/from_fixtures.json",
+ "brief": "validator/brief_ok.md",
+ "brief_replace": [
+  [
+   "**Tanker war spreads across Gulf**",
+   "**Tanker war spreads across the whole Gulf**"
+  ]
+ ],
+ "expect": "fail",
+ "expect_codes": [
+  "headline_not_in_payload"
+ ]
+}

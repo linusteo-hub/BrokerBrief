@@ -2,7 +2,7 @@
 tests/test_whatif.py
 
 The what-if thresholds must agree with the engine itself. Hand-checked figures
-use the README demo scenario: 45 MT/day, ETA Fujairah 8 days, default reserve
+use the README demo scenario: 45 MT/day, ETA Fujairah 11.5 days, default reserve
 = max(10% of fuel on board, 24h consumption).
 """
 
@@ -27,11 +27,12 @@ class WhatIfTests(unittest.TestCase):
         self.assertEqual([(o.id, o.is_feasible, o.score) for o in options],
                          [(o.id, o.is_feasible, o.score) for o in mine])
 
-    def test_fujairah_fuel_threshold_is_405_mt(self):
-        # 8 days x 45 MT/day + 45 MT reserve (24h consumption beats 10% of 405 MT) = 405 MT.
+    def test_fujairah_fuel_threshold_is_575_mt(self):
+        # 11.5 days x 45 MT/day = 517.5 MT. Above 450 MT on board, 10% of fuel beats 24h
+        # consumption as the reserve, so fuel >= 517.5 + 0.1 x fuel, i.e. fuel >= 575 MT.
         market = _market()
         thresholds = fuel_thresholds(_scenario(280.0), market["congestion_signals"])
-        self.assertEqual(thresholds["FUJ_FULL"], 405.0)
+        self.assertEqual(thresholds["FUJ_FULL"], 575.0)
         self.assertLessEqual(thresholds["SGP_FULL"], 280.0)
 
     def test_fujairah_eta_limit_is_18_days_at_900_mt(self):
@@ -43,7 +44,7 @@ class WhatIfTests(unittest.TestCase):
         market = _market()
         lines = threshold_sentences(_scenario(280.0), market["congestion_signals"],
                                     {"FUJ_FULL": "Full bunker — Fujairah"})
-        self.assertIn("Full bunker — Fujairah: needs at least 405 MT on board (you have 280 MT).", lines)
+        self.assertIn("Full bunker — Fujairah: needs at least 575 MT on board (you have 280 MT).", lines)
 
 
 if __name__ == "__main__":

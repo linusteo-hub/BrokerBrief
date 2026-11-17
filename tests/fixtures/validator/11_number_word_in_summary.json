@@ -1,0 +1,11 @@
+{
+ "description": "A number written in words is a number.",
+ "check": "summary",
+ "payload": "payload/from_fixtures.json",
+ "item_id": "38ec41e21301",
+ "text": "MISC has lined up two more LNG carriers for Petronas.",
+ "expect": "fail",
+ "expect_codes": [
+  "number_word"
+ ]
+}

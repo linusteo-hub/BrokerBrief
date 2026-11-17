@@ -1,0 +1,16 @@
+{
+ "description": "Brent fell on the day; the brief says 'Up'.",
+ "check": "brief",
+ "payload": "payload/from_fixtures.json",
+ "brief": "validator/brief_ok.md",
+ "brief_replace": [
+  [
+   "Down USD 0.07/bbl",
+   "Up USD 0.07/bbl"
+  ]
+ ],
+ "expect": "fail",
+ "expect_codes": [
+  "direction_mismatch"
+ ]
+}

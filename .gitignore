@@ -4,3 +4,5 @@ __pycache__/
 calibration.yaml
 .venv/
 .DS_Store
+# Streamlit secrets (the EIA key for local runs). Never commit.
+.streamlit/secrets.toml

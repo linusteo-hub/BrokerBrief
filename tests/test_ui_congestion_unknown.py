@@ -40,18 +40,21 @@ def texts(at):
 
 
 class UnknownCongestionShownTests(unittest.TestCase):
-    def test_market_intelligence_shows_unknown_with_reason(self):
-        at = open_page("Market intelligence")
+    def test_data_input_shows_unknown_with_reason(self):
+        # The congestion list moved from Market intelligence to Data input (beside the signal engine).
+        at = open_page("Data input")
         self.assertEqual(len(at.exception), 0)
         shown = texts(at)
         self.assertIn(f"- **Fujairah**: Unknown — {REASON}", shown)
         self.assertFalse(any("**Fujairah**: Stable" in t for t in shown))
         self.assertTrue(any(t.startswith("Congestion unknown") and REASON in t for t in shown))
+        self.assertIn(portwatch.PORTWATCH_CREDIT, shown)   # IMF credit kept alongside Unknown handling
 
     def test_live_data_shows_unknown_with_reason(self):
         at = open_page("Live data")
         self.assertEqual(len(at.exception), 0)
         self.assertIn(f"- **Fujairah**: Unknown — {REASON}", texts(at))
+        self.assertIn(portwatch.PORTWATCH_CREDIT, texts(at))
 
 
 if __name__ == "__main__":

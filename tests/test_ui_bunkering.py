@@ -47,7 +47,7 @@ class BunkeringPageTests(unittest.TestCase):
         rec = page.index('class="rec-card')
         self.assertIn("Full bunker — Singapore", page[rec:rec + 600])
         self.assertIn("<b>F1</b>fuel safety reserve not met", page)
-        self.assertIn("Full bunker — Fujairah: needs at least 405 MT on board (you have 280 MT).", page)
+        self.assertIn("Full bunker — Fujairah: needs at least 575 MT on board (you have 280 MT).", page)
 
     def test_step_inputs_survive_moving_between_steps(self):
         self.at.number_input(key="bkw_fuel").set_value(350.0).run()

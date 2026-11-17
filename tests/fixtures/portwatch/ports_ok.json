@@ -1,0 +1,1051 @@
+{
+"objectIdFieldName": "ObjectId",
+"uniqueIdField": {
+"name": "ObjectId",
+"isSystemMaintained": true
+},
+"globalIdFieldName": "",
+"features": [
+{
+"attributes": {
+"date": "2026-10-02",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 83
+}
+},
+{
+"attributes": {
+"date": "2026-10-01",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 91
+}
+},
+{
+"attributes": {
+"date": "2026-09-30",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 97
+}
+},
+{
+"attributes": {
+"date": "2026-09-29",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 82
+}
+},
+{
+"attributes": {
+"date": "2026-09-28",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 85
+}
+},
+{
+"attributes": {
+"date": "2026-09-27",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 79
+}
+},
+{
+"attributes": {
+"date": "2026-09-26",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 63
+}
+},
+{
+"attributes": {
+"date": "2026-09-25",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 85
+}
+},
+{
+"attributes": {
+"date": "2026-09-24",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 78
+}
+},
+{
+"attributes": {
+"date": "2026-09-23",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 96
+}
+},
+{
+"attributes": {
+"date": "2026-09-22",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 101
+}
+},
+{
+"attributes": {
+"date": "2026-09-21",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 101
+}
+},
+{
+"attributes": {
+"date": "2026-09-20",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 85
+}
+},
+{
+"attributes": {
+"date": "2026-09-19",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 65
+}
+},
+{
+"attributes": {
+"date": "2026-09-18",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 79
+}
+},
+{
+"attributes": {
+"date": "2026-09-17",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 89
+}
+},
+{
+"attributes": {
+"date": "2026-09-16",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 80
+}
+},
+{
+"attributes": {
+"date": "2026-09-15",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 87
+}
+},
+{
+"attributes": {
+"date": "2026-09-14",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 93
+}
+},
+{
+"attributes": {
+"date": "2026-09-13",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 86
+}
+},
+{
+"attributes": {
+"date": "2026-09-12",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 67
+}
+},
+{
+"attributes": {
+"date": "2026-09-11",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 76
+}
+},
+{
+"attributes": {
+"date": "2026-09-10",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 91
+}
+},
+{
+"attributes": {
+"date": "2026-09-09",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 91
+}
+},
+{
+"attributes": {
+"date": "2026-09-08",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 83
+}
+},
+{
+"attributes": {
+"date": "2026-09-07",
+"portid": "port1114",
+"portname": "Rotterdam",
+"portcalls": 93
+}
+},
+{
+"attributes": {
+"date": "2026-10-02",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 108
+}
+},
+{
+"attributes": {
+"date": "2026-10-01",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 116
+}
+},
+{
+"attributes": {
+"date": "2026-09-30",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 119
+}
+},
+{
+"attributes": {
+"date": "2026-09-29",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 122
+}
+},
+{
+"attributes": {
+"date": "2026-09-28",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 128
+}
+},
+{
+"attributes": {
+"date": "2026-09-27",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 119
+}
+},
+{
+"attributes": {
+"date": "2026-09-26",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 99
+}
+},
+{
+"attributes": {
+"date": "2026-09-25",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 117
+}
+},
+{
+"attributes": {
+"date": "2026-09-24",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 119
+}
+},
+{
+"attributes": {
+"date": "2026-09-23",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 133
+}
+},
+{
+"attributes": {
+"date": "2026-09-22",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 102
+}
+},
+{
+"attributes": {
+"date": "2026-09-21",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 136
+}
+},
+{
+"attributes": {
+"date": "2026-09-20",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 94
+}
+},
+{
+"attributes": {
+"date": "2026-09-19",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 106
+}
+},
+{
+"attributes": {
+"date": "2026-09-18",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 125
+}
+},
+{
+"attributes": {
+"date": "2026-09-17",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 96
+}
+},
+{
+"attributes": {
+"date": "2026-09-16",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 129
+}
+},
+{
+"attributes": {
+"date": "2026-09-15",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 119
+}
+},
+{
+"attributes": {
+"date": "2026-09-14",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 114
+}
+},
+{
+"attributes": {
+"date": "2026-09-13",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 121
+}
+},
+{
+"attributes": {
+"date": "2026-09-12",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 121
+}
+},
+{
+"attributes": {
+"date": "2026-09-11",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 105
+}
+},
+{
+"attributes": {
+"date": "2026-09-10",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 111
+}
+},
+{
+"attributes": {
+"date": "2026-09-09",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 135
+}
+},
+{
+"attributes": {
+"date": "2026-09-08",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 121
+}
+},
+{
+"attributes": {
+"date": "2026-09-07",
+"portid": "port1201",
+"portname": "Singapore",
+"portcalls": 150
+}
+},
+{
+"attributes": {
+"date": "2026-10-02",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 8
+}
+},
+{
+"attributes": {
+"date": "2026-10-01",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 6
+}
+},
+{
+"attributes": {
+"date": "2026-09-30",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 7
+}
+},
+{
+"attributes": {
+"date": "2026-09-29",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 5
+}
+},
+{
+"attributes": {
+"date": "2026-09-28",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 9
+}
+},
+{
+"attributes": {
+"date": "2026-09-27",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 7
+}
+},
+{
+"attributes": {
+"date": "2026-09-26",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 5
+}
+},
+{
+"attributes": {
+"date": "2026-09-25",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 6
+}
+},
+{
+"attributes": {
+"date": "2026-09-24",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 14
+}
+},
+{
+"attributes": {
+"date": "2026-09-23",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 8
+}
+},
+{
+"attributes": {
+"date": "2026-09-22",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 6
+}
+},
+{
+"attributes": {
+"date": "2026-09-21",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 9
+}
+},
+{
+"attributes": {
+"date": "2026-09-20",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 8
+}
+},
+{
+"attributes": {
+"date": "2026-09-19",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 7
+}
+},
+{
+"attributes": {
+"date": "2026-09-18",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 8
+}
+},
+{
+"attributes": {
+"date": "2026-09-17",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 4
+}
+},
+{
+"attributes": {
+"date": "2026-09-16",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 8
+}
+},
+{
+"attributes": {
+"date": "2026-09-15",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 4
+}
+},
+{
+"attributes": {
+"date": "2026-09-14",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 7
+}
+},
+{
+"attributes": {
+"date": "2026-09-13",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 3
+}
+},
+{
+"attributes": {
+"date": "2026-09-12",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 11
+}
+},
+{
+"attributes": {
+"date": "2026-09-11",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 4
+}
+},
+{
+"attributes": {
+"date": "2026-09-10",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 6
+}
+},
+{
+"attributes": {
+"date": "2026-09-09",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 11
+}
+},
+{
+"attributes": {
+"date": "2026-09-08",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 5
+}
+},
+{
+"attributes": {
+"date": "2026-09-07",
+"portid": "port362",
+"portname": "Fujairah",
+"portcalls": 10
+}
+},
+{
+"attributes": {
+"date": "2026-10-02",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 22
+}
+},
+{
+"attributes": {
+"date": "2026-10-01",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 17
+}
+},
+{
+"attributes": {
+"date": "2026-09-30",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 16
+}
+},
+{
+"attributes": {
+"date": "2026-09-29",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 24
+}
+},
+{
+"attributes": {
+"date": "2026-09-28",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 25
+}
+},
+{
+"attributes": {
+"date": "2026-09-27",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 19
+}
+},
+{
+"attributes": {
+"date": "2026-09-26",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 27
+}
+},
+{
+"attributes": {
+"date": "2026-09-25",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 18
+}
+},
+{
+"attributes": {
+"date": "2026-09-24",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 27
+}
+},
+{
+"attributes": {
+"date": "2026-09-23",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 23
+}
+},
+{
+"attributes": {
+"date": "2026-09-22",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 16
+}
+},
+{
+"attributes": {
+"date": "2026-09-21",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 10
+}
+},
+{
+"attributes": {
+"date": "2026-09-20",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 17
+}
+},
+{
+"attributes": {
+"date": "2026-09-19",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 21
+}
+},
+{
+"attributes": {
+"date": "2026-09-18",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 14
+}
+},
+{
+"attributes": {
+"date": "2026-09-17",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 26
+}
+},
+{
+"attributes": {
+"date": "2026-09-16",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 20
+}
+},
+{
+"attributes": {
+"date": "2026-09-15",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 21
+}
+},
+{
+"attributes": {
+"date": "2026-09-14",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 21
+}
+},
+{
+"attributes": {
+"date": "2026-09-13",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 23
+}
+},
+{
+"attributes": {
+"date": "2026-09-12",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 22
+}
+},
+{
+"attributes": {
+"date": "2026-09-11",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 22
+}
+},
+{
+"attributes": {
+"date": "2026-09-10",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 25
+}
+},
+{
+"attributes": {
+"date": "2026-09-09",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 27
+}
+},
+{
+"attributes": {
+"date": "2026-09-08",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 14
+}
+},
+{
+"attributes": {
+"date": "2026-09-07",
+"portid": "port481",
+"portname": "Houston (US-TX)",
+"portcalls": 14
+}
+},
+{
+"attributes": {
+"date": "2026-10-02",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 9
+}
+},
+{
+"attributes": {
+"date": "2026-10-01",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 8
+}
+},
+{
+"attributes": {
+"date": "2026-09-30",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 9
+}
+},
+{
+"attributes": {
+"date": "2026-09-29",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 7
+}
+},
+{
+"attributes": {
+"date": "2026-09-28",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 11
+}
+},
+{
+"attributes": {
+"date": "2026-09-27",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 6
+}
+},
+{
+"attributes": {
+"date": "2026-09-26",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 10
+}
+},
+{
+"attributes": {
+"date": "2026-09-25",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 10
+}
+},
+{
+"attributes": {
+"date": "2026-09-24",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 12
+}
+},
+{
+"attributes": {
+"date": "2026-09-23",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 8
+}
+},
+{
+"attributes": {
+"date": "2026-09-22",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 8
+}
+},
+{
+"attributes": {
+"date": "2026-09-21",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 9
+}
+},
+{
+"attributes": {
+"date": "2026-09-20",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 12
+}
+},
+{
+"attributes": {
+"date": "2026-09-19",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 10
+}
+},
+{
+"attributes": {
+"date": "2026-09-18",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 8
+}
+},
+{
+"attributes": {
+"date": "2026-09-17",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 10
+}
+},
+{
+"attributes": {
+"date": "2026-09-16",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 9
+}
+},
+{
+"attributes": {
+"date": "2026-09-15",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 10
+}
+},
+{
+"attributes": {
+"date": "2026-09-14",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 7
+}
+},
+{
+"attributes": {
+"date": "2026-09-13",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 10
+}
+},
+{
+"attributes": {
+"date": "2026-09-12",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 11
+}
+},
+{
+"attributes": {
+"date": "2026-09-11",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 7
+}
+},
+{
+"attributes": {
+"date": "2026-09-10",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 11
+}
+},
+{
+"attributes": {
+"date": "2026-09-09",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 12
+}
+},
+{
+"attributes": {
+"date": "2026-09-08",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 11
+}
+},
+{
+"attributes": {
+"date": "2026-09-07",
+"portid": "port955",
+"portname": "Port Hedland",
+"portcalls": 9
+}
+}
+],
+"_comment": "Recorded IMF PortWatch ArcGIS response, 12-10-2026 (field metadata removed). Source: International Monetary Fund, PortWatch, https://portwatch.imf.org"
+}

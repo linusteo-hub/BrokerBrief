@@ -1,0 +1,7 @@
+{
+ "description": "A brief built from good summaries passes every check.",
+ "check": "brief",
+ "payload": "payload/from_fixtures.json",
+ "brief": "validator/brief_ok.md",
+ "expect": "pass"
+}

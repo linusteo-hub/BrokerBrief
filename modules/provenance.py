@@ -33,6 +33,21 @@ class Freshness(str, Enum):
     UNKNOWN = "UNKNOWN"  # as_of is missing/unparseable, or max_age is None
 
 
+def utc_today() -> date:
+    """Today's date in UTC. Use this, never date.today(), which is the machine's
+    local date (on a Singapore laptop it runs 8 hours ahead of UTC)."""
+    return datetime.now(timezone.utc).date()
+
+
+def utc_date(value) -> Optional[date]:
+    """The UTC calendar date of a source timestamp (ISO string, epoch ms,
+    date or datetime), or None if it can't be parsed. Converts to UTC
+    explicitly, so an offset like -04:00 or the machine's time zone never
+    moves a value onto another day."""
+    parsed = parse_as_of(value)
+    return None if parsed is None else parsed.astimezone(timezone.utc).date()
+
+
 def parse_as_of(value) -> Optional[datetime]:
     """
     The only sanctioned way to build the `as_of` field from source data.
@@ -66,6 +81,13 @@ def parse_as_of(value) -> Optional[datetime]:
             return parsed if parsed.tzinfo is not None else parsed.replace(tzinfo=timezone.utc)
         except ValueError:
             pass
+        # Day/month/year, the project's own date convention (12/11/2026 is
+        # 12 November). Month/day/year is never guessed.
+        for fmt in ("%d/%m/%Y", "%d-%m-%Y"):
+            try:
+                return datetime.strptime(text, fmt).replace(tzinfo=timezone.utc)
+            except ValueError:
+                pass
         try:
             year, month = text.split("-")[:2]
             return datetime(int(year), int(month), 1, tzinfo=timezone.utc)
@@ -151,9 +173,11 @@ EIA_FORECAST_MAX_AGE = timedelta(days=35)  # assumes STEO forecast is republishe
 # not checked. EIA forecast currently has no as_of at
 # all (see modules/eia.py), so this max_age is presently
 # inert — freshness() always returns UNKNOWN for it.
-PORTWATCH_MAX_AGE = timedelta(days=10)  # assumes weekly (Tuesday) cadence, per app.py's
-# existing (also unverified) UI caption, plus slack;
-# not checked against PortWatch's own documentation
+# PortWatch publishes weekly batches that lag 8–10 days (observed 12-10-2026,
+# Phase 0 source audit). 14 days allows one late batch; the morning brief's
+# allowlist uses the same figure. At 10 days the newest data was often already
+# "stale" on arrival.
+PORTWATCH_MAX_AGE = timedelta(days=14)
 MANUAL_ENTRY_MAX_AGE = timedelta(hours=48)  # arbitrary placeholder — no analyst refresh SLA
 # exists today; needs an actual policy decision, this
 # is not derived from anything

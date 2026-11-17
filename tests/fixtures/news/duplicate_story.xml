@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-made: the same wire story as special_cases.xml's first item, carried by a second publisher a little later. -->
+<feed xmlns="http://www.w3.org/2005/Atom">
+<title>The Maritime Executive</title>
+<entry>
+  <title><![CDATA[Port Strike Talks Resume on the US Gulf Coast]]></title>
+  <link rel="alternate" href="https://maritime-executive.com/article/test-duplicate" />
+  <author><name>The Maritime Executive</name></author>
+  <summary type="html"><![CDATA[Talks between dockworkers and employers resumed on Monday after a pause.]]></summary>
+  <updated>2026-10-12T10:00:00+00:00</updated>
+</entry>
+</feed>

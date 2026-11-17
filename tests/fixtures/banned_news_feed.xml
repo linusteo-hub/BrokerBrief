@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Deliberately names banned sources, to test that such items are dropped whole (file name starts with banned_ so the licensed-source scan allows it). Text written for tests. -->
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+<title>Splash247</title>
+<item>
+  <title>Dry bulk market wrap</title>
+  <link>https://splash247.com/test-bdi-falls/</link>
+  <dc:creator><![CDATA[Jane Example]]></dc:creator>
+  <pubDate>Mon, 12 Oct 2026 09:00:00 +0000</pubDate>
+  <description><![CDATA[<p>The Baltic Exchange's capesize index slipped as owners struggled for cargoes. The BDI followed it lower.</p>]]></description>
+</item>
+<item>
+  <title>Clarksons says ordering slowed</title>
+  <link>https://splash247.com/test-clarksons-title/</link>
+  <dc:creator><![CDATA[Jane Example]]></dc:creator>
+  <pubDate>Mon, 12 Oct 2026 08:00:00 +0000</pubDate>
+  <description><![CDATA[<p>Contracting slowed across most segments this quarter.</p>]]></description>
+</item>
+</channel>
+</rss>

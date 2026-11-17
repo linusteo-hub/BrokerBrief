@@ -1,0 +1,4 @@
+{
+ "_comment": "EIA-shaped response with no rows (e.g. a series with nothing since start).",
+ "response": {"total": "0", "data": []}
+}

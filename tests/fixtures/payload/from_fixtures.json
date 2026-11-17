@@ -1,0 +1,1096 @@
+{
+  "schema_version": 1,
+  "brief_date": "2026-10-12",
+  "brief_date_display": "12 October 2026",
+  "generated_at": "2026-10-12T12:00:00+00:00",
+  "trial_notice": "Trial — under review",
+  "sources": [
+    {
+      "tag": "S1",
+      "id": "eia_spot",
+      "name": "EIA spot prices",
+      "publisher": "U.S. Energy Information Administration",
+      "url": "https://www.eia.gov/dnav/pet/pet_pri_spt_s1_d.htm",
+      "terms_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "licence": "Public domain (U.S. Government work); credit requested",
+      "credit": "Source: U.S. Energy Information Administration, spot prices",
+      "redistributable": true,
+      "kind": "data"
+    },
+    {
+      "tag": "S2",
+      "id": "mpa_bunker_sales",
+      "name": "MPA bunker sales (data.gov.sg)",
+      "publisher": "Maritime and Port Authority of Singapore",
+      "url": "https://data.gov.sg/datasets/d_4f5abbf4486bf8e52bbed3be56dde562/view",
+      "terms_url": "https://data.gov.sg/open-data-licence",
+      "licence": "Singapore Open Data Licence version 1.0: use, copy, distribute and adapt, commercially or not, with a conspicuous attribution notice and a link to the licence",
+      "credit": "Contains information from Bunker Sales Breakdown, Monthly, accessed from data.gov.sg (Maritime and Port Authority of Singapore), which is made available under the terms of the Singapore Open Data Licence version 1.0, https://data.gov.sg/open-data-licence",
+      "redistributable": true,
+      "kind": "data"
+    },
+    {
+      "tag": "S3",
+      "id": "gcaptain",
+      "name": "gCaptain",
+      "publisher": "gCaptain",
+      "url": "https://gcaptain.com/feed/",
+      "terms_url": "https://gcaptain.com/editorial-standards/",
+      "licence": "No terms of use published; default copyright. Headline, link and own summary only.",
+      "credit": "gCaptain (https://gcaptain.com)",
+      "redistributable": false,
+      "kind": "news"
+    },
+    {
+      "tag": "S4",
+      "id": "imf_portwatch",
+      "name": "IMF PortWatch",
+      "publisher": "International Monetary Fund",
+      "url": "https://portwatch.imf.org",
+      "terms_url": "https://www.imf.org/en/about/copyright-and-terms",
+      "licence": "IMF terms: reuse and publication with credit; commercial reuse and automated bulk download need IMF permission",
+      "credit": "BrokerBrief calculations based on data from International Monetary Fund, PortWatch, https://portwatch.imf.org",
+      "redistributable": true,
+      "kind": "data"
+    },
+    {
+      "tag": "S5",
+      "id": "splash247",
+      "name": "Splash247",
+      "publisher": "Splash Maritime Group",
+      "url": "https://splash247.com/feed/",
+      "terms_url": "https://splash247.com/terms-of-service/",
+      "licence": "Terms pages empty; all rights reserved. Headline, link and own summary only.",
+      "credit": "Splash247 (https://splash247.com)",
+      "redistributable": false,
+      "kind": "news"
+    },
+    {
+      "tag": "S6",
+      "id": "maritime_executive",
+      "name": "The Maritime Executive",
+      "publisher": "The Maritime Executive",
+      "url": "https://maritime-executive.com/articles.rss",
+      "terms_url": "https://maritime-executive.com/privacy-policy",
+      "licence": "No terms page; all rights reserved. Headline, link and own summary only.",
+      "credit": "The Maritime Executive (https://maritime-executive.com)",
+      "redistributable": false,
+      "kind": "news"
+    }
+  ],
+  "sections": {
+    "prices": {
+      "title": "Prices",
+      "status": "ok",
+      "reason": null,
+      "cadence": "latest available (EIA releases weekly)",
+      "counts": {
+        "fetched": 2,
+        "kept": 2,
+        "dropped": {}
+      },
+      "items": [
+        {
+          "id": "brent_spot",
+          "label": "Brent crude oil spot price (FOB Europe)",
+          "unit": "USD/bbl",
+          "value": 125.44,
+          "display": "USD 125.44/bbl",
+          "as_of": "2026-10-06",
+          "as_of_display": "6 October 2026",
+          "changes": [
+            {
+              "basis": "previous published day",
+              "compared_with": "5 October 2026",
+              "previous_value": 125.51,
+              "previous_display": "USD 125.51/bbl",
+              "abs_change": -0.07,
+              "abs_display": "USD 0.07/bbl",
+              "pct_change": -0.06,
+              "pct_display": "0.06%",
+              "direction": "down"
+            },
+            {
+              "basis": "one week earlier",
+              "compared_with": "29 September 2026",
+              "previous_value": 113.96,
+              "previous_display": "USD 113.96/bbl",
+              "abs_change": 11.48,
+              "abs_display": "USD 11.48/bbl",
+              "pct_change": 10.07,
+              "pct_display": "10.07%",
+              "direction": "up"
+            }
+          ],
+          "source_id": "eia_spot",
+          "quality_tier": "LIVE_API",
+          "notes": "",
+          "plausible_range": [
+            10.0,
+            300.0
+          ],
+          "source_tag": "S1"
+        },
+        {
+          "id": "ulsd_nyh",
+          "label": "New York Harbor ultra-low-sulphur diesel spot price",
+          "unit": "USD/gal",
+          "value": 4.713,
+          "display": "USD 4.713/gal",
+          "as_of": "2026-10-06",
+          "as_of_display": "6 October 2026",
+          "changes": [
+            {
+              "basis": "previous published day",
+              "compared_with": "5 October 2026",
+              "previous_value": 4.628,
+              "previous_display": "USD 4.628/gal",
+              "abs_change": 0.085,
+              "abs_display": "USD 0.085/gal",
+              "pct_change": 1.84,
+              "pct_display": "1.84%",
+              "direction": "up"
+            },
+            {
+              "basis": "one week earlier",
+              "compared_with": "29 September 2026",
+              "previous_value": 4.999,
+              "previous_display": "USD 4.999/gal",
+              "abs_change": -0.286,
+              "abs_display": "USD 0.286/gal",
+              "pct_change": -5.72,
+              "pct_display": "5.72%",
+              "direction": "down"
+            }
+          ],
+          "source_id": "eia_spot",
+          "quality_tier": "LIVE_API",
+          "notes": "",
+          "plausible_range": [
+            0.5,
+            10.0
+          ],
+          "source_tag": "S1"
+        }
+      ]
+    },
+    "bunker_sales": {
+      "title": "Singapore bunker sales",
+      "status": "ok",
+      "reason": null,
+      "cadence": "monthly (MPA publishes about three weeks after month end)",
+      "counts": {
+        "fetched": 6,
+        "kept": 6,
+        "dropped": {}
+      },
+      "items": [
+        {
+          "id": "sg_bunker_total",
+          "label": "Singapore bunker sales, all fuel types (BrokerBrief sum of MPA's types)",
+          "unit": "thousand tonnes",
+          "value": 4726.39,
+          "display": "4,726.39 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 4772.68,
+              "previous_display": "4,772.68 thousand tonnes",
+              "abs_change": -46.29,
+              "abs_display": "46.29 thousand tonnes",
+              "pct_change": -0.97,
+              "pct_display": "0.97%",
+              "direction": "down"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 4765.08,
+              "previous_display": "4,765.08 thousand tonnes",
+              "abs_change": -38.69,
+              "abs_display": "38.69 thousand tonnes",
+              "pct_change": -0.81,
+              "pct_display": "0.81%",
+              "direction": "down"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            1000.0,
+            10000.0
+          ],
+          "period": "month",
+          "source_tag": "S2"
+        },
+        {
+          "id": "sg_bunker_lsfo",
+          "label": "Low sulphur fuel oil (MPA type: Low Sulphur Fuel Oil)",
+          "unit": "thousand tonnes",
+          "value": 2218.11,
+          "display": "2,218.11 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 2193.8,
+              "previous_display": "2,193.80 thousand tonnes",
+              "abs_change": 24.31,
+              "abs_display": "24.31 thousand tonnes",
+              "pct_change": 1.11,
+              "pct_display": "1.11%",
+              "direction": "up"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 2350.48,
+              "previous_display": "2,350.48 thousand tonnes",
+              "abs_change": -132.37,
+              "abs_display": "132.37 thousand tonnes",
+              "pct_change": -5.63,
+              "pct_display": "5.63%",
+              "direction": "down"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            0.0,
+            10000.0
+          ],
+          "period": "month",
+          "source_tag": "S2"
+        },
+        {
+          "id": "sg_bunker_mfo",
+          "label": "Marine fuel oil, the high-sulphur grades (MPA type: Marine Fuel Oil)",
+          "unit": "thousand tonnes",
+          "value": 1993.2,
+          "display": "1,993.20 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 2095.18,
+              "previous_display": "2,095.18 thousand tonnes",
+              "abs_change": -101.98,
+              "abs_display": "101.98 thousand tonnes",
+              "pct_change": -4.87,
+              "pct_display": "4.87%",
+              "direction": "down"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 1872.95,
+              "previous_display": "1,872.95 thousand tonnes",
+              "abs_change": 120.25,
+              "abs_display": "120.25 thousand tonnes",
+              "pct_change": 6.42,
+              "pct_display": "6.42%",
+              "direction": "up"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            0.0,
+            10000.0
+          ],
+          "period": "month",
+          "source_tag": "S2"
+        },
+        {
+          "id": "sg_bunker_lsmgo",
+          "label": "Low sulphur marine gas oil (MPA type: Low Sulphur Marine Gas Oil)",
+          "unit": "thousand tonnes",
+          "value": 378.84,
+          "display": "378.84 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 367.73,
+              "previous_display": "367.73 thousand tonnes",
+              "abs_change": 11.11,
+              "abs_display": "11.11 thousand tonnes",
+              "pct_change": 3.02,
+              "pct_display": "3.02%",
+              "direction": "up"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 373.56,
+              "previous_display": "373.56 thousand tonnes",
+              "abs_change": 5.28,
+              "abs_display": "5.28 thousand tonnes",
+              "pct_change": 1.41,
+              "pct_display": "1.41%",
+              "direction": "up"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            0.0,
+            10000.0
+          ],
+          "period": "month",
+          "source_tag": "S2"
+        },
+        {
+          "id": "sg_bunker_bio",
+          "label": "Biofuel blends and B100 (BrokerBrief sum of MPA's bio-blended types and B100)",
+          "unit": "thousand tonnes",
+          "value": 83.21,
+          "display": "83.21 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 57.33,
+              "previous_display": "57.33 thousand tonnes",
+              "abs_change": 25.88,
+              "abs_display": "25.88 thousand tonnes",
+              "pct_change": 45.14,
+              "pct_display": "45.14%",
+              "direction": "up"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 119.33,
+              "previous_display": "119.33 thousand tonnes",
+              "abs_change": -36.12,
+              "abs_display": "36.12 thousand tonnes",
+              "pct_change": -30.27,
+              "pct_display": "30.27%",
+              "direction": "down"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            0.0,
+            10000.0
+          ],
+          "period": "month",
+          "source_tag": "S2"
+        },
+        {
+          "id": "sg_bunker_lng",
+          "label": "LNG (MPA type: LNG)",
+          "unit": "thousand tonnes",
+          "value": 51.51,
+          "display": "51.51 thousand tonnes",
+          "as_of": "2026-09-30",
+          "as_of_display": "September 2026",
+          "changes": [
+            {
+              "basis": "previous month",
+              "compared_with": "August 2026",
+              "previous_value": 58.64,
+              "previous_display": "58.64 thousand tonnes",
+              "abs_change": -7.13,
+              "abs_display": "7.13 thousand tonnes",
+              "pct_change": -12.16,
+              "pct_display": "12.16%",
+              "direction": "down"
+            },
+            {
+              "basis": "same month a year earlier",
+              "compared_with": "September 2025",
+              "previous_value": 48.45,
+              "previous_display": "48.45 thousand tonnes",
+              "abs_change": 3.06,
+              "abs_display": "3.06 thousand tonnes",
+              "pct_change": 6.32,
+              "pct_display": "6.32%",
+              "direction": "up"
+            }
+          ],
+          "source_id": "mpa_bunker_sales",
+          "quality_tier": "LIVE_API",
+          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "plausible_range": [
+            0.0,
+            10000.0
+          ],
+          "period": "month",
+          "source_tag": "S2"
+        }
+      ]
+    },
+    "freight": {
+      "title": "Freight",
+      "status": "ok",
+      "reason": null,
+      "cadence": "weekly",
+      "counts": {
+        "fetched": 13,
+        "kept": 12,
+        "dropped": {
+          "banned_source": 0,
+          "digit_in_freight_headline": 1,
+          "other": 0
+        }
+      },
+      "subsections": {
+        "container_rates": {
+          "title": "Container freight rates",
+          "status": "not_covered",
+          "reason": "No container freight index can be republished: Drewry's terms forbid republishing the WCI, the SCFI has no reuse terms, and the other indices are licensed.",
+          "cadence": "weekly",
+          "counts": null,
+          "items": []
+        },
+        "rate_direction": {
+          "title": "Freight rate direction (from news, no figures)",
+          "status": "ok",
+          "reason": null,
+          "cadence": "weekly",
+          "counts": {
+            "fetched": 2,
+            "kept": 1,
+            "dropped": {
+              "banned_source": 0,
+              "digit_in_freight_headline": 1,
+              "other": 0
+            },
+            "other_detail": {},
+            "wire_headline_only": 0
+          },
+          "items": [
+            {
+              "id": "cfc1c2cab9ac",
+              "headline": "Capesize rates climb on strong Atlantic iron ore demand",
+              "link": "https://gcaptain.com/test-freight-direction/",
+              "source_id": "gcaptain",
+              "publisher": "gCaptain",
+              "author": "Jane Example",
+              "wire_agency": null,
+              "summary_allowed": true,
+              "excerpt": "Rates for the largest bulkers firmed through the week as Brazilian iron ore cargoes increased. Owners were reluctant to fix forward.",
+              "published": "2026-10-11T05:00:00+00:00",
+              "published_display": "11 October 2026",
+              "section": "freight",
+              "segment": "dry_bulk",
+              "also_reported_by": [],
+              "source_tag": "S3"
+            }
+          ]
+        },
+        "activity": {
+          "title": "Ship activity (transits and port calls, not rates)",
+          "status": "ok",
+          "reason": null,
+          "cadence": "weekly",
+          "counts": {
+            "fetched": 11,
+            "kept": 11,
+            "dropped": {}
+          },
+          "items": [
+            {
+              "id": "transits_chokepoint1",
+              "label": "Suez Canal transits, 7 days to 4 October 2026",
+              "unit": "transits",
+              "value": 302.0,
+              "display": "302 transits",
+              "as_of": "2026-10-04",
+              "as_of_display": "4 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 27 September 2026",
+                  "previous_value": 280.0,
+                  "previous_display": "280 transits",
+                  "abs_change": 22.0,
+                  "abs_display": "22 transits",
+                  "pct_change": 7.86,
+                  "pct_display": "7.86%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            },
+            {
+              "id": "transits_chokepoint2",
+              "label": "Panama Canal transits, 7 days to 4 October 2026",
+              "unit": "transits",
+              "value": 190.0,
+              "display": "190 transits",
+              "as_of": "2026-10-04",
+              "as_of_display": "4 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 27 September 2026",
+                  "previous_value": 189.0,
+                  "previous_display": "189 transits",
+                  "abs_change": 1.0,
+                  "abs_display": "1 transit",
+                  "pct_change": 0.53,
+                  "pct_display": "0.53%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            },
+            {
+              "id": "transits_chokepoint4",
+              "label": "Bab el-Mandeb Strait transits, 7 days to 4 October 2026",
+              "unit": "transits",
+              "value": 207.0,
+              "display": "207 transits",
+              "as_of": "2026-10-04",
+              "as_of_display": "4 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 27 September 2026",
+                  "previous_value": 190.0,
+                  "previous_display": "190 transits",
+                  "abs_change": 17.0,
+                  "abs_display": "17 transits",
+                  "pct_change": 8.95,
+                  "pct_display": "8.95%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            },
+            {
+              "id": "transits_chokepoint5",
+              "label": "Strait of Malacca transits, 7 days to 4 October 2026",
+              "unit": "transits",
+              "value": 1584.0,
+              "display": "1,584 transits",
+              "as_of": "2026-10-04",
+              "as_of_display": "4 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 27 September 2026",
+                  "previous_value": 1525.0,
+                  "previous_display": "1,525 transits",
+                  "abs_change": 59.0,
+                  "abs_display": "59 transits",
+                  "pct_change": 3.87,
+                  "pct_display": "3.87%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            },
+            {
+              "id": "transits_chokepoint6",
+              "label": "Strait of Hormuz transits, 7 days to 4 October 2026",
+              "unit": "transits",
+              "value": 19.0,
+              "display": "19 transits",
+              "as_of": "2026-10-04",
+              "as_of_display": "4 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 27 September 2026",
+                  "previous_value": 22.0,
+                  "previous_display": "22 transits",
+                  "abs_change": -3.0,
+                  "abs_display": "3 transits",
+                  "pct_change": -13.64,
+                  "pct_display": "13.64%",
+                  "direction": "down"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            },
+            {
+              "id": "transits_chokepoint7",
+              "label": "Cape of Good Hope transits, 7 days to 4 October 2026",
+              "unit": "transits",
+              "value": 614.0,
+              "display": "614 transits",
+              "as_of": "2026-10-04",
+              "as_of_display": "4 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 27 September 2026",
+                  "previous_value": 617.0,
+                  "previous_display": "617 transits",
+                  "abs_change": -3.0,
+                  "abs_display": "3 transits",
+                  "pct_change": -0.49,
+                  "pct_display": "0.49%",
+                  "direction": "down"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            },
+            {
+              "id": "portcalls_port1201",
+              "label": "Singapore port calls, 7 days to 2 October 2026",
+              "unit": "port calls",
+              "value": 811.0,
+              "display": "811 port calls",
+              "as_of": "2026-10-02",
+              "as_of_display": "2 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 25 September 2026",
+                  "previous_value": 807.0,
+                  "previous_display": "807 port calls",
+                  "abs_change": 4.0,
+                  "abs_display": "4 port calls",
+                  "pct_change": 0.5,
+                  "pct_display": "0.50%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            },
+            {
+              "id": "portcalls_port1114",
+              "label": "Rotterdam port calls, 7 days to 2 October 2026",
+              "unit": "port calls",
+              "value": 580.0,
+              "display": "580 port calls",
+              "as_of": "2026-10-02",
+              "as_of_display": "2 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 25 September 2026",
+                  "previous_value": 611.0,
+                  "previous_display": "611 port calls",
+                  "abs_change": -31.0,
+                  "abs_display": "31 port calls",
+                  "pct_change": -5.07,
+                  "pct_display": "5.07%",
+                  "direction": "down"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            },
+            {
+              "id": "portcalls_port362",
+              "label": "Fujairah port calls, 7 days to 2 October 2026",
+              "unit": "port calls",
+              "value": 47.0,
+              "display": "47 port calls",
+              "as_of": "2026-10-02",
+              "as_of_display": "2 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 25 September 2026",
+                  "previous_value": 58.0,
+                  "previous_display": "58 port calls",
+                  "abs_change": -11.0,
+                  "abs_display": "11 port calls",
+                  "pct_change": -18.97,
+                  "pct_display": "18.97%",
+                  "direction": "down"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            },
+            {
+              "id": "portcalls_port955",
+              "label": "Port Hedland port calls, 7 days to 2 October 2026",
+              "unit": "port calls",
+              "value": 60.0,
+              "display": "60 port calls",
+              "as_of": "2026-10-02",
+              "as_of_display": "2 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 25 September 2026",
+                  "previous_value": 69.0,
+                  "previous_display": "69 port calls",
+                  "abs_change": -9.0,
+                  "abs_display": "9 port calls",
+                  "pct_change": -13.04,
+                  "pct_display": "13.04%",
+                  "direction": "down"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            },
+            {
+              "id": "portcalls_port481",
+              "label": "Houston port calls, 7 days to 2 October 2026",
+              "unit": "port calls",
+              "value": 150.0,
+              "display": "150 port calls",
+              "as_of": "2026-10-02",
+              "as_of_display": "2 October 2026",
+              "changes": [
+                {
+                  "basis": "previous 7 days",
+                  "compared_with": "7 days to 25 September 2026",
+                  "previous_value": 132.0,
+                  "previous_display": "132 port calls",
+                  "abs_change": 18.0,
+                  "abs_display": "18 port calls",
+                  "pct_change": 13.64,
+                  "pct_display": "13.64%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "imf_portwatch",
+              "quality_tier": "LIVE_API",
+              "notes": "Physical activity from AIS ship tracking, not freight rates.",
+              "plausible_range": [
+                0,
+                10000
+              ],
+              "source_tag": "S4"
+            }
+          ]
+        }
+      }
+    },
+    "sale_and_purchase": {
+      "title": "Sale & Purchase",
+      "status": "ok",
+      "reason": null,
+      "cadence": "weekly",
+      "counts": {
+        "fetched": 3,
+        "kept": 3,
+        "dropped": {
+          "banned_source": 0,
+          "digit_in_freight_headline": 0,
+          "other": 0
+        },
+        "other_detail": {},
+        "wire_headline_only": 0
+      },
+      "items": [
+        {
+          "id": "86fc4834bcf6",
+          "headline": "Yangzijiang Maritime adds kamsarmax bulkers to newbuild spree",
+          "link": "https://splash247.com/yangzijiang-maritime-adds-kamsarmax-bulkers-to-newbuild-spree/",
+          "source_id": "splash247",
+          "publisher": "Splash247",
+          "author": "Adis Ajdin",
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item a. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T11:04:34+00:00",
+          "published_display": "12 October 2026",
+          "section": "sale_and_purchase",
+          "segment": "dry_bulk",
+          "also_reported_by": [],
+          "source_tag": "S5"
+        },
+        {
+          "id": "38ec41e21301",
+          "headline": "MISC lines up five more LNG carriers for Petronas",
+          "link": "https://splash247.com/misc-lines-up-five-more-lng-carriers-for-petronas/",
+          "source_id": "splash247",
+          "publisher": "Splash247",
+          "author": "Adis Ajdin",
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item b. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T11:03:37+00:00",
+          "published_display": "12 October 2026",
+          "section": "sale_and_purchase",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S5"
+        },
+        {
+          "id": "56d907003e1c",
+          "headline": "Chinese buyers snap up capesizes",
+          "link": "https://splash247.com/chinese-buyers-snap-up-capesizes/",
+          "source_id": "splash247",
+          "publisher": "Splash247",
+          "author": "Hans Thaulow",
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item c. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T09:24:00+00:00",
+          "published_display": "12 October 2026",
+          "section": "sale_and_purchase",
+          "segment": "dry_bulk",
+          "also_reported_by": [],
+          "source_tag": "S5"
+        }
+      ]
+    },
+    "events": {
+      "title": "Events",
+      "status": "ok",
+      "reason": null,
+      "cadence": "daily",
+      "counts": {
+        "fetched": 16,
+        "kept": 8,
+        "dropped": {
+          "banned_source": 0,
+          "digit_in_freight_headline": 0,
+          "other": 8
+        },
+        "other_detail": {
+          "no_date": 1,
+          "outside_window": 1,
+          "over_limit": 6
+        },
+        "wire_headline_only": 3
+      },
+      "items": [
+        {
+          "id": "aa893b4f28a4",
+          "headline": "Port strike talks resume on the US Gulf Coast",
+          "link": "https://gcaptain.com/test-reuters-no-author/",
+          "source_id": "gcaptain",
+          "publisher": "gCaptain",
+          "author": null,
+          "wire_agency": "Reuters",
+          "summary_allowed": false,
+          "excerpt": null,
+          "published": "2026-10-12T09:00:00+00:00",
+          "published_display": "12 October 2026",
+          "section": "events",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S3"
+        },
+        {
+          "id": "7574f629218b",
+          "headline": "Bloomberg: Shipowners weigh new route options around Africa",
+          "link": "https://gcaptain.com/test-bloomberg-in-title/",
+          "source_id": "gcaptain",
+          "publisher": "gCaptain",
+          "author": null,
+          "wire_agency": "Bloomberg",
+          "summary_allowed": false,
+          "excerpt": null,
+          "published": "2026-10-12T08:30:00+00:00",
+          "published_display": "12 October 2026",
+          "section": "events",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S3"
+        },
+        {
+          "id": "8b8cdc5f3ec8",
+          "headline": "Insurers review war-risk cover for the region",
+          "link": "https://gcaptain.com/test-reuters-credit-field/",
+          "source_id": "gcaptain",
+          "publisher": "gCaptain",
+          "author": null,
+          "wire_agency": "Reuters",
+          "summary_allowed": false,
+          "excerpt": null,
+          "published": "2026-10-12T08:00:00+00:00",
+          "published_display": "12 October 2026",
+          "section": "events",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S3"
+        },
+        {
+          "id": "e8fd72eddcea",
+          "headline": "Tanker war spreads across Gulf",
+          "link": "https://splash247.com/tanker-war-spreads-across-gulf/",
+          "source_id": "splash247",
+          "publisher": "Splash247",
+          "author": "Sam Chambers",
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item d. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T07:30:15+00:00",
+          "published_display": "12 October 2026",
+          "section": "events",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S5"
+        },
+        {
+          "id": "dc19c507a379",
+          "headline": "Chinese shipping investor makes play for asphalt tanker owner Xin Yuan",
+          "link": "https://splash247.com/chinese-shipping-investor-makes-play-for-asphalt-tanker-owner-xin-yuan/",
+          "source_id": "splash247",
+          "publisher": "Splash247",
+          "author": "Adis Ajdin",
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item e. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T06:45:00+00:00",
+          "published_display": "12 October 2026",
+          "section": "events",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S5"
+        },
+        {
+          "id": "a7906d5c7d2e",
+          "headline": "Baltic states push for EU-wide ban on Russian grain transit",
+          "link": "https://splash247.com/baltic-states-push-for-eu-wide-ban-on-russian-grain-transit/",
+          "source_id": "splash247",
+          "publisher": "Splash247",
+          "author": "Adis Ajdin",
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item f. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T06:00:00+00:00",
+          "published_display": "12 October 2026",
+          "section": "events",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S5"
+        },
+        {
+          "id": "64fa131aa297",
+          "headline": "BIMCO Adopts Addendum to Support Investments in Retrofit Projects",
+          "link": "https://maritime-executive.com/article/bimco-adopts-addendum-to-support-investments-in-retrofit-projects",
+          "source_id": "maritime_executive",
+          "publisher": "The Maritime Executive",
+          "author": null,
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item a. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T03:51:00+00:00",
+          "published_display": "12 October 2026",
+          "section": "events",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S6"
+        },
+        {
+          "id": "38719df7d78c",
+          "headline": "Germany's Navy Rebuilds, Doubling Frigate Order and Adding New Base",
+          "link": "https://maritime-executive.com/article/germany-s-navy-rebuilds-doubling-frigate-order-and-adding-new-base",
+          "source_id": "maritime_executive",
+          "publisher": "The Maritime Executive",
+          "author": null,
+          "wire_agency": null,
+          "summary_allowed": true,
+          "excerpt": "Placeholder excerpt for test item b. It describes the story in general terms. Nothing here is quoted from the publisher …",
+          "published": "2026-10-12T03:30:39+00:00",
+          "published_display": "12 October 2026",
+          "section": "events",
+          "segment": null,
+          "also_reported_by": [],
+          "source_tag": "S6"
+        }
+      ]
+    }
+  },
+  "validation": {
+    "excluded_figures": [],
+    "dropped_news": [
+      {
+        "source_id": "gcaptain",
+        "id": "3e7814968a0d",
+        "link": "https://gcaptain.com/test-freight-headline-digits/",
+        "code": "digit_in_freight_headline",
+        "reason": "freight headline quotes figures"
+      },
+      {
+        "source_id": "gcaptain",
+        "id": "a60b757b6019",
+        "link": "https://gcaptain.com/test-no-date/",
+        "code": "no_date",
+        "reason": "no publication date"
+      }
+    ],
+    "feed_errors": {}
+  }
+}

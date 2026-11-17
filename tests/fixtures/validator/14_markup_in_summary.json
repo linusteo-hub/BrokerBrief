@@ -1,0 +1,11 @@
+{
+ "description": "A summary may not add links or Markdown.",
+ "check": "summary",
+ "payload": "payload/from_fixtures.json",
+ "item_id": "38ec41e21301",
+ "text": "MISC has lined up more LNG carriers, see [details](https://example.com).",
+ "expect": "fail",
+ "expect_codes": [
+  "markup"
+ ]
+}
