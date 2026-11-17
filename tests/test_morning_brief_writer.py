@@ -184,10 +184,10 @@ def test_same_figure_as_the_previous_brief_is_labelled():
     from modules.morning_brief.validator import figures
     assert render_brief(payload(), {}).count("Same figure as in the previous brief") == 0
     markdown = render_brief(payload(), {}, previous_payload=payload())
-    assert markdown.count("Same figure as in the previous brief") == len(figures(payload())) == 19
+    assert markdown.count("Same figure as in the previous brief") == len(figures(payload())) == 22
     newer = payload()
     newer["sections"]["prices"]["items"][0]["as_of"] = "2026-10-07"     # a new Brent value since yesterday
-    assert render_brief(newer, {}, previous_payload=payload()).count("Same figure as in the previous brief") == 18
+    assert render_brief(newer, {}, previous_payload=payload()).count("Same figure as in the previous brief") == 21
 
 
 def test_feed_text_cannot_inject_markdown():

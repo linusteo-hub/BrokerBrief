@@ -43,6 +43,18 @@
     },
     {
       "tag": "S4",
+      "id": "mpa_port_traffic",
+      "name": "MPA vessel arrivals and calls (data.gov.sg)",
+      "publisher": "Maritime and Port Authority of Singapore",
+      "url": "https://data.gov.sg/datasets/d_48cb38d12697d3463c8cadfb22e6c61d/view",
+      "terms_url": "https://data.gov.sg/open-data-licence",
+      "licence": "Singapore Open Data Licence version 1.0: use, copy, distribute and adapt, commercially or not, with a conspicuous attribution notice and a link to the licence",
+      "credit": "Contains information from Vessel Arrivals (>75 GT) Total, Monthly and Vessel Calls (>75 GT), Monthly, accessed from data.gov.sg (Maritime and Port Authority of Singapore), which is made available under the terms of the Singapore Open Data Licence version 1.0, https://data.gov.sg/open-data-licence",
+      "redistributable": true,
+      "kind": "data"
+    },
+    {
+      "tag": "S5",
       "id": "imf_portwatch",
       "name": "IMF PortWatch",
       "publisher": "International Monetary Fund",
@@ -54,7 +66,7 @@
       "kind": "data"
     },
     {
-      "tag": "S5",
+      "tag": "S6",
       "id": "splash247",
       "name": "Splash247",
       "publisher": "Splash Maritime Group",
@@ -66,7 +78,7 @@
       "kind": "news"
     },
     {
-      "tag": "S6",
+      "tag": "S7",
       "id": "maritime_executive",
       "name": "The Maritime Executive",
       "publisher": "The Maritime Executive",
@@ -1293,8 +1305,8 @@
       "reason": null,
       "cadence": "weekly",
       "counts": {
-        "fetched": 13,
-        "kept": 12,
+        "fetched": 16,
+        "kept": 15,
         "dropped": {
           "banned_source": 0,
           "digit_in_freight_headline": 1,
@@ -1346,6 +1358,400 @@
             }
           ]
         },
+        "port_calls": {
+          "title": "Singapore port calls (vessel counts, not rates)",
+          "status": "ok",
+          "reason": null,
+          "cadence": "monthly (MPA publishes about three weeks after month end)",
+          "counts": {
+            "fetched": 3,
+            "kept": 3,
+            "dropped": {}
+          },
+          "items": [
+            {
+              "id": "sg_vessel_arrivals",
+              "label": "Vessel arrivals at Singapore, all types (MPA: Vessel Arrivals (>75 GT) Total)",
+              "unit": "arrivals",
+              "value": 11608,
+              "display": "11,608 arrivals",
+              "as_of": "2026-09-30",
+              "as_of_display": "September 2026",
+              "changes": [
+                {
+                  "basis": "previous month",
+                  "compared_with": "August 2026",
+                  "previous_value": 11631,
+                  "previous_display": "11,631 arrivals",
+                  "abs_change": -23,
+                  "abs_display": "23 arrivals",
+                  "pct_change": -0.2,
+                  "pct_display": "0.20%",
+                  "direction": "down"
+                },
+                {
+                  "basis": "same month a year earlier",
+                  "compared_with": "September 2025",
+                  "previous_value": 10992,
+                  "previous_display": "10,992 arrivals",
+                  "abs_change": 616,
+                  "abs_display": "616 arrivals",
+                  "pct_change": 5.6,
+                  "pct_display": "5.60%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "mpa_port_traffic",
+              "quality_tier": "LIVE_API",
+              "notes": "Vessels over 75 GT, Singapore only. MPA marks the latest month's figures as preliminary estimates.",
+              "plausible_range": [
+                3000,
+                30000
+              ],
+              "series": {
+                "label": "Monthly count as published by MPA",
+                "points": [
+                  {
+                    "date": "2025-09-30",
+                    "date_display": "September 2025",
+                    "value": 10992,
+                    "display": "10,992 arrivals"
+                  },
+                  {
+                    "date": "2025-10-31",
+                    "date_display": "October 2025",
+                    "value": 11552,
+                    "display": "11,552 arrivals"
+                  },
+                  {
+                    "date": "2025-11-30",
+                    "date_display": "November 2025",
+                    "value": 11207,
+                    "display": "11,207 arrivals"
+                  },
+                  {
+                    "date": "2025-12-31",
+                    "date_display": "December 2025",
+                    "value": 11892,
+                    "display": "11,892 arrivals"
+                  },
+                  {
+                    "date": "2026-01-31",
+                    "date_display": "January 2026",
+                    "value": 12031,
+                    "display": "12,031 arrivals"
+                  },
+                  {
+                    "date": "2026-02-28",
+                    "date_display": "February 2026",
+                    "value": 10886,
+                    "display": "10,886 arrivals"
+                  },
+                  {
+                    "date": "2026-03-31",
+                    "date_display": "March 2026",
+                    "value": 11591,
+                    "display": "11,591 arrivals"
+                  },
+                  {
+                    "date": "2026-04-30",
+                    "date_display": "April 2026",
+                    "value": 10873,
+                    "display": "10,873 arrivals"
+                  },
+                  {
+                    "date": "2026-05-31",
+                    "date_display": "May 2026",
+                    "value": 11729,
+                    "display": "11,729 arrivals"
+                  },
+                  {
+                    "date": "2026-06-30",
+                    "date_display": "June 2026",
+                    "value": 11520,
+                    "display": "11,520 arrivals"
+                  },
+                  {
+                    "date": "2026-07-31",
+                    "date_display": "July 2026",
+                    "value": 11655,
+                    "display": "11,655 arrivals"
+                  },
+                  {
+                    "date": "2026-08-31",
+                    "date_display": "August 2026",
+                    "value": 11631,
+                    "display": "11,631 arrivals"
+                  },
+                  {
+                    "date": "2026-09-30",
+                    "date_display": "September 2026",
+                    "value": 11608,
+                    "display": "11,608 arrivals"
+                  }
+                ]
+              },
+              "series_note": null,
+              "period": "month",
+              "short_label": "Vessel arrivals",
+              "source_tag": "S4"
+            },
+            {
+              "id": "sg_calls_bunkers",
+              "label": "Vessel calls for bunkers (MPA purpose type: Bunkers)",
+              "unit": "calls",
+              "value": 3617,
+              "display": "3,617 calls",
+              "as_of": "2026-09-30",
+              "as_of_display": "September 2026",
+              "changes": [
+                {
+                  "basis": "previous month",
+                  "compared_with": "August 2026",
+                  "previous_value": 3588,
+                  "previous_display": "3,588 calls",
+                  "abs_change": 29,
+                  "abs_display": "29 calls",
+                  "pct_change": 0.81,
+                  "pct_display": "0.81%",
+                  "direction": "up"
+                },
+                {
+                  "basis": "same month a year earlier",
+                  "compared_with": "September 2025",
+                  "previous_value": 3518,
+                  "previous_display": "3,518 calls",
+                  "abs_change": 99,
+                  "abs_display": "99 calls",
+                  "pct_change": 2.81,
+                  "pct_display": "2.81%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "mpa_port_traffic",
+              "quality_tier": "LIVE_API",
+              "notes": "Vessels over 75 GT, Singapore only. MPA marks the latest month's figures as preliminary estimates.",
+              "plausible_range": [
+                500,
+                15000
+              ],
+              "series": {
+                "label": "Monthly count as published by MPA",
+                "points": [
+                  {
+                    "date": "2025-09-30",
+                    "date_display": "September 2025",
+                    "value": 3518,
+                    "display": "3,518 calls"
+                  },
+                  {
+                    "date": "2025-10-31",
+                    "date_display": "October 2025",
+                    "value": 3753,
+                    "display": "3,753 calls"
+                  },
+                  {
+                    "date": "2025-11-30",
+                    "date_display": "November 2025",
+                    "value": 3632,
+                    "display": "3,632 calls"
+                  },
+                  {
+                    "date": "2025-12-31",
+                    "date_display": "December 2025",
+                    "value": 3721,
+                    "display": "3,721 calls"
+                  },
+                  {
+                    "date": "2026-01-31",
+                    "date_display": "January 2026",
+                    "value": 3778,
+                    "display": "3,778 calls"
+                  },
+                  {
+                    "date": "2026-02-28",
+                    "date_display": "February 2026",
+                    "value": 3423,
+                    "display": "3,423 calls"
+                  },
+                  {
+                    "date": "2026-03-31",
+                    "date_display": "March 2026",
+                    "value": 3502,
+                    "display": "3,502 calls"
+                  },
+                  {
+                    "date": "2026-04-30",
+                    "date_display": "April 2026",
+                    "value": 3438,
+                    "display": "3,438 calls"
+                  },
+                  {
+                    "date": "2026-05-31",
+                    "date_display": "May 2026",
+                    "value": 3690,
+                    "display": "3,690 calls"
+                  },
+                  {
+                    "date": "2026-06-30",
+                    "date_display": "June 2026",
+                    "value": 3618,
+                    "display": "3,618 calls"
+                  },
+                  {
+                    "date": "2026-07-31",
+                    "date_display": "July 2026",
+                    "value": 3675,
+                    "display": "3,675 calls"
+                  },
+                  {
+                    "date": "2026-08-31",
+                    "date_display": "August 2026",
+                    "value": 3588,
+                    "display": "3,588 calls"
+                  },
+                  {
+                    "date": "2026-09-30",
+                    "date_display": "September 2026",
+                    "value": 3617,
+                    "display": "3,617 calls"
+                  }
+                ]
+              },
+              "series_note": null,
+              "period": "month",
+              "short_label": "Calls for bunkers",
+              "source_tag": "S4"
+            },
+            {
+              "id": "sg_calls_cargo",
+              "label": "Vessel calls for cargo (MPA purpose type: Cargo)",
+              "unit": "calls",
+              "value": 4070,
+              "display": "4,070 calls",
+              "as_of": "2026-09-30",
+              "as_of_display": "September 2026",
+              "changes": [
+                {
+                  "basis": "previous month",
+                  "compared_with": "August 2026",
+                  "previous_value": 4092,
+                  "previous_display": "4,092 calls",
+                  "abs_change": -22,
+                  "abs_display": "22 calls",
+                  "pct_change": -0.54,
+                  "pct_display": "0.54%",
+                  "direction": "down"
+                },
+                {
+                  "basis": "same month a year earlier",
+                  "compared_with": "September 2025",
+                  "previous_value": 4007,
+                  "previous_display": "4,007 calls",
+                  "abs_change": 63,
+                  "abs_display": "63 calls",
+                  "pct_change": 1.57,
+                  "pct_display": "1.57%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "mpa_port_traffic",
+              "quality_tier": "LIVE_API",
+              "notes": "Vessels over 75 GT, Singapore only. MPA marks the latest month's figures as preliminary estimates.",
+              "plausible_range": [
+                500,
+                15000
+              ],
+              "series": {
+                "label": "Monthly count as published by MPA",
+                "points": [
+                  {
+                    "date": "2025-09-30",
+                    "date_display": "September 2025",
+                    "value": 4007,
+                    "display": "4,007 calls"
+                  },
+                  {
+                    "date": "2025-10-31",
+                    "date_display": "October 2025",
+                    "value": 4198,
+                    "display": "4,198 calls"
+                  },
+                  {
+                    "date": "2025-11-30",
+                    "date_display": "November 2025",
+                    "value": 4134,
+                    "display": "4,134 calls"
+                  },
+                  {
+                    "date": "2025-12-31",
+                    "date_display": "December 2025",
+                    "value": 4229,
+                    "display": "4,229 calls"
+                  },
+                  {
+                    "date": "2026-01-31",
+                    "date_display": "January 2026",
+                    "value": 4314,
+                    "display": "4,314 calls"
+                  },
+                  {
+                    "date": "2026-02-28",
+                    "date_display": "February 2026",
+                    "value": 3854,
+                    "display": "3,854 calls"
+                  },
+                  {
+                    "date": "2026-03-31",
+                    "date_display": "March 2026",
+                    "value": 4094,
+                    "display": "4,094 calls"
+                  },
+                  {
+                    "date": "2026-04-30",
+                    "date_display": "April 2026",
+                    "value": 3950,
+                    "display": "3,950 calls"
+                  },
+                  {
+                    "date": "2026-05-31",
+                    "date_display": "May 2026",
+                    "value": 4239,
+                    "display": "4,239 calls"
+                  },
+                  {
+                    "date": "2026-06-30",
+                    "date_display": "June 2026",
+                    "value": 4107,
+                    "display": "4,107 calls"
+                  },
+                  {
+                    "date": "2026-07-31",
+                    "date_display": "July 2026",
+                    "value": 4206,
+                    "display": "4,206 calls"
+                  },
+                  {
+                    "date": "2026-08-31",
+                    "date_display": "August 2026",
+                    "value": 4092,
+                    "display": "4,092 calls"
+                  },
+                  {
+                    "date": "2026-09-30",
+                    "date_display": "September 2026",
+                    "value": 4070,
+                    "display": "4,070 calls"
+                  }
+                ]
+              },
+              "series_note": null,
+              "period": "month",
+              "short_label": "Calls for cargo",
+              "source_tag": "S4"
+            }
+          ]
+        },
         "activity": {
           "title": "Ship activity (transits and port calls, not rates)",
           "status": "ok",
@@ -1387,7 +1793,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             },
             {
               "id": "transits_chokepoint2",
@@ -1419,7 +1825,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             },
             {
               "id": "transits_chokepoint4",
@@ -1451,7 +1857,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             },
             {
               "id": "transits_chokepoint5",
@@ -1483,7 +1889,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             },
             {
               "id": "transits_chokepoint6",
@@ -1515,7 +1921,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             },
             {
               "id": "transits_chokepoint7",
@@ -1547,7 +1953,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             },
             {
               "id": "portcalls_port1201",
@@ -1579,7 +1985,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             },
             {
               "id": "portcalls_port1114",
@@ -1611,7 +2017,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             },
             {
               "id": "portcalls_port362",
@@ -1643,7 +2049,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             },
             {
               "id": "portcalls_port955",
@@ -1675,7 +2081,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             },
             {
               "id": "portcalls_port481",
@@ -1707,7 +2113,7 @@
               ],
               "series": null,
               "series_note": null,
-              "source_tag": "S4"
+              "source_tag": "S5"
             }
           ]
         }
@@ -1745,7 +2151,7 @@
           "section": "sale_and_purchase",
           "segment": "dry_bulk",
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         },
         {
           "id": "38ec41e21301",
@@ -1762,7 +2168,7 @@
           "section": "sale_and_purchase",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         },
         {
           "id": "56d907003e1c",
@@ -1779,7 +2185,7 @@
           "section": "sale_and_purchase",
           "segment": "dry_bulk",
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         }
       ]
     },
@@ -1870,7 +2276,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         },
         {
           "id": "dc19c507a379",
@@ -1887,7 +2293,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         },
         {
           "id": "a7906d5c7d2e",
@@ -1904,7 +2310,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         },
         {
           "id": "64fa131aa297",
@@ -1921,7 +2327,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S6"
+          "source_tag": "S7"
         },
         {
           "id": "38719df7d78c",
@@ -1938,7 +2344,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S6"
+          "source_tag": "S7"
         }
       ]
     }

@@ -25,7 +25,9 @@ NOW = datetime(2026, 10, 12, 12, 0, tzinfo=timezone.utc)
 
 RECORDED = {
     "api.eia.gov": lambda p: "eia/brent_ok.json" if p.get("facets[series][]") == "RBRTE" else "eia/ulsd_ok.json",
-    "data.gov.sg": lambda p: "mpa/bunker_sales_ok.json",
+    "data.gov.sg": lambda p: {"d_d48c5a038904f6da3c603cd854b6c191": "mpa/vessel_arrivals_ok.json",
+                              "d_48cb38d12697d3463c8cadfb22e6c61d": "mpa/vessel_calls_ok.json"}.get(
+                                  p.get("resource_id"), "mpa/bunker_sales_ok.json"),
     "Daily_Chokepoints_Data": lambda p: "portwatch/chokepoints_ok.json",
     "Daily_Ports_Data": lambda p: "portwatch/ports_ok.json",
     "gcaptain.com": lambda p: "news/special_cases.xml",
@@ -97,7 +99,8 @@ def test_missing_feeds_mark_sections_missing_not_fabricated():
     assert sections["events"]["reason"].startswith("every news feed failed")
     assert all(not s["items"] for k, s in sections.items() if k != "freight")
     assert set(payload["validation"]["feed_errors"]) == {
-        "eia_spot", "mpa_bunker_sales", "imf_portwatch", "gcaptain", "splash247", "maritime_executive"}
+        "eia_spot", "mpa_bunker_sales", "mpa_port_traffic", "imf_portwatch", "gcaptain", "splash247",
+        "maritime_executive"}
 
 
 def _empty_results():
@@ -165,7 +168,7 @@ def test_every_section_reports_counts_that_add_up():
         assert counts["fetched"] == counts["kept"] + sum(counts["dropped"].values()), key
     freight = payload["sections"]["freight"]["counts"]
     subs = payload["sections"]["freight"]["subsections"]
-    assert freight["kept"] == subs["rate_direction"]["counts"]["kept"] + subs["activity"]["counts"]["kept"]
+    assert freight["kept"] == sum(subs[k]["counts"]["kept"] for k in ("rate_direction", "port_calls", "activity"))
 
 
 def test_news_counts_by_reason():

@@ -725,11 +725,14 @@ elif page == "Market intelligence":
         activity_body = ui.brief_figures(subs.get("activity", {}).get("items") or [])
         if subs.get("activity", {}).get("items"):
             activity_body += f'<div class="field-label" style="margin-top:.6rem;">{escape(PORTWATCH_CREDIT)}</div>'
+        # Data first, then the news-based direction, then what no free source covers.
         freight_body = "".join([
-            ui.brief_subsection(subs["container_rates"]) if "container_rates" in subs else "",
+            ui.brief_subsection(subs["port_calls"], ui.brief_figures(subs["port_calls"].get("items") or [], chart="bars"))
+            if "port_calls" in subs else "",
+            ui.brief_subsection(subs["activity"], activity_body) if "activity" in subs else "",
             ui.brief_subsection(subs["rate_direction"], ui.brief_news(subs["rate_direction"].get("items") or []))
             if "rate_direction" in subs else "",
-            ui.brief_subsection(subs["activity"], activity_body) if "activity" in subs else "",
+            ui.brief_subsection(subs["container_rates"]) if "container_rates" in subs else "",
         ])
         st.markdown(ui.brief_header(payload), unsafe_allow_html=True)
         col_figs, col_news = st.columns([7, 5], gap="large")

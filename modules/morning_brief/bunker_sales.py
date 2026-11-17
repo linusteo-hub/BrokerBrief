@@ -212,7 +212,7 @@ def fetch_bunker_sales(today: date, get: Callable = guarded_get) -> dict:
 
     try:
         response = get(API_URL, params={"resource_id": RESOURCE_ID, "limit": ROW_LIMIT, "sort": "month desc"},
-                       timeout=20)
+                       timeout=20, source_id=SOURCE_ID)
         response.raise_for_status()
         body = response.json()
         if not isinstance(body, dict) or not body.get("success"):

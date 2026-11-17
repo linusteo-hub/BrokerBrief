@@ -508,13 +508,15 @@ def news_timeline(lanes: list, start: str, end: str) -> str:
                          f'aria-label="{escape(title)}: {label}">'
                          f'<span class="nf-pop"><ul>{"".join(entries)}</ul></span></span>')
         count = len(dated)
-        track = "".join(ticks) if ticks else f'<span class="nf-empty">{escape(reason) if reason else "no headlines"}</span>'
+        # An empty row says so briefly; the section's full reason is its title (and on its own card below).
+        track = ("".join(ticks) if ticks else
+                 f'<span class="nf-empty" title="{escape(reason)}">no headlines</span>')
         rows.append(f'<div class="nf-row"><div class="nf-name">{escape(title)}</div>'
                     f'<div class="nf-track">{track}</div><div class="nf-count">{count}</div></div>')
     t0, t1 = t0.astimezone(timezone.utc), t1.astimezone(timezone.utc)
     fmt = lambda t: f"{t.day} {t:%b %H:%M}"
-    return (f'<div class="nf">{"".join(rows)}'
-            f'<div class="nf-axis"><span>{fmt(t0)}</span><span>{fmt(t1)} UTC</span></div></div>')
+    axis = f'<div class="nf-axis"><span>{fmt(t0)}</span><span>{fmt(t1)} UTC</span></div>'
+    return f'<div class="nf">{"".join(rows)}{axis}</div>'
 
 
 # Short keys for a comparison's basis (the full basis and date stay in the chip's title and for screen readers).
@@ -617,7 +619,15 @@ def brief_section(section: dict, body: str = "") -> str:
 
 
 def brief_subsection(section: dict, body: str = "") -> str:
-    return f'<div class="mb-sub">{_s(section, "title")}</div>{_status_line(section)}{body}'
+    """A part of a section: title (with the shared date-and-source chip when its figures share them),
+    its state, then the body."""
+    asof, tag = _shared(section.get("items") or [])
+    chip = ""
+    if asof:
+        chip = (f'<span class="mb-asof">{escape(asof)}'
+                f'{f"<span class=mb-tag>[{escape(tag)}]</span>" if tag else ""}</span>')
+    return (f'<div class="mb-sub-head"><div class="mb-sub">{_s(section, "title")}</div>{chip}</div>'
+            f'{_status_line(section)}{body}')
 
 
 def brief_sources(sources: list) -> str:

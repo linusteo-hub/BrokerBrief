@@ -32,7 +32,7 @@ on:
         description: "Failure test: make one source fail on purpose (never archived or published)"
         type: choice
         default: none
-        options: [none, eia_spot, mpa_bunker_sales, imf_portwatch, gcaptain, splash247, maritime_executive]
+        options: [none, eia_spot, mpa_bunker_sales, mpa_port_traffic, imf_portwatch, gcaptain, splash247, maritime_executive]
       no_model:
         description: "Skip the model even if BRIEF_USE_MODEL is on (it is off by default)"
         type: boolean

@@ -107,6 +107,28 @@ ALLOWLIST: dict[str, AllowedSource] = {
         notes=("Sales volumes, not prices. Values are thousand tonnes; the latest month is a "
                "preliminary estimate. The licence forbids suggesting official status or endorsement."),
     ),
+    "mpa_port_traffic": AllowedSource(
+        id="mpa_port_traffic",
+        name="MPA vessel arrivals and calls (data.gov.sg)",
+        publisher="Maritime and Port Authority of Singapore",
+        url="https://data.gov.sg/datasets/d_48cb38d12697d3463c8cadfb22e6c61d/view",
+        terms_url="https://data.gov.sg/open-data-licence",
+        licence="Singapore Open Data Licence version 1.0: use, copy, distribute and adapt, "
+                "commercially or not, with a conspicuous attribution notice and a link to the licence",
+        redistributable=True,
+        kind="data",
+        credit=("Contains information from Vessel Arrivals (>75 GT) Total, Monthly and Vessel Calls (>75 GT), "
+                "Monthly, accessed from data.gov.sg (Maritime and Port Authority of Singapore), which is made "
+                "available under the terms of the Singapore Open Data Licence version 1.0, "
+                "https://data.gov.sg/open-data-licence"),
+        quality_tier="LIVE_API",
+        # Same release pattern as MPA's bunker sales (September 2026 published on 21-10-2026).
+        max_age=timedelta(days=62),
+        fetch_urls=("https://data.gov.sg/api/action/datastore_search",),
+        notes=("Counts of vessels over 75 GT, Singapore only, monthly; the latest month is a preliminary "
+               "estimate. Added 17-11-2026 as the brief's port-activity source after IMF PortWatch's daily "
+               "data began to require a token. The licence forbids suggesting official status or endorsement."),
+    ),
     "gcaptain": AllowedSource(
         id="gcaptain",
         name="gCaptain",
@@ -197,11 +219,20 @@ def mentions_banned_source(text: str) -> Optional[str]:
     return match.group(0) if match else None
 
 
-def require_allowed_url(url: str) -> AllowedSource:
+def require_allowed_url(url: str, source_id: Optional[str] = None) -> AllowedSource:
     """Every HTTP request the brief makes passes through this. A URL that is not
     one of an allowlisted source's `fetch_urls` raises SourceNotAllowed — it is
-    never caught by the fetchers, so the run fails loudly."""
-    for source in ALLOWLIST.values():
+    never caught by the fetchers, so the run fails loudly.
+
+    Two sources can share a URL (both MPA datasets come through data.gov.sg's
+    datastore API), so a fetcher may name its source: the URL must then be one
+    of that source's own `fetch_urls`, and that source is returned."""
+    candidates = ALLOWLIST.values()
+    if source_id is not None:
+        if source_id not in ALLOWLIST:
+            raise SourceNotAllowed(f"refusing to fetch for {source_id!r}: not on the morning-brief allowlist")
+        candidates = [ALLOWLIST[source_id]]
+    for source in candidates:
         for prefix in source.fetch_urls:
             # Exact URL, or the prefix followed by a query string only.
             if url == prefix or url.startswith(prefix + "?"):

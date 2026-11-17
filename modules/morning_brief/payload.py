@@ -20,6 +20,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from modules.morning_brief.activity import fetch_activity
+from modules.morning_brief.port_traffic import fetch_port_traffic
 from modules.morning_brief.allowlist import SourceNotAllowed, mentions_banned_source, require_allowed
 from modules.morning_brief.bunker_sales import fetch_bunker_sales
 from modules.morning_brief.figures import fmt_date
@@ -77,8 +78,10 @@ def _news_failure(news: dict, label: str) -> str:
     return f"no {label} stories met the rules in the time window"
 
 
-def build_payload(*, now: datetime, prices: dict, bunker_sales: dict, activity: dict, news: dict) -> dict:
+def build_payload(*, now: datetime, prices: dict, bunker_sales: dict, activity: dict, news: dict,
+                  port_traffic: Optional[dict] = None) -> dict:
     """Pure assembly from fetcher results (no network); see fetch_and_build()."""
+    port_traffic = port_traffic or {"items": [], "excluded": [], "error": "MPA port traffic was not fetched"}
     news_sections = news["sections"]
     freight_news = news_sections["freight"]
     subsections = {
@@ -87,6 +90,9 @@ def build_payload(*, now: datetime, prices: dict, bunker_sales: dict, activity: 
                             "items": []},
         "rate_direction": _section("Freight rate direction (from news, no figures)", "weekly", freight_news,
                                    _news_failure(news, "freight-rate"), news["counts"]["freight"]),
+        "port_calls": _section("Singapore port calls (vessel counts, not rates)",
+                               "monthly (MPA publishes about three weeks after month end)", port_traffic["items"],
+                               _failure_reason(port_traffic, "MPA returned no figures"), figure_counts(port_traffic)),
         "activity": _section("Ship activity (transits and port calls, not rates)", "weekly", activity["items"],
                              _failure_reason(activity, "PortWatch returned no figures"), figure_counts(activity)),
     }
@@ -125,10 +131,11 @@ def build_payload(*, now: datetime, prices: dict, bunker_sales: dict, activity: 
         "sections": sections,
         "validation": {
             "excluded_figures": (prices.get("excluded", []) + bunker_sales.get("excluded", [])
-                                 + activity.get("excluded", [])),
+                                 + port_traffic.get("excluded", []) + activity.get("excluded", [])),
             "dropped_news": news.get("dropped", []),
             "feed_errors": {**({"eia_spot": prices["error"]} if prices.get("error") else {}),
                             **({"mpa_bunker_sales": bunker_sales["error"]} if bunker_sales.get("error") else {}),
+                            **({"mpa_port_traffic": port_traffic["error"]} if port_traffic.get("error") else {}),
                             **({"imf_portwatch": activity["error"]} if activity.get("error") else {}),
                             **news.get("feed_errors", {})},
         },
@@ -201,6 +208,7 @@ def fetch_and_build(now: Optional[datetime] = None, eia_api_key: Optional[str] =
         now=now,
         prices=fetch_prices(eia_api_key, today, **kwargs),
         bunker_sales=fetch_bunker_sales(today, **kwargs),
+        port_traffic=fetch_port_traffic(today, **kwargs),
         activity=fetch_activity(today, **kwargs),
         news=fetch_news(now, **kwargs),
     )

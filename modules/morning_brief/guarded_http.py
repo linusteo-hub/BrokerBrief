@@ -24,17 +24,18 @@ from modules.morning_brief.allowlist import require_allowed_url
 BREAK_FEED_VARIABLE = "BROKERBRIEF_BREAK_FEED"
 
 
-def check_break(url: str) -> None:
+def check_break(url: str, source_id=None) -> None:
     broken = os.environ.get(BREAK_FEED_VARIABLE, "").strip()
-    if broken and broken != "none" and require_allowed_url(url).id == broken:
+    if broken and broken != "none" and require_allowed_url(url, source_id).id == broken:
         raise requests.ConnectionError(f"{broken} deliberately broken for a failure test")
 
 USER_AGENT = "BrokerBrief-MorningBrief/0.1 (+https://github.com/linusteo-hub/BrokerBrief)"
 
 
-def guarded_get(url: str, params=None, timeout: float = 15, **kwargs) -> requests.Response:
-    require_allowed_url(url)
-    check_break(url)
+def guarded_get(url: str, params=None, timeout: float = 15, source_id=None, **kwargs) -> requests.Response:
+    """`source_id` names the source when its URL is shared with another (see require_allowed_url)."""
+    require_allowed_url(url, source_id)
+    check_break(url, source_id)
     headers = {"User-Agent": USER_AGENT, **kwargs.pop("headers", {})}
     response = requests.get(url, params=params, timeout=timeout, headers=headers,
                             allow_redirects=False, **kwargs)

@@ -129,7 +129,9 @@ class MarketIntelligencePage(unittest.TestCase):
     def test_source_notes_are_shown_once(self):
         # MPA's "preliminary" warning belongs beside the bunker-sales figures, once, not six times.
         page = html(open_mi(mock.Mock(return_value=copy.deepcopy(PAYLOAD))))
-        self.assertEqual(page.count("preliminary estimates"), 1)
+        # Each section's note once: bunker sales (six figures) and port calls (three figures).
+        self.assertEqual(page.count("Monthly total, in tonnes (MPA publishes thousand tonnes)."), 1)
+        self.assertEqual(page.count("Vessels over 75 GT, Singapore only."), 1)
 
     def test_only_https_links_are_rendered(self):
         data = copy.deepcopy(PAYLOAD)
@@ -222,8 +224,8 @@ class MarketIntelligenceCharts(unittest.TestCase):
         # Hover text is the payload's own display strings: the newest point is the figure itself.
         self.assertIn("<b>USD 125.44/bbl</b>6 October 2026", page)
         self.assertIn("<b>4,726,390 MT</b>September 2026", page)
-        self.assertEqual(page.count('<div class="ch ch-bars'), 6)          # total full size, five compact
-        self.assertEqual(page.count('class="ch-bar'), 6 * 13)
+        self.assertEqual(page.count('<div class="ch ch-bars'), 6 + 3)      # bunker sales + port calls
+        self.assertEqual(page.count('class="ch-bar'), (6 + 3) * 13)
 
     def test_a_dropped_series_says_why_instead_of_drawing(self):
         data = copy.deepcopy(PAYLOAD)
@@ -241,6 +243,16 @@ class MarketIntelligenceCharts(unittest.TestCase):
         self.assertIn("News flow", page)
         self.assertEqual(page.count("<li>"), sum(1 for i in news if i.get("published")))   # every headline listed
         self.assertIn('<div class="nf-name">Sale &amp; Purchase</div>', page)
+
+
+class PortCalls(unittest.TestCase):
+    def test_mpa_port_calls_show_in_freight_with_bars_and_their_source(self):
+        page = html(open_mi(mock.Mock(return_value=copy.deepcopy(PAYLOAD))))
+        self.assertIn("Singapore port calls (vessel counts, not rates)", page)
+        self.assertIn('<div class="mb-stat-value">3,617 calls</div>', page)
+        self.assertIn(">Calls for bunkers</div>", page)
+        self.assertIn("MPA vessel arrivals and calls (data.gov.sg)", page)      # listed under Sources
+        self.assertEqual(page.count('<div class="ch ch-bars'), 6 + 3)
 
 
 class TimelineStacking(unittest.TestCase):
@@ -286,7 +298,7 @@ class ChartBuilders(unittest.TestCase):
         from modules import ui
         out = ui.news_timeline([("Events", [], "no events stories met the rules")],
                                "2026-10-11T09:00:00+00:00", "2026-10-12T12:00:00+00:00")
-        self.assertIn('<span class="nf-empty">no events stories met the rules</span>', out)
+        self.assertIn('<span class="nf-empty" title="no events stories met the rules">no headlines</span>', out)
 
 
 class DataInputValidation(unittest.TestCase):
