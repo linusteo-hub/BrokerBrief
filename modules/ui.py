@@ -374,7 +374,102 @@ def _https(url) -> str:
     return escape(url) if isinstance(url, str) and url.startswith("https://") else ""
 
 
-def brief_figures(items: list, *, prices: bool = False) -> str:
+# ── Charts (morning brief) ───────────────────────────────────────────────────
+# Drawn from the payload's `series`, whose points carry their own display
+# strings: these builders only place marks; they calculate no figure. Hover
+# is CSS only (Streamlit runs no scripts in page text): each point or bar is a
+# hit band larger than its mark, showing a crosshair and its value and date.
+
+def _edge(x: float) -> str:
+    """Tooltip anchoring so it never leaves the card: left third opens right, right third opens left."""
+    return " ch-pt-start" if x < 34 else " ch-pt-end" if x > 66 else ""
+
+
+def _chart_label(series: dict, name: str) -> str:
+    pts = series["points"]
+    return (f'{name}: {len(pts)} values from {pts[0]["date_display"]} to {pts[-1]["date_display"]}; '
+            f'latest {pts[-1]["display"]}')
+
+
+def line_chart(series: dict, name: str = "") -> str:
+    """One series as a line with a soft area under it. Its scale spans the series' own low to high."""
+    pts = series["points"]
+    values = [p["value"] for p in pts]
+    lo, hi = min(values), max(values)
+    pad = (hi - lo) * 0.12 or abs(hi) * 0.05 or 1.0
+    lo, hi = lo - pad, hi + pad
+    n = len(pts)
+    xs = [(i / (n - 1)) * 100 for i in range(n)]
+    ys = [(1 - (v - lo) / (hi - lo)) * 100 for v in values]
+    line = " ".join(f'{"M" if i == 0 else "L"}{x:.2f},{y:.2f}' for i, (x, y) in enumerate(zip(xs, ys)))
+    area = f"{line} L100,100 L0,100 Z"
+    band = 100 / n
+    hits = "".join(
+        f'<div class="ch-pt{_edge(x)}" style="left:{max(0.0, x - band / 2):.2f}%;width:{band:.2f}%;--y:{y:.2f}%">'
+        f'<i class="ch-dot"></i><span class="ch-tip"><b>{escape(p["display"])}</b>{escape(p["date_display"])}</span></div>'
+        for x, y, p in zip(xs, ys, pts))
+    top = max(pts, key=lambda p: p["value"])
+    bottom = min(pts, key=lambda p: p["value"])
+    return (f'<div class="ch ch-line" role="img" aria-label="{escape(_chart_label(series, name))}">'
+            f'<div class="ch-scale"><span>{escape(top["display"])}</span><span>{escape(bottom["display"])}</span></div>'
+            f'<div class="ch-plot"><svg class="ch-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">'
+            '<defs><linearGradient id="ch-fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="ch-fade-top"/>'
+            '<stop offset="1" class="ch-fade-bottom"/></linearGradient></defs>'
+            f'<path class="ch-area" d="{area}"/><path class="ch-path" d="{line}"/></svg>'
+            f'<i class="ch-last" style="--y:{ys[-1]:.2f}%"></i>{hits}</div>'
+            f'<div class="ch-axis"><span>{escape(pts[0]["date_display"])}</span><span>{escape(pts[-1]["date_display"])}</span></div></div>')
+
+
+def bar_chart(series: dict, name: str = "", compact: bool = False) -> str:
+    """One bar per point on a zero baseline (a cut baseline would exaggerate the change)."""
+    pts = series["points"]
+    hi = max(p["value"] for p in pts) or 1.0
+    bars = "".join(
+        f'<div class="ch-bar{_edge((i + .5) / len(pts) * 100)}" style="--h:{max(p["value"], 0) / hi * 100:.2f}%;--i:{i}">'
+        f'<span class="ch-tip"><b>{escape(p["display"])}</b>{escape(p["date_display"])}</span></div>'
+        for i, p in enumerate(pts))
+    axis = ("" if compact else
+            f'<div class="ch-axis"><span>{escape(pts[0]["date_display"])}</span><span>{escape(pts[-1]["date_display"])}</span></div>')
+    return (f'<div class="ch ch-bars{" ch-compact" if compact else ""}" role="img" aria-label="{escape(_chart_label(series, name))}">'
+            f'<div class="ch-plot">{bars}</div>{axis}</div>')
+
+
+def news_timeline(lanes: list, start: str, end: str) -> str:
+    """Headlines placed by publication time, one lane per section (the lane names the section, so
+    identity never rests on colour). `lanes` = [(title, items)]; `start`/`end` are ISO times."""
+    from datetime import datetime, timezone
+    t0, t1 = datetime.fromisoformat(start), datetime.fromisoformat(end)
+    span = (t1 - t0).total_seconds() or 1.0
+    rows = []
+    for title, items in lanes:
+        placed = []                              # (x, row): dots closer than 5% stack into rows
+        dots = []
+        for it in sorted(items, key=lambda i: str(i.get("published", ""))):
+            try:
+                x = (datetime.fromisoformat(it["published"]) - t0).total_seconds() / span * 100
+            except (KeyError, TypeError, ValueError):
+                continue
+            x = min(max(x, 0.0), 100.0)
+            row = 0
+            while any(abs(x - px) < 5 and r == row for px, r in placed):
+                row += 1
+            placed.append((x, row))
+            link = _https(it.get("link"))
+            tip = (f'<span class="ch-tip"><b>{_s(it, "headline")}</b>'
+                   f'{" · ".join(c for c in (_s(it, "publisher"), _s(it, "published_display")) if c)}</span>')
+            tag = "a" if link else "span"
+            attrs = f' href="{link}" target="_blank" rel="noopener noreferrer"' if link else ""
+            dots.append(f'<{tag} class="tl-dot{_edge(x)}" style="left:{x:.2f}%;--row:{row}"{attrs}>'
+                        f'<span class="sr-only">{_s(it, "headline")}</span>{tip}</{tag}>')
+        rows.append(f'<div class="tl-lane"><div class="tl-name">{escape(title)}</div>'
+                    f'<div class="tl-track" style="--rows:{max((r for _, r in placed), default=0)}">{"".join(dots) or "<em>no headlines</em>"}</div></div>')
+    t0, t1 = t0.astimezone(timezone.utc), t1.astimezone(timezone.utc)
+    fmt = lambda t: f"{t.day} {t:%b %H:%M}"
+    return (f'<div class="tl">{"".join(rows)}'
+            f'<div class="ch-axis tl-axis"><span>{fmt(t0)}</span><span>{fmt(t1)} UTC</span></div></div>')
+
+
+def brief_figures(items: list, *, prices: bool = False, chart: str = "") -> str:
     """One row per figure: label, value, each comparison in words, as-of date and source tag.
     The source's notes (e.g. MPA's "preliminary" warning) follow the figures, each note once."""
     rows, notes = [], []
@@ -389,12 +484,18 @@ def brief_figures(items: list, *, prices: bool = False) -> str:
             amount = "".join(f"{x} · " for x in parts)
             changes.append(f'<div class="mb-change"><span class="{cls}">{escape(word)}</span>{amount}'
                            f'vs {_s(ch, "compared_with")} ({_s(ch, "basis")})</div>')
+        graphic = ""
+        if chart and it.get("series"):
+            graphic = (line_chart(it["series"], it.get("label", "")) if chart == "line"
+                       else bar_chart(it["series"], it.get("label", ""), compact=bool(rows)))
+        elif chart and it.get("series_note"):
+            graphic = f'<div class="mb-fig-meta ch-none">No chart: {_s(it, "series_note")}</div>'
         note = (str(it["notes"]), _tag(it)) if it.get("notes") else None
         if note and note not in notes:
             notes.append(note)
         rows.append(f'<div class="mb-fig"><div class="mb-fig-label">{_s(it, "label")}</div>'
                     f'<div class="mb-fig-value">{_s(it, "display")}</div>{"".join(changes)}'
-                    f'<div class="mb-fig-meta">as of {_s(it, "as_of_display")}{_tag(it)}</div></div>')
+                    f'<div class="mb-fig-meta">as of {_s(it, "as_of_display")}{_tag(it)}</div>{graphic}</div>')
     return "".join(rows) + "".join(f'<div class="mb-note">{escape(n)}{tag}</div>' for n, tag in notes)
 
 
@@ -417,7 +518,7 @@ def brief_news(items: list) -> str:
 
 def brief_section(section: dict, body: str = "") -> str:
     """A section card: title, cadence, its state (ok / MISSING / NOT COVERED with the reason), then the body."""
-    return (f'<div class="info-card no-motion"><div class="mb-sec-head"><div class="info-card-title">{_s(section, "title")}</div>'
+    return (f'<div class="info-card"><div class="mb-sec-head"><div class="info-card-title">{_s(section, "title")}</div>'
             f'<div class="mb-cadence">{escape(section.get("cadence") or "")}</div></div>{_status_line(section)}{body}</div>')
 
 
@@ -435,4 +536,4 @@ def brief_sources(sources: list) -> str:
         f'<div><b>{_s(s, "name")}</b>{" · " + _s(s, "publisher") if s.get("publisher") else ""}<br>'
         f'Licence: {_s(s, "licence")}. {_s(s, "credit")} {links(s)}</div></div>'
         for s in sources)
-    return f'<div class="info-card no-motion"><div class="info-card-title">Sources</div>{rows}</div>'
+    return f'<div class="info-card"><div class="info-card-title">Sources</div>{rows}</div>'

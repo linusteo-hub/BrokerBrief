@@ -31,7 +31,7 @@ from typing import Callable, Optional
 
 from modules.morning_brief.allowlist import SourceNotAllowed, require_allowed
 from modules.morning_brief.checks import check_range, check_staleness
-from modules.morning_brief.figures import make_change, make_figure
+from modules.morning_brief.figures import make_change, make_figure, make_series
 from modules.morning_brief.guarded_http import guarded_get
 
 SOURCE_ID = "mpa_bunker_sales"
@@ -64,6 +64,7 @@ FIGURES = (
     ("sg_bunker_lng", "LNG (MPA type: LNG)", ("LNG",)),
 )
 
+CHART_MONTHS = 13               # the latest month and the 12 before it
 UNIT = "thousand tonnes"
 DECIMALS = 2                    # as MPA publishes it
 # Plausible monthly ranges in thousand tonnes. Monthly totals since 2015 have
@@ -147,10 +148,21 @@ def build_figures(months: dict, today: date) -> tuple[list, list]:
                 previous = round(sum(months[other][t] for t in types), DECIMALS)
                 changes.append(make_change(value, previous, fmt, decimals=DECIMALS,
                                            basis=basis, compared_with=month_display(other)))
+        # Chart: the latest month and up to 12 before it, complete months only (an
+        # incomplete month is a gap in the line, so the chart stops there).
+        history = []
+        for back in range(CHART_MONTHS):
+            month = shift_month(latest, -back)
+            if not is_complete(months.get(month)):
+                break
+            history.append((month_end(month), round(sum(months[month][t] for t in types), DECIMALS)))
+        chart, chart_note = make_series(history[::-1], fmt, label="Monthly sales as published by MPA",
+                                        date_display=lambda d: d.strftime("%B %Y"),
+                                        plausible_range=(low, high))
         figure = make_figure(
             figure_id=figure_id, label=label, unit=UNIT, value=value, fmt=fmt,
             as_of=month_end(latest), source_id=SOURCE_ID, quality_tier=source.quality_tier,
-            changes=changes,
+            changes=changes, series=chart, series_note=chart_note,
             notes="Monthly total. MPA marks the latest month's figures as preliminary estimates.",
             plausible_range=(low, high))
         figure["as_of_display"] = month_display(latest)     # a month, not a day

@@ -13,7 +13,16 @@ A figure looks like:
                     "abs_display": "USD 0.71/bbl", "pct_display": "0.84%",
                     "direction": "down", ...} ],
       "source_id": "eia_spot", "quality_tier": "LIVE_API",
+      "series": {"label": "...", "points": [{"date": "2026-08-28",
+                 "date_display": "28 August 2026", "value": 80.1,
+                 "display": "USD 80.10/bbl"}, ...]} or None,
+      "series_note": None, or why there is no series,
     }
+
+`series` is the short history a chart draws, oldest first, every point with
+its own display strings. It is checked against the same plausible range as
+the figure: one point outside it drops the whole series (with the reason in
+`series_note`), never a silently missing point.
 
 Direction is taken from the change *as displayed*: if the absolute change
 rounds to zero at display precision it is "flat", otherwise its sign. That way
@@ -66,10 +75,27 @@ def make_change(current: float, previous: float, fmt: Formatter, *, decimals: in
     }
 
 
+def make_series(points: list, fmt: Formatter, *, label: str, date_display: Callable,
+                plausible_range: Optional[tuple]) -> tuple[Optional[dict], Optional[str]]:
+    """`points` = [(date, value)] oldest first -> (series, None) or (None, reason)."""
+    if len(points) < 2:
+        return None, "fewer than two values in the chart window"
+    if plausible_range:
+        low, high = plausible_range
+        for d, v in points:
+            if not (low <= v <= high):
+                return None, (f"{fmt(v)} on {date_display(d)} is outside the plausible range "
+                              f"{low:g}–{high:g}, so no chart is drawn")
+    return {"label": label,
+            "points": [{"date": d.isoformat(), "date_display": date_display(d), "value": v, "display": fmt(v)}
+                       for d, v in points]}, None
+
+
 def make_figure(*, figure_id: str, label: str, unit: str, value: float, fmt: Formatter,
                 as_of: date, source_id: str, quality_tier: str,
                 changes: Optional[list] = None, notes: str = "",
-                plausible_range: Optional[tuple] = None) -> dict:
+                plausible_range: Optional[tuple] = None,
+                series: Optional[dict] = None, series_note: Optional[str] = None) -> dict:
     """`plausible_range` (low, high) is the range the fetcher already checked
     the value against. It travels with the figure so the publishing gate can
     re-check it: a bug that let a bad value past the fetcher is still caught."""
@@ -86,4 +112,6 @@ def make_figure(*, figure_id: str, label: str, unit: str, value: float, fmt: For
         "quality_tier": quality_tier,
         "notes": notes,
         "plausible_range": list(plausible_range) if plausible_range else None,
+        "series": series,
+        "series_note": series_note,
     }

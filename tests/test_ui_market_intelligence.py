@@ -208,6 +208,45 @@ class MarketIntelligencePage(unittest.TestCase):
         self.assertNotIn("USD 125.44/bbl", page)
 
 
+class MarketIntelligenceCharts(unittest.TestCase):
+    def test_price_lines_and_bunker_bars_are_drawn_from_the_series(self):
+        page = html(open_mi(mock.Mock(return_value=copy.deepcopy(PAYLOAD))))
+        self.assertEqual(page.count('<div class="ch ch-line"'), 2)
+        # Hover text is the payload's own display strings: the newest point is the figure itself.
+        self.assertIn("<b>USD 125.44/bbl</b>6 October 2026", page)
+        self.assertIn("<b>4,726.39 thousand tonnes</b>September 2026", page)
+        self.assertEqual(page.count('<div class="ch ch-bars'), 6)          # total full size, five compact
+        self.assertEqual(page.count('class="ch-bar'), 6 * 13)
+
+    def test_a_dropped_series_says_why_instead_of_drawing(self):
+        data = copy.deepcopy(PAYLOAD)
+        fig = data["sections"]["prices"]["items"][0]
+        fig.update(series=None, series_note="USD 5.00/bbl on 1 October 2026 is outside the plausible range 10–300, so no chart is drawn")
+        page = html(open_mi(mock.Mock(return_value=data)))
+        self.assertIn("No chart: USD 5.00/bbl on 1 October 2026 is outside the plausible range", page)
+        self.assertEqual(page.count('<div class="ch ch-line"'), 1)
+
+    def test_timeline_places_every_dated_headline_in_its_section_lane(self):
+        page = html(open_mi(mock.Mock(return_value=copy.deepcopy(PAYLOAD))))
+        sec = PAYLOAD["sections"]
+        news = (sec["freight"]["subsections"]["rate_direction"]["items"] + sec["sale_and_purchase"]["items"]
+                + sec["events"]["items"])
+        self.assertIn("Headlines over time", page)
+        self.assertEqual(page.count('class="tl-dot'), sum(1 for i in news if i.get("published")))
+        self.assertIn('<div class="tl-name">Sale &amp; Purchase</div>', page)
+
+
+class TimelineStacking(unittest.TestCase):
+    def test_headlines_at_the_same_time_stack_instead_of_hiding_each_other(self):
+        from modules import ui
+        items = [{"headline": f"H{i}", "published": "2026-10-12T09:00:00+00:00", "link": "https://example.org/"}
+                 for i in range(3)]
+        out = ui.news_timeline([("Events", items)], "2026-10-11T09:00:00+00:00", "2026-10-12T12:00:00+00:00")
+        for row in range(3):
+            self.assertIn(f"--row:{row}", out)
+        self.assertIn('style="--rows:2"', out)
+
+
 class DataInputValidation(unittest.TestCase):
     def test_no_rows_means_no_passed_checks(self):
         # "PASSED — all 0 rows populated" was shown for every column with nothing loaded.

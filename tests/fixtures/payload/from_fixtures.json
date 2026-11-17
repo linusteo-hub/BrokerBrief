@@ -129,6 +129,174 @@
             10.0,
             300.0
           ],
+          "series": {
+            "label": "Daily spot price as published by EIA",
+            "points": [
+              {
+                "date": "2026-08-28",
+                "date_display": "28 August 2026",
+                "value": 89.75,
+                "display": "USD 89.75/bbl"
+              },
+              {
+                "date": "2026-09-01",
+                "date_display": "1 September 2026",
+                "value": 96.02,
+                "display": "USD 96.02/bbl"
+              },
+              {
+                "date": "2026-09-02",
+                "date_display": "2 September 2026",
+                "value": 97.59,
+                "display": "USD 97.59/bbl"
+              },
+              {
+                "date": "2026-09-03",
+                "date_display": "3 September 2026",
+                "value": 100.52,
+                "display": "USD 100.52/bbl"
+              },
+              {
+                "date": "2026-09-04",
+                "date_display": "4 September 2026",
+                "value": 102.24,
+                "display": "USD 102.24/bbl"
+              },
+              {
+                "date": "2026-09-07",
+                "date_display": "7 September 2026",
+                "value": 104.47,
+                "display": "USD 104.47/bbl"
+              },
+              {
+                "date": "2026-09-08",
+                "date_display": "8 September 2026",
+                "value": 106.12,
+                "display": "USD 106.12/bbl"
+              },
+              {
+                "date": "2026-09-09",
+                "date_display": "9 September 2026",
+                "value": 109.51,
+                "display": "USD 109.51/bbl"
+              },
+              {
+                "date": "2026-09-10",
+                "date_display": "10 September 2026",
+                "value": 120.98,
+                "display": "USD 120.98/bbl"
+              },
+              {
+                "date": "2026-09-11",
+                "date_display": "11 September 2026",
+                "value": 118.06,
+                "display": "USD 118.06/bbl"
+              },
+              {
+                "date": "2026-09-14",
+                "date_display": "14 September 2026",
+                "value": 121.25,
+                "display": "USD 121.25/bbl"
+              },
+              {
+                "date": "2026-09-15",
+                "date_display": "15 September 2026",
+                "value": 130.8,
+                "display": "USD 130.80/bbl"
+              },
+              {
+                "date": "2026-09-16",
+                "date_display": "16 September 2026",
+                "value": 127.84,
+                "display": "USD 127.84/bbl"
+              },
+              {
+                "date": "2026-09-17",
+                "date_display": "17 September 2026",
+                "value": 121.18,
+                "display": "USD 121.18/bbl"
+              },
+              {
+                "date": "2026-09-18",
+                "date_display": "18 September 2026",
+                "value": 119.66,
+                "display": "USD 119.66/bbl"
+              },
+              {
+                "date": "2026-09-21",
+                "date_display": "21 September 2026",
+                "value": 116.15,
+                "display": "USD 116.15/bbl"
+              },
+              {
+                "date": "2026-09-22",
+                "date_display": "22 September 2026",
+                "value": 114.89,
+                "display": "USD 114.89/bbl"
+              },
+              {
+                "date": "2026-09-23",
+                "date_display": "23 September 2026",
+                "value": 117.45,
+                "display": "USD 117.45/bbl"
+              },
+              {
+                "date": "2026-09-24",
+                "date_display": "24 September 2026",
+                "value": 120.92,
+                "display": "USD 120.92/bbl"
+              },
+              {
+                "date": "2026-09-25",
+                "date_display": "25 September 2026",
+                "value": 116.01,
+                "display": "USD 116.01/bbl"
+              },
+              {
+                "date": "2026-09-28",
+                "date_display": "28 September 2026",
+                "value": 119.97,
+                "display": "USD 119.97/bbl"
+              },
+              {
+                "date": "2026-09-29",
+                "date_display": "29 September 2026",
+                "value": 113.96,
+                "display": "USD 113.96/bbl"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "30 September 2026",
+                "value": 115.91,
+                "display": "USD 115.91/bbl"
+              },
+              {
+                "date": "2026-10-01",
+                "date_display": "1 October 2026",
+                "value": 114.82,
+                "display": "USD 114.82/bbl"
+              },
+              {
+                "date": "2026-10-02",
+                "date_display": "2 October 2026",
+                "value": 135.51,
+                "display": "USD 135.51/bbl"
+              },
+              {
+                "date": "2026-10-05",
+                "date_display": "5 October 2026",
+                "value": 125.51,
+                "display": "USD 125.51/bbl"
+              },
+              {
+                "date": "2026-10-06",
+                "date_display": "6 October 2026",
+                "value": 125.44,
+                "display": "USD 125.44/bbl"
+              }
+            ]
+          },
+          "series_note": null,
           "source_tag": "S1"
         },
         {
@@ -170,6 +338,174 @@
             0.5,
             10.0
           ],
+          "series": {
+            "label": "Daily spot price as published by EIA",
+            "points": [
+              {
+                "date": "2026-08-28",
+                "date_display": "28 August 2026",
+                "value": 4.351,
+                "display": "USD 4.351/gal"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "31 August 2026",
+                "value": 4.491,
+                "display": "USD 4.491/gal"
+              },
+              {
+                "date": "2026-09-01",
+                "date_display": "1 September 2026",
+                "value": 4.724,
+                "display": "USD 4.724/gal"
+              },
+              {
+                "date": "2026-09-02",
+                "date_display": "2 September 2026",
+                "value": 4.666,
+                "display": "USD 4.666/gal"
+              },
+              {
+                "date": "2026-09-03",
+                "date_display": "3 September 2026",
+                "value": 4.592,
+                "display": "USD 4.592/gal"
+              },
+              {
+                "date": "2026-09-04",
+                "date_display": "4 September 2026",
+                "value": 4.549,
+                "display": "USD 4.549/gal"
+              },
+              {
+                "date": "2026-09-08",
+                "date_display": "8 September 2026",
+                "value": 4.644,
+                "display": "USD 4.644/gal"
+              },
+              {
+                "date": "2026-09-09",
+                "date_display": "9 September 2026",
+                "value": 4.85,
+                "display": "USD 4.850/gal"
+              },
+              {
+                "date": "2026-09-10",
+                "date_display": "10 September 2026",
+                "value": 5.17,
+                "display": "USD 5.170/gal"
+              },
+              {
+                "date": "2026-09-11",
+                "date_display": "11 September 2026",
+                "value": 5.048,
+                "display": "USD 5.048/gal"
+              },
+              {
+                "date": "2026-09-14",
+                "date_display": "14 September 2026",
+                "value": 5.078,
+                "display": "USD 5.078/gal"
+              },
+              {
+                "date": "2026-09-15",
+                "date_display": "15 September 2026",
+                "value": 5.338,
+                "display": "USD 5.338/gal"
+              },
+              {
+                "date": "2026-09-16",
+                "date_display": "16 September 2026",
+                "value": 5.365,
+                "display": "USD 5.365/gal"
+              },
+              {
+                "date": "2026-09-17",
+                "date_display": "17 September 2026",
+                "value": 5.174,
+                "display": "USD 5.174/gal"
+              },
+              {
+                "date": "2026-09-18",
+                "date_display": "18 September 2026",
+                "value": 5.16,
+                "display": "USD 5.160/gal"
+              },
+              {
+                "date": "2026-09-21",
+                "date_display": "21 September 2026",
+                "value": 4.977,
+                "display": "USD 4.977/gal"
+              },
+              {
+                "date": "2026-09-22",
+                "date_display": "22 September 2026",
+                "value": 5.007,
+                "display": "USD 5.007/gal"
+              },
+              {
+                "date": "2026-09-23",
+                "date_display": "23 September 2026",
+                "value": 4.962,
+                "display": "USD 4.962/gal"
+              },
+              {
+                "date": "2026-09-24",
+                "date_display": "24 September 2026",
+                "value": 4.881,
+                "display": "USD 4.881/gal"
+              },
+              {
+                "date": "2026-09-25",
+                "date_display": "25 September 2026",
+                "value": 4.949,
+                "display": "USD 4.949/gal"
+              },
+              {
+                "date": "2026-09-28",
+                "date_display": "28 September 2026",
+                "value": 4.91,
+                "display": "USD 4.910/gal"
+              },
+              {
+                "date": "2026-09-29",
+                "date_display": "29 September 2026",
+                "value": 4.999,
+                "display": "USD 4.999/gal"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "30 September 2026",
+                "value": 5.023,
+                "display": "USD 5.023/gal"
+              },
+              {
+                "date": "2026-10-01",
+                "date_display": "1 October 2026",
+                "value": 4.75,
+                "display": "USD 4.750/gal"
+              },
+              {
+                "date": "2026-10-02",
+                "date_display": "2 October 2026",
+                "value": 4.674,
+                "display": "USD 4.674/gal"
+              },
+              {
+                "date": "2026-10-05",
+                "date_display": "5 October 2026",
+                "value": 4.628,
+                "display": "USD 4.628/gal"
+              },
+              {
+                "date": "2026-10-06",
+                "date_display": "6 October 2026",
+                "value": 4.713,
+                "display": "USD 4.713/gal"
+              }
+            ]
+          },
+          "series_note": null,
           "source_tag": "S1"
         }
       ]
@@ -224,6 +560,90 @@
             1000.0,
             10000.0
           ],
+          "series": {
+            "label": "Monthly sales as published by MPA",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 4765.08,
+                "display": "4,765.08 thousand tonnes"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 4817.73,
+                "display": "4,817.73 thousand tonnes"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 4820.68,
+                "display": "4,820.68 thousand tonnes"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 5508.63,
+                "display": "5,508.63 thousand tonnes"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 5228.07,
+                "display": "5,228.07 thousand tonnes"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 4678.17,
+                "display": "4,678.17 thousand tonnes"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 4766.84,
+                "display": "4,766.84 thousand tonnes"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 4355.07,
+                "display": "4,355.07 thousand tonnes"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 4553.66,
+                "display": "4,553.66 thousand tonnes"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 4672.49,
+                "display": "4,672.49 thousand tonnes"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 4740.14,
+                "display": "4,740.14 thousand tonnes"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 4772.68,
+                "display": "4,772.68 thousand tonnes"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 4726.39,
+                "display": "4,726.39 thousand tonnes"
+              }
+            ]
+          },
+          "series_note": null,
           "period": "month",
           "source_tag": "S2"
         },
@@ -266,6 +686,90 @@
             0.0,
             10000.0
           ],
+          "series": {
+            "label": "Monthly sales as published by MPA",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 2350.48,
+                "display": "2,350.48 thousand tonnes"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 2433.38,
+                "display": "2,433.38 thousand tonnes"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 2512.38,
+                "display": "2,512.38 thousand tonnes"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 2830.32,
+                "display": "2,830.32 thousand tonnes"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 2561.23,
+                "display": "2,561.23 thousand tonnes"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 2310.01,
+                "display": "2,310.01 thousand tonnes"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 2338.69,
+                "display": "2,338.69 thousand tonnes"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 2192.51,
+                "display": "2,192.51 thousand tonnes"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 2296.76,
+                "display": "2,296.76 thousand tonnes"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 2197.0,
+                "display": "2,197.00 thousand tonnes"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 2327.9,
+                "display": "2,327.90 thousand tonnes"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 2193.8,
+                "display": "2,193.80 thousand tonnes"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 2218.11,
+                "display": "2,218.11 thousand tonnes"
+              }
+            ]
+          },
+          "series_note": null,
           "period": "month",
           "source_tag": "S2"
         },
@@ -308,6 +812,90 @@
             0.0,
             10000.0
           ],
+          "series": {
+            "label": "Monthly sales as published by MPA",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 1872.95,
+                "display": "1,872.95 thousand tonnes"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 1866.53,
+                "display": "1,866.53 thousand tonnes"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 1818.67,
+                "display": "1,818.67 thousand tonnes"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 2117.58,
+                "display": "2,117.58 thousand tonnes"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 2159.67,
+                "display": "2,159.67 thousand tonnes"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 1833.57,
+                "display": "1,833.57 thousand tonnes"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 1934.22,
+                "display": "1,934.22 thousand tonnes"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 1787.93,
+                "display": "1,787.93 thousand tonnes"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 1795.83,
+                "display": "1,795.83 thousand tonnes"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 2034.55,
+                "display": "2,034.55 thousand tonnes"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 1952.9,
+                "display": "1,952.90 thousand tonnes"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 2095.18,
+                "display": "2,095.18 thousand tonnes"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 1993.2,
+                "display": "1,993.20 thousand tonnes"
+              }
+            ]
+          },
+          "series_note": null,
           "period": "month",
           "source_tag": "S2"
         },
@@ -350,6 +938,90 @@
             0.0,
             10000.0
           ],
+          "series": {
+            "label": "Monthly sales as published by MPA",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 373.56,
+                "display": "373.56 thousand tonnes"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 392.0,
+                "display": "392.00 thousand tonnes"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 366.41,
+                "display": "366.41 thousand tonnes"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 410.55,
+                "display": "410.55 thousand tonnes"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 402.06,
+                "display": "402.06 thousand tonnes"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 371.72,
+                "display": "371.72 thousand tonnes"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 346.87,
+                "display": "346.87 thousand tonnes"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 256.25,
+                "display": "256.25 thousand tonnes"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 328.7,
+                "display": "328.70 thousand tonnes"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 343.8,
+                "display": "343.80 thousand tonnes"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 358.87,
+                "display": "358.87 thousand tonnes"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 367.73,
+                "display": "367.73 thousand tonnes"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 378.84,
+                "display": "378.84 thousand tonnes"
+              }
+            ]
+          },
+          "series_note": null,
           "period": "month",
           "source_tag": "S2"
         },
@@ -392,6 +1064,90 @@
             0.0,
             10000.0
           ],
+          "series": {
+            "label": "Monthly sales as published by MPA",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 119.33,
+                "display": "119.33 thousand tonnes"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 62.97,
+                "display": "62.97 thousand tonnes"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 62.18,
+                "display": "62.18 thousand tonnes"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 91.07,
+                "display": "91.07 thousand tonnes"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 60.21,
+                "display": "60.21 thousand tonnes"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 92.72,
+                "display": "92.72 thousand tonnes"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 92.34,
+                "display": "92.34 thousand tonnes"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 75.95,
+                "display": "75.95 thousand tonnes"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 61.46,
+                "display": "61.46 thousand tonnes"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 40.3,
+                "display": "40.30 thousand tonnes"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 39.51,
+                "display": "39.51 thousand tonnes"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 57.33,
+                "display": "57.33 thousand tonnes"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 83.21,
+                "display": "83.21 thousand tonnes"
+              }
+            ]
+          },
+          "series_note": null,
           "period": "month",
           "source_tag": "S2"
         },
@@ -434,6 +1190,90 @@
             0.0,
             10000.0
           ],
+          "series": {
+            "label": "Monthly sales as published by MPA",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 48.45,
+                "display": "48.45 thousand tonnes"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 60.6,
+                "display": "60.60 thousand tonnes"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 55.04,
+                "display": "55.04 thousand tonnes"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 54.57,
+                "display": "54.57 thousand tonnes"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 42.59,
+                "display": "42.59 thousand tonnes"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 59.01,
+                "display": "59.01 thousand tonnes"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 49.02,
+                "display": "49.02 thousand tonnes"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 42.43,
+                "display": "42.43 thousand tonnes"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 70.27,
+                "display": "70.27 thousand tonnes"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 54.97,
+                "display": "54.97 thousand tonnes"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 58.69,
+                "display": "58.69 thousand tonnes"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 58.64,
+                "display": "58.64 thousand tonnes"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 51.51,
+                "display": "51.51 thousand tonnes"
+              }
+            ]
+          },
+          "series_note": null,
           "period": "month",
           "source_tag": "S2"
         }
@@ -537,6 +1377,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             },
             {
@@ -567,6 +1409,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             },
             {
@@ -597,6 +1441,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             },
             {
@@ -627,6 +1473,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             },
             {
@@ -657,6 +1505,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             },
             {
@@ -687,6 +1537,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             },
             {
@@ -717,6 +1569,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             },
             {
@@ -747,6 +1601,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             },
             {
@@ -777,6 +1633,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             },
             {
@@ -807,6 +1665,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             },
             {
@@ -837,6 +1697,8 @@
                 0,
                 10000
               ],
+              "series": null,
+              "series_note": null,
               "source_tag": "S4"
             }
           ]

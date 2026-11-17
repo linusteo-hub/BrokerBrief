@@ -16,11 +16,12 @@ from typing import Callable, Optional
 from modules.eia import fetch_spot_series
 from modules.morning_brief.allowlist import require_allowed
 from modules.morning_brief.checks import check_range, check_staleness
-from modules.morning_brief.figures import fmt_date, make_change, make_figure, money
+from modules.morning_brief.figures import fmt_date, make_change, make_figure, make_series, money
 from modules.morning_brief.guarded_http import guarded_get
 
 SOURCE_ID = "eia_spot"
-LOOKBACK_DAYS = 45          # enough rows for a week-on-week change after a long lag
+CHART_DAYS = 63             # the chart shows the last 9 weeks up to the latest value
+LOOKBACK_DAYS = 70          # covers the chart window, and a week-on-week change after a long lag
 WEEK_GAP_TOLERANCE = 5      # week-ago value may be up to 7+5 days before as_of (holidays)
 
 
@@ -86,10 +87,14 @@ def build_price_figure(series: PriceSeries, rows: list, today: date) -> tuple[Op
                                    basis="one week earlier",
                                    compared_with=fmt_date(wk_date)))
 
+    window = [(d, v) for d, v in observations if d > as_of - timedelta(days=CHART_DAYS)]
+    chart, chart_note = make_series(window, fmt, label="Daily spot price as published by EIA",
+                                    date_display=fmt_date, plausible_range=(series.low, series.high))
     return make_figure(figure_id=series.key, label=series.label, unit=series.unit,
                        value=value, fmt=fmt, as_of=as_of, source_id=SOURCE_ID,
                        quality_tier=source.quality_tier, changes=changes,
-                       plausible_range=(series.low, series.high)), None
+                       plausible_range=(series.low, series.high),
+                       series=chart, series_note=chart_note), None
 
 
 def fetch_prices(api_key: Optional[str], today: date, get: Callable = guarded_get) -> dict:

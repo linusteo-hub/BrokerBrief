@@ -735,8 +735,8 @@ elif page == "Market intelligence":
         col_figs, col_news = st.columns([7, 5], gap="large")
         with col_figs:
             st.markdown(
-                ui.brief_section(sec["prices"], ui.brief_figures(sec["prices"].get("items") or [], prices=True))
-                + ui.brief_section(sec["bunker_sales"], ui.brief_figures(sec["bunker_sales"].get("items") or []))
+                ui.brief_section(sec["prices"], ui.brief_figures(sec["prices"].get("items") or [], prices=True, chart="line"))
+                + ui.brief_section(sec["bunker_sales"], ui.brief_figures(sec["bunker_sales"].get("items") or [], chart="bars"))
                 + ui.brief_section(freight, freight_body),
                 unsafe_allow_html=True)
         # A section this page does not know yet (a newer payload) is still shown, never silently dropped.
@@ -753,9 +753,18 @@ elif page == "Market intelligence":
             st.markdown(ui.warn_strip(f"Feeds that failed in this build, so their items are missing below: {listed}. "
                                       f"Retried after {FAILURE_RETRY_SECONDS // 60} minutes."),
                         unsafe_allow_html=True)
+        lanes = [(s.get("title", ""), s.get("items") or []) for s in
+                 (subs.get("rate_direction", {}), sec["sale_and_purchase"], sec["events"]) if s]
+        published = [it["published"] for _, items in lanes for it in items if it.get("published")]
+        timeline = ""
+        if published:
+            timeline = ('<div class="info-card"><div class="mb-sec-head"><div class="info-card-title">Headlines over time</div>'
+                        '<div class="mb-cadence">hover or tab to a dot to read it</div></div>'
+                        + ui.news_timeline(lanes, min(published, key=datetime.fromisoformat), payload["generated_at"]) + '</div>')
         with col_news:
             st.markdown(
-                ui.brief_section(sec["sale_and_purchase"], ui.brief_news(sec["sale_and_purchase"].get("items") or []))
+                timeline
+                + ui.brief_section(sec["sale_and_purchase"], ui.brief_news(sec["sale_and_purchase"].get("items") or []))
                 + ui.brief_section(sec["events"], ui.brief_news(sec["events"].get("items") or []))
                 + extra
                 + ui.brief_sources(payload.get("sources") or []),

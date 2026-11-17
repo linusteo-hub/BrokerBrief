@@ -143,6 +143,7 @@ Licensed market data or paid sources are never used in the deployed app.
   - Brent and diesel prices (EIA), Singapore bunker sales (MPA), and ship activity (IMF PortWatch), each with its date and source tag; the value and date come from the source, and the comparisons with earlier readings (for example the previous published day, or one week earlier) are calculated by BrokerBrief's code;
   - freight-rate direction, sale-and-purchase and events headlines from gCaptain, Splash247 and The Maritime Executive, shown as headline, publisher, date and link only;
   - a section with no verified data is marked missing, or not covered (container freight rates, which no free source may republish), with the reason.
+  - charts drawn from the same checked data: a line of each price over the last nine weeks, bars of each bunker-sales series over the latest 13 months (zero baseline), and a timeline of the headlines by section. Hovering shows each point's value and date as the source published it. A chart value outside its plausible range drops that chart, with the reason shown, and the publishing gate re-checks every chart value.
 
   Shared by every visitor and rebuilt on the first visit after it is 3 hours old; a brief built while a feed was down names the failed feed on the page and is rebuilt on the first visit after 5 minutes. Covered by `tests/test_ui_market_intelligence.py`.
 - **Data input** takes your own CSV of freight and bunker rows and turns it into a signal table, bunker spreads, and email, PDF and LinkedIn reports.

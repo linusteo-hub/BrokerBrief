@@ -169,6 +169,14 @@ def final_gate(payload: dict) -> None:
         require_allowed(item["source_id"], numeric=is_figure)
         if item.get("source_tag") not in tags:
             raise SourceNotAllowed(f"item {item.get('id')!r} has no source tag in `sources`")
+        if is_figure and item.get("series"):
+            # Re-check every chart point: a bug that let a bad value past the fetcher is still caught.
+            low_high = item.get("plausible_range")
+            for point in item["series"].get("points") or []:
+                if not isinstance(point.get("value"), (int, float)) or not point.get("display"):
+                    raise ValueError(f"figure {item.get('id')!r} has a chart point without a value and display")
+                if low_high and not (low_high[0] <= point["value"] <= low_high[1]):
+                    raise ValueError(f"figure {item.get('id')!r} has a chart point outside its plausible range")
         if not is_figure:
             if item.get("excerpt") and re.search(r"\d", item["excerpt"]):
                 raise ValueError(f"news item {item['id']!r} has a digit in its excerpt")
