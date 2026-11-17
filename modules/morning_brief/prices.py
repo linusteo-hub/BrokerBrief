@@ -30,6 +30,7 @@ class PriceSeries:
     key: str
     series_id: str          # EIA series ID, read from EIA's spot-price table
     label: str
+    short_label: str        # for the page; `label` says exactly what it is
     unit: str
     decimals: int           # as EIA publishes it
     low: float              # plausible range; outside it the value is refused
@@ -37,10 +38,10 @@ class PriceSeries:
 
 
 SERIES = (
-    PriceSeries("brent_spot", "RBRTE", "Brent crude oil spot price (FOB Europe)",
+    PriceSeries("brent_spot", "RBRTE", "Brent crude oil spot price (FOB Europe)", "Brent crude",
                 "USD/bbl", 2, 10.0, 300.0),
     PriceSeries("ulsd_nyh", "EER_EPD2DXL0_PF4_Y35NY_DPG",
-                "New York Harbor ultra-low-sulphur diesel spot price",
+                "New York Harbor ultra-low-sulphur diesel spot price", "New York Harbor diesel",
                 "USD/gal", 3, 0.5, 10.0),
 )
 
@@ -94,7 +95,7 @@ def build_price_figure(series: PriceSeries, rows: list, today: date) -> tuple[Op
                        value=value, fmt=fmt, as_of=as_of, source_id=SOURCE_ID,
                        quality_tier=source.quality_tier, changes=changes,
                        plausible_range=(series.low, series.high),
-                       series=chart, series_note=chart_note), None
+                       series=chart, series_note=chart_note) | {"short_label": series.short_label}, None
 
 
 def fetch_prices(api_key: Optional[str], today: date, get: Callable = guarded_get) -> dict:

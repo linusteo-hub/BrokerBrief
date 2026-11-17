@@ -753,13 +753,15 @@ elif page == "Market intelligence":
             st.markdown(ui.warn_strip(f"Feeds that failed in this build, so their items are missing below: {listed}. "
                                       f"Retried after {FAILURE_RETRY_SECONDS // 60} minutes."),
                         unsafe_allow_html=True)
-        lanes = [(s.get("title", ""), s.get("items") or [], s.get("reason") or "") for s in
-                 (subs.get("rate_direction", {}), sec["sale_and_purchase"], sec["events"]) if s]
+        # Short lane names; each section's full title is on its own card below.
+        lanes = [(name, s.get("items") or [], s.get("reason") or "") for name, s in
+                 (("Rate direction", subs.get("rate_direction", {})), ("Sale & Purchase", sec["sale_and_purchase"]),
+                  ("Events", sec["events"])) if s]
         published = [it["published"] for _, items, _ in lanes for it in items if it.get("published")]
         timeline = ""
         if published:
-            timeline = ('<div class="info-card"><div class="mb-sec-head"><div class="info-card-title">Headlines over time</div>'
-                        '<div class="mb-cadence">hover or tab to a dot to read it</div></div>'
+            timeline = ('<div class="info-card"><div class="mb-sec-head"><div class="info-card-title">News flow</div>'
+                        '</div>'
                         + ui.news_timeline(lanes, min(published, key=datetime.fromisoformat), payload["generated_at"]) + '</div>')
         with col_news:
             st.markdown(

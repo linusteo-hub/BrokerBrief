@@ -297,6 +297,7 @@
             ]
           },
           "series_note": null,
+          "short_label": "Brent crude",
           "source_tag": "S1"
         },
         {
@@ -506,6 +507,7 @@
             ]
           },
           "series_note": null,
+          "short_label": "New York Harbor diesel",
           "source_tag": "S1"
         }
       ]
@@ -524,19 +526,19 @@
         {
           "id": "sg_bunker_total",
           "label": "Singapore bunker sales, all fuel types (BrokerBrief sum of MPA's types)",
-          "unit": "thousand tonnes",
-          "value": 4726.39,
-          "display": "4,726.39 thousand tonnes",
+          "unit": "MT",
+          "value": 4726390,
+          "display": "4,726,390 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 4772.68,
-              "previous_display": "4,772.68 thousand tonnes",
-              "abs_change": -46.29,
-              "abs_display": "46.29 thousand tonnes",
+              "previous_value": 4772680,
+              "previous_display": "4,772,680 MT",
+              "abs_change": -46290,
+              "abs_display": "46,290 MT",
               "pct_change": -0.97,
               "pct_display": "0.97%",
               "direction": "down"
@@ -544,10 +546,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 4765.08,
-              "previous_display": "4,765.08 thousand tonnes",
-              "abs_change": -38.69,
-              "abs_display": "38.69 thousand tonnes",
+              "previous_value": 4765080,
+              "previous_display": "4,765,080 MT",
+              "abs_change": -38690,
+              "abs_display": "38,690 MT",
               "pct_change": -0.81,
               "pct_display": "0.81%",
               "direction": "down"
@@ -555,10 +557,10 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            1000.0,
-            10000.0
+            1000000,
+            10000000
           ],
           "series": {
             "label": "BrokerBrief sum of MPA's monthly figures",
@@ -566,103 +568,104 @@
               {
                 "date": "2025-09-30",
                 "date_display": "September 2025",
-                "value": 4765.08,
-                "display": "4,765.08 thousand tonnes"
+                "value": 4765080,
+                "display": "4,765,080 MT"
               },
               {
                 "date": "2025-10-31",
                 "date_display": "October 2025",
-                "value": 4817.73,
-                "display": "4,817.73 thousand tonnes"
+                "value": 4817730,
+                "display": "4,817,730 MT"
               },
               {
                 "date": "2025-11-30",
                 "date_display": "November 2025",
-                "value": 4820.68,
-                "display": "4,820.68 thousand tonnes"
+                "value": 4820680,
+                "display": "4,820,680 MT"
               },
               {
                 "date": "2025-12-31",
                 "date_display": "December 2025",
-                "value": 5508.63,
-                "display": "5,508.63 thousand tonnes"
+                "value": 5508630,
+                "display": "5,508,630 MT"
               },
               {
                 "date": "2026-01-31",
                 "date_display": "January 2026",
-                "value": 5228.07,
-                "display": "5,228.07 thousand tonnes"
+                "value": 5228070,
+                "display": "5,228,070 MT"
               },
               {
                 "date": "2026-02-28",
                 "date_display": "February 2026",
-                "value": 4678.17,
-                "display": "4,678.17 thousand tonnes"
+                "value": 4678170,
+                "display": "4,678,170 MT"
               },
               {
                 "date": "2026-03-31",
                 "date_display": "March 2026",
-                "value": 4766.84,
-                "display": "4,766.84 thousand tonnes"
+                "value": 4766840,
+                "display": "4,766,840 MT"
               },
               {
                 "date": "2026-04-30",
                 "date_display": "April 2026",
-                "value": 4355.07,
-                "display": "4,355.07 thousand tonnes"
+                "value": 4355070,
+                "display": "4,355,070 MT"
               },
               {
                 "date": "2026-05-31",
                 "date_display": "May 2026",
-                "value": 4553.66,
-                "display": "4,553.66 thousand tonnes"
+                "value": 4553660,
+                "display": "4,553,660 MT"
               },
               {
                 "date": "2026-06-30",
                 "date_display": "June 2026",
-                "value": 4672.49,
-                "display": "4,672.49 thousand tonnes"
+                "value": 4672490,
+                "display": "4,672,490 MT"
               },
               {
                 "date": "2026-07-31",
                 "date_display": "July 2026",
-                "value": 4740.14,
-                "display": "4,740.14 thousand tonnes"
+                "value": 4740140,
+                "display": "4,740,140 MT"
               },
               {
                 "date": "2026-08-31",
                 "date_display": "August 2026",
-                "value": 4772.68,
-                "display": "4,772.68 thousand tonnes"
+                "value": 4772680,
+                "display": "4,772,680 MT"
               },
               {
                 "date": "2026-09-30",
                 "date_display": "September 2026",
-                "value": 4726.39,
-                "display": "4,726.39 thousand tonnes"
+                "value": 4726390,
+                "display": "4,726,390 MT"
               }
             ]
           },
           "series_note": null,
+          "short_label": "All fuels",
           "period": "month",
           "source_tag": "S2"
         },
         {
           "id": "sg_bunker_lsfo",
           "label": "Low sulphur fuel oil (MPA type: Low Sulphur Fuel Oil)",
-          "unit": "thousand tonnes",
-          "value": 2218.11,
-          "display": "2,218.11 thousand tonnes",
+          "unit": "MT",
+          "value": 2218110,
+          "display": "2,218,110 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 2193.8,
-              "previous_display": "2,193.80 thousand tonnes",
-              "abs_change": 24.31,
-              "abs_display": "24.31 thousand tonnes",
+              "previous_value": 2193800,
+              "previous_display": "2,193,800 MT",
+              "abs_change": 24310,
+              "abs_display": "24,310 MT",
               "pct_change": 1.11,
               "pct_display": "1.11%",
               "direction": "up"
@@ -670,10 +673,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 2350.48,
-              "previous_display": "2,350.48 thousand tonnes",
-              "abs_change": -132.37,
-              "abs_display": "132.37 thousand tonnes",
+              "previous_value": 2350480,
+              "previous_display": "2,350,480 MT",
+              "abs_change": -132370,
+              "abs_display": "132,370 MT",
               "pct_change": -5.63,
               "pct_display": "5.63%",
               "direction": "down"
@@ -681,10 +684,10 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            0.0,
-            10000.0
+            0,
+            10000000
           ],
           "series": {
             "label": "Monthly sales as published by MPA",
@@ -692,103 +695,104 @@
               {
                 "date": "2025-09-30",
                 "date_display": "September 2025",
-                "value": 2350.48,
-                "display": "2,350.48 thousand tonnes"
+                "value": 2350480,
+                "display": "2,350,480 MT"
               },
               {
                 "date": "2025-10-31",
                 "date_display": "October 2025",
-                "value": 2433.38,
-                "display": "2,433.38 thousand tonnes"
+                "value": 2433380,
+                "display": "2,433,380 MT"
               },
               {
                 "date": "2025-11-30",
                 "date_display": "November 2025",
-                "value": 2512.38,
-                "display": "2,512.38 thousand tonnes"
+                "value": 2512380,
+                "display": "2,512,380 MT"
               },
               {
                 "date": "2025-12-31",
                 "date_display": "December 2025",
-                "value": 2830.32,
-                "display": "2,830.32 thousand tonnes"
+                "value": 2830320,
+                "display": "2,830,320 MT"
               },
               {
                 "date": "2026-01-31",
                 "date_display": "January 2026",
-                "value": 2561.23,
-                "display": "2,561.23 thousand tonnes"
+                "value": 2561230,
+                "display": "2,561,230 MT"
               },
               {
                 "date": "2026-02-28",
                 "date_display": "February 2026",
-                "value": 2310.01,
-                "display": "2,310.01 thousand tonnes"
+                "value": 2310010,
+                "display": "2,310,010 MT"
               },
               {
                 "date": "2026-03-31",
                 "date_display": "March 2026",
-                "value": 2338.69,
-                "display": "2,338.69 thousand tonnes"
+                "value": 2338690,
+                "display": "2,338,690 MT"
               },
               {
                 "date": "2026-04-30",
                 "date_display": "April 2026",
-                "value": 2192.51,
-                "display": "2,192.51 thousand tonnes"
+                "value": 2192510,
+                "display": "2,192,510 MT"
               },
               {
                 "date": "2026-05-31",
                 "date_display": "May 2026",
-                "value": 2296.76,
-                "display": "2,296.76 thousand tonnes"
+                "value": 2296760,
+                "display": "2,296,760 MT"
               },
               {
                 "date": "2026-06-30",
                 "date_display": "June 2026",
-                "value": 2197.0,
-                "display": "2,197.00 thousand tonnes"
+                "value": 2197000,
+                "display": "2,197,000 MT"
               },
               {
                 "date": "2026-07-31",
                 "date_display": "July 2026",
-                "value": 2327.9,
-                "display": "2,327.90 thousand tonnes"
+                "value": 2327900,
+                "display": "2,327,900 MT"
               },
               {
                 "date": "2026-08-31",
                 "date_display": "August 2026",
-                "value": 2193.8,
-                "display": "2,193.80 thousand tonnes"
+                "value": 2193800,
+                "display": "2,193,800 MT"
               },
               {
                 "date": "2026-09-30",
                 "date_display": "September 2026",
-                "value": 2218.11,
-                "display": "2,218.11 thousand tonnes"
+                "value": 2218110,
+                "display": "2,218,110 MT"
               }
             ]
           },
           "series_note": null,
+          "short_label": "Low sulphur fuel oil",
           "period": "month",
           "source_tag": "S2"
         },
         {
           "id": "sg_bunker_mfo",
           "label": "Marine fuel oil, the high-sulphur grades (MPA type: Marine Fuel Oil)",
-          "unit": "thousand tonnes",
-          "value": 1993.2,
-          "display": "1,993.20 thousand tonnes",
+          "unit": "MT",
+          "value": 1993200,
+          "display": "1,993,200 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 2095.18,
-              "previous_display": "2,095.18 thousand tonnes",
-              "abs_change": -101.98,
-              "abs_display": "101.98 thousand tonnes",
+              "previous_value": 2095180,
+              "previous_display": "2,095,180 MT",
+              "abs_change": -101980,
+              "abs_display": "101,980 MT",
               "pct_change": -4.87,
               "pct_display": "4.87%",
               "direction": "down"
@@ -796,10 +800,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 1872.95,
-              "previous_display": "1,872.95 thousand tonnes",
-              "abs_change": 120.25,
-              "abs_display": "120.25 thousand tonnes",
+              "previous_value": 1872950,
+              "previous_display": "1,872,950 MT",
+              "abs_change": 120250,
+              "abs_display": "120,250 MT",
               "pct_change": 6.42,
               "pct_display": "6.42%",
               "direction": "up"
@@ -807,10 +811,10 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            0.0,
-            10000.0
+            0,
+            10000000
           ],
           "series": {
             "label": "Monthly sales as published by MPA",
@@ -818,103 +822,104 @@
               {
                 "date": "2025-09-30",
                 "date_display": "September 2025",
-                "value": 1872.95,
-                "display": "1,872.95 thousand tonnes"
+                "value": 1872950,
+                "display": "1,872,950 MT"
               },
               {
                 "date": "2025-10-31",
                 "date_display": "October 2025",
-                "value": 1866.53,
-                "display": "1,866.53 thousand tonnes"
+                "value": 1866530,
+                "display": "1,866,530 MT"
               },
               {
                 "date": "2025-11-30",
                 "date_display": "November 2025",
-                "value": 1818.67,
-                "display": "1,818.67 thousand tonnes"
+                "value": 1818670,
+                "display": "1,818,670 MT"
               },
               {
                 "date": "2025-12-31",
                 "date_display": "December 2025",
-                "value": 2117.58,
-                "display": "2,117.58 thousand tonnes"
+                "value": 2117580,
+                "display": "2,117,580 MT"
               },
               {
                 "date": "2026-01-31",
                 "date_display": "January 2026",
-                "value": 2159.67,
-                "display": "2,159.67 thousand tonnes"
+                "value": 2159670,
+                "display": "2,159,670 MT"
               },
               {
                 "date": "2026-02-28",
                 "date_display": "February 2026",
-                "value": 1833.57,
-                "display": "1,833.57 thousand tonnes"
+                "value": 1833570,
+                "display": "1,833,570 MT"
               },
               {
                 "date": "2026-03-31",
                 "date_display": "March 2026",
-                "value": 1934.22,
-                "display": "1,934.22 thousand tonnes"
+                "value": 1934220,
+                "display": "1,934,220 MT"
               },
               {
                 "date": "2026-04-30",
                 "date_display": "April 2026",
-                "value": 1787.93,
-                "display": "1,787.93 thousand tonnes"
+                "value": 1787930,
+                "display": "1,787,930 MT"
               },
               {
                 "date": "2026-05-31",
                 "date_display": "May 2026",
-                "value": 1795.83,
-                "display": "1,795.83 thousand tonnes"
+                "value": 1795830,
+                "display": "1,795,830 MT"
               },
               {
                 "date": "2026-06-30",
                 "date_display": "June 2026",
-                "value": 2034.55,
-                "display": "2,034.55 thousand tonnes"
+                "value": 2034550,
+                "display": "2,034,550 MT"
               },
               {
                 "date": "2026-07-31",
                 "date_display": "July 2026",
-                "value": 1952.9,
-                "display": "1,952.90 thousand tonnes"
+                "value": 1952900,
+                "display": "1,952,900 MT"
               },
               {
                 "date": "2026-08-31",
                 "date_display": "August 2026",
-                "value": 2095.18,
-                "display": "2,095.18 thousand tonnes"
+                "value": 2095180,
+                "display": "2,095,180 MT"
               },
               {
                 "date": "2026-09-30",
                 "date_display": "September 2026",
-                "value": 1993.2,
-                "display": "1,993.20 thousand tonnes"
+                "value": 1993200,
+                "display": "1,993,200 MT"
               }
             ]
           },
           "series_note": null,
+          "short_label": "High sulphur fuel oil",
           "period": "month",
           "source_tag": "S2"
         },
         {
           "id": "sg_bunker_lsmgo",
           "label": "Low sulphur marine gas oil (MPA type: Low Sulphur Marine Gas Oil)",
-          "unit": "thousand tonnes",
-          "value": 378.84,
-          "display": "378.84 thousand tonnes",
+          "unit": "MT",
+          "value": 378840,
+          "display": "378,840 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 367.73,
-              "previous_display": "367.73 thousand tonnes",
-              "abs_change": 11.11,
-              "abs_display": "11.11 thousand tonnes",
+              "previous_value": 367730,
+              "previous_display": "367,730 MT",
+              "abs_change": 11110,
+              "abs_display": "11,110 MT",
               "pct_change": 3.02,
               "pct_display": "3.02%",
               "direction": "up"
@@ -922,10 +927,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 373.56,
-              "previous_display": "373.56 thousand tonnes",
-              "abs_change": 5.28,
-              "abs_display": "5.28 thousand tonnes",
+              "previous_value": 373560,
+              "previous_display": "373,560 MT",
+              "abs_change": 5280,
+              "abs_display": "5,280 MT",
               "pct_change": 1.41,
               "pct_display": "1.41%",
               "direction": "up"
@@ -933,10 +938,10 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            0.0,
-            10000.0
+            0,
+            10000000
           ],
           "series": {
             "label": "Monthly sales as published by MPA",
@@ -944,103 +949,104 @@
               {
                 "date": "2025-09-30",
                 "date_display": "September 2025",
-                "value": 373.56,
-                "display": "373.56 thousand tonnes"
+                "value": 373560,
+                "display": "373,560 MT"
               },
               {
                 "date": "2025-10-31",
                 "date_display": "October 2025",
-                "value": 392.0,
-                "display": "392.00 thousand tonnes"
+                "value": 392000,
+                "display": "392,000 MT"
               },
               {
                 "date": "2025-11-30",
                 "date_display": "November 2025",
-                "value": 366.41,
-                "display": "366.41 thousand tonnes"
+                "value": 366410,
+                "display": "366,410 MT"
               },
               {
                 "date": "2025-12-31",
                 "date_display": "December 2025",
-                "value": 410.55,
-                "display": "410.55 thousand tonnes"
+                "value": 410550,
+                "display": "410,550 MT"
               },
               {
                 "date": "2026-01-31",
                 "date_display": "January 2026",
-                "value": 402.06,
-                "display": "402.06 thousand tonnes"
+                "value": 402060,
+                "display": "402,060 MT"
               },
               {
                 "date": "2026-02-28",
                 "date_display": "February 2026",
-                "value": 371.72,
-                "display": "371.72 thousand tonnes"
+                "value": 371720,
+                "display": "371,720 MT"
               },
               {
                 "date": "2026-03-31",
                 "date_display": "March 2026",
-                "value": 346.87,
-                "display": "346.87 thousand tonnes"
+                "value": 346870,
+                "display": "346,870 MT"
               },
               {
                 "date": "2026-04-30",
                 "date_display": "April 2026",
-                "value": 256.25,
-                "display": "256.25 thousand tonnes"
+                "value": 256250,
+                "display": "256,250 MT"
               },
               {
                 "date": "2026-05-31",
                 "date_display": "May 2026",
-                "value": 328.7,
-                "display": "328.70 thousand tonnes"
+                "value": 328700,
+                "display": "328,700 MT"
               },
               {
                 "date": "2026-06-30",
                 "date_display": "June 2026",
-                "value": 343.8,
-                "display": "343.80 thousand tonnes"
+                "value": 343800,
+                "display": "343,800 MT"
               },
               {
                 "date": "2026-07-31",
                 "date_display": "July 2026",
-                "value": 358.87,
-                "display": "358.87 thousand tonnes"
+                "value": 358870,
+                "display": "358,870 MT"
               },
               {
                 "date": "2026-08-31",
                 "date_display": "August 2026",
-                "value": 367.73,
-                "display": "367.73 thousand tonnes"
+                "value": 367730,
+                "display": "367,730 MT"
               },
               {
                 "date": "2026-09-30",
                 "date_display": "September 2026",
-                "value": 378.84,
-                "display": "378.84 thousand tonnes"
+                "value": 378840,
+                "display": "378,840 MT"
               }
             ]
           },
           "series_note": null,
+          "short_label": "Low sulphur gas oil",
           "period": "month",
           "source_tag": "S2"
         },
         {
           "id": "sg_bunker_bio",
           "label": "Biofuel blends and B100 (BrokerBrief sum of MPA's bio-blended types and B100)",
-          "unit": "thousand tonnes",
-          "value": 83.21,
-          "display": "83.21 thousand tonnes",
+          "unit": "MT",
+          "value": 83210,
+          "display": "83,210 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 57.33,
-              "previous_display": "57.33 thousand tonnes",
-              "abs_change": 25.88,
-              "abs_display": "25.88 thousand tonnes",
+              "previous_value": 57330,
+              "previous_display": "57,330 MT",
+              "abs_change": 25880,
+              "abs_display": "25,880 MT",
               "pct_change": 45.14,
               "pct_display": "45.14%",
               "direction": "up"
@@ -1048,10 +1054,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 119.33,
-              "previous_display": "119.33 thousand tonnes",
-              "abs_change": -36.12,
-              "abs_display": "36.12 thousand tonnes",
+              "previous_value": 119330,
+              "previous_display": "119,330 MT",
+              "abs_change": -36120,
+              "abs_display": "36,120 MT",
               "pct_change": -30.27,
               "pct_display": "30.27%",
               "direction": "down"
@@ -1059,10 +1065,10 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            0.0,
-            10000.0
+            0,
+            10000000
           ],
           "series": {
             "label": "BrokerBrief sum of MPA's monthly figures",
@@ -1070,103 +1076,104 @@
               {
                 "date": "2025-09-30",
                 "date_display": "September 2025",
-                "value": 119.33,
-                "display": "119.33 thousand tonnes"
+                "value": 119330,
+                "display": "119,330 MT"
               },
               {
                 "date": "2025-10-31",
                 "date_display": "October 2025",
-                "value": 62.97,
-                "display": "62.97 thousand tonnes"
+                "value": 62970,
+                "display": "62,970 MT"
               },
               {
                 "date": "2025-11-30",
                 "date_display": "November 2025",
-                "value": 62.18,
-                "display": "62.18 thousand tonnes"
+                "value": 62180,
+                "display": "62,180 MT"
               },
               {
                 "date": "2025-12-31",
                 "date_display": "December 2025",
-                "value": 91.07,
-                "display": "91.07 thousand tonnes"
+                "value": 91070,
+                "display": "91,070 MT"
               },
               {
                 "date": "2026-01-31",
                 "date_display": "January 2026",
-                "value": 60.21,
-                "display": "60.21 thousand tonnes"
+                "value": 60210,
+                "display": "60,210 MT"
               },
               {
                 "date": "2026-02-28",
                 "date_display": "February 2026",
-                "value": 92.72,
-                "display": "92.72 thousand tonnes"
+                "value": 92720,
+                "display": "92,720 MT"
               },
               {
                 "date": "2026-03-31",
                 "date_display": "March 2026",
-                "value": 92.34,
-                "display": "92.34 thousand tonnes"
+                "value": 92340,
+                "display": "92,340 MT"
               },
               {
                 "date": "2026-04-30",
                 "date_display": "April 2026",
-                "value": 75.95,
-                "display": "75.95 thousand tonnes"
+                "value": 75950,
+                "display": "75,950 MT"
               },
               {
                 "date": "2026-05-31",
                 "date_display": "May 2026",
-                "value": 61.46,
-                "display": "61.46 thousand tonnes"
+                "value": 61460,
+                "display": "61,460 MT"
               },
               {
                 "date": "2026-06-30",
                 "date_display": "June 2026",
-                "value": 40.3,
-                "display": "40.30 thousand tonnes"
+                "value": 40300,
+                "display": "40,300 MT"
               },
               {
                 "date": "2026-07-31",
                 "date_display": "July 2026",
-                "value": 39.51,
-                "display": "39.51 thousand tonnes"
+                "value": 39510,
+                "display": "39,510 MT"
               },
               {
                 "date": "2026-08-31",
                 "date_display": "August 2026",
-                "value": 57.33,
-                "display": "57.33 thousand tonnes"
+                "value": 57330,
+                "display": "57,330 MT"
               },
               {
                 "date": "2026-09-30",
                 "date_display": "September 2026",
-                "value": 83.21,
-                "display": "83.21 thousand tonnes"
+                "value": 83210,
+                "display": "83,210 MT"
               }
             ]
           },
           "series_note": null,
+          "short_label": "Biofuel blends",
           "period": "month",
           "source_tag": "S2"
         },
         {
           "id": "sg_bunker_lng",
           "label": "LNG (MPA type: LNG)",
-          "unit": "thousand tonnes",
-          "value": 51.51,
-          "display": "51.51 thousand tonnes",
+          "unit": "MT",
+          "value": 51510,
+          "display": "51,510 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 58.64,
-              "previous_display": "58.64 thousand tonnes",
-              "abs_change": -7.13,
-              "abs_display": "7.13 thousand tonnes",
+              "previous_value": 58640,
+              "previous_display": "58,640 MT",
+              "abs_change": -7130,
+              "abs_display": "7,130 MT",
               "pct_change": -12.16,
               "pct_display": "12.16%",
               "direction": "down"
@@ -1174,10 +1181,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 48.45,
-              "previous_display": "48.45 thousand tonnes",
-              "abs_change": 3.06,
-              "abs_display": "3.06 thousand tonnes",
+              "previous_value": 48450,
+              "previous_display": "48,450 MT",
+              "abs_change": 3060,
+              "abs_display": "3,060 MT",
               "pct_change": 6.32,
               "pct_display": "6.32%",
               "direction": "up"
@@ -1185,10 +1192,10 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            0.0,
-            10000.0
+            0,
+            10000000
           ],
           "series": {
             "label": "Monthly sales as published by MPA",
@@ -1196,84 +1203,85 @@
               {
                 "date": "2025-09-30",
                 "date_display": "September 2025",
-                "value": 48.45,
-                "display": "48.45 thousand tonnes"
+                "value": 48450,
+                "display": "48,450 MT"
               },
               {
                 "date": "2025-10-31",
                 "date_display": "October 2025",
-                "value": 60.6,
-                "display": "60.60 thousand tonnes"
+                "value": 60600,
+                "display": "60,600 MT"
               },
               {
                 "date": "2025-11-30",
                 "date_display": "November 2025",
-                "value": 55.04,
-                "display": "55.04 thousand tonnes"
+                "value": 55040,
+                "display": "55,040 MT"
               },
               {
                 "date": "2025-12-31",
                 "date_display": "December 2025",
-                "value": 54.57,
-                "display": "54.57 thousand tonnes"
+                "value": 54570,
+                "display": "54,570 MT"
               },
               {
                 "date": "2026-01-31",
                 "date_display": "January 2026",
-                "value": 42.59,
-                "display": "42.59 thousand tonnes"
+                "value": 42590,
+                "display": "42,590 MT"
               },
               {
                 "date": "2026-02-28",
                 "date_display": "February 2026",
-                "value": 59.01,
-                "display": "59.01 thousand tonnes"
+                "value": 59010,
+                "display": "59,010 MT"
               },
               {
                 "date": "2026-03-31",
                 "date_display": "March 2026",
-                "value": 49.02,
-                "display": "49.02 thousand tonnes"
+                "value": 49020,
+                "display": "49,020 MT"
               },
               {
                 "date": "2026-04-30",
                 "date_display": "April 2026",
-                "value": 42.43,
-                "display": "42.43 thousand tonnes"
+                "value": 42430,
+                "display": "42,430 MT"
               },
               {
                 "date": "2026-05-31",
                 "date_display": "May 2026",
-                "value": 70.27,
-                "display": "70.27 thousand tonnes"
+                "value": 70270,
+                "display": "70,270 MT"
               },
               {
                 "date": "2026-06-30",
                 "date_display": "June 2026",
-                "value": 54.97,
-                "display": "54.97 thousand tonnes"
+                "value": 54970,
+                "display": "54,970 MT"
               },
               {
                 "date": "2026-07-31",
                 "date_display": "July 2026",
-                "value": 58.69,
-                "display": "58.69 thousand tonnes"
+                "value": 58690,
+                "display": "58,690 MT"
               },
               {
                 "date": "2026-08-31",
                 "date_display": "August 2026",
-                "value": 58.64,
-                "display": "58.64 thousand tonnes"
+                "value": 58640,
+                "display": "58,640 MT"
               },
               {
                 "date": "2026-09-30",
                 "date_display": "September 2026",
-                "value": 51.51,
-                "display": "51.51 thousand tonnes"
+                "value": 51510,
+                "display": "51,510 MT"
               }
             ]
           },
           "series_note": null,
+          "short_label": "LNG",
           "period": "month",
           "source_tag": "S2"
         }

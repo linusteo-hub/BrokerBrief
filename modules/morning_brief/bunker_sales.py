@@ -63,10 +63,16 @@ FIGURES = (
      tuple(t for t in FUEL_TYPES if t.startswith("Bio-Blended")) + ("B100",)),
     ("sg_bunker_lng", "LNG (MPA type: LNG)", ("LNG",)),
 )
+# Short names for the page; the full label (with how the figure is made) stays on the figure.
+SHORT_LABELS = {
+    "sg_bunker_total": "All fuels", "sg_bunker_lsfo": "Low sulphur fuel oil",
+    "sg_bunker_mfo": "High sulphur fuel oil", "sg_bunker_lsmgo": "Low sulphur gas oil",
+    "sg_bunker_bio": "Biofuel blends", "sg_bunker_lng": "LNG",
+}
 
 CHART_MONTHS = 13               # the latest month and the 12 before it
-UNIT = "thousand tonnes"
-DECIMALS = 2                    # as MPA publishes it
+UNIT = "MT"                     # shown in tonnes (MT); MPA publishes thousand tonnes
+DECIMALS = 2                    # MPA's thousand tonnes carry 2 decimals, so x1000 is exact
 # Plausible monthly ranges in thousand tonnes. Monthly totals since 2015 have
 # been roughly 3,300 to 5,500; a total outside 1,000–10,000 means a unit or
 # data error. Components are only bounded above.
@@ -74,8 +80,19 @@ TOTAL_RANGE = (1_000.0, 10_000.0)
 COMPONENT_RANGE = (0.0, 10_000.0)
 
 
+def fmt_kt(value: float) -> str:
+    """MPA's own unit, used in range-check messages."""
+    return f"{value:,.{DECIMALS}f} thousand tonnes"
+
+
+def to_mt(thousand_tonnes: float) -> int:
+    """Thousand tonnes (2 decimals, as MPA publishes) -> whole tonnes. Exact, not an estimate."""
+    return round(thousand_tonnes * 1000)
+
+
 def fmt(value: float) -> str:
-    return f"{value:,.{DECIMALS}f} {UNIT}"
+    """Whole tonnes, e.g. '4,726,390 MT'."""
+    return f"{value:,.0f} {UNIT}"
 
 
 def month_end(month: str) -> date:
@@ -138,7 +155,7 @@ def build_figures(months: dict, today: date) -> tuple[list, list]:
     for figure_id, label, types in FIGURES:
         value = round(sum(months[latest][t] for t in types), DECIMALS)
         low, high = TOTAL_RANGE if figure_id == "sg_bunker_total" else COMPONENT_RANGE
-        problem = check_range(value, low, high, fmt(value))
+        problem = check_range(value, low, high, fmt_kt(value))
         if problem:
             excluded.append({"id": figure_id, "code": "out_of_range", "reason": problem})
             continue
@@ -146,7 +163,7 @@ def build_figures(months: dict, today: date) -> tuple[list, list]:
         for basis, other in comparisons:
             if is_complete(months.get(other)):
                 previous = round(sum(months[other][t] for t in types), DECIMALS)
-                changes.append(make_change(value, previous, fmt, decimals=DECIMALS,
+                changes.append(make_change(to_mt(value), to_mt(previous), fmt, decimals=0,
                                            basis=basis, compared_with=month_display(other)))
         # Chart: the latest month and up to 12 before it, complete months only (an
         # incomplete month is a gap in the line, so the chart stops there).
@@ -155,19 +172,21 @@ def build_figures(months: dict, today: date) -> tuple[list, list]:
             month = shift_month(latest, -back)
             if not is_complete(months.get(month)):
                 break
-            history.append((month_end(month), round(sum(months[month][t] for t in types), DECIMALS)))
+            history.append((month_end(month), to_mt(round(sum(months[month][t] for t in types), DECIMALS))))
         summed = len(types) > 1      # the total and the biofuel figure add MPA's types together
         chart, chart_note = make_series(history[::-1], fmt,
                                         label=("BrokerBrief sum of MPA's monthly figures" if summed
                                                else "Monthly sales as published by MPA"),
                                         date_display=lambda d: d.strftime("%B %Y"),
-                                        plausible_range=(low, high))
+                                        plausible_range=(to_mt(low), to_mt(high)))
         figure = make_figure(
-            figure_id=figure_id, label=label, unit=UNIT, value=value, fmt=fmt,
+            figure_id=figure_id, label=label, unit=UNIT, value=to_mt(value), fmt=fmt,
             as_of=month_end(latest), source_id=SOURCE_ID, quality_tier=source.quality_tier,
             changes=changes, series=chart, series_note=chart_note,
-            notes="Monthly total. MPA marks the latest month's figures as preliminary estimates.",
-            plausible_range=(low, high))
+            notes=("Monthly total, in tonnes (MPA publishes thousand tonnes). "
+                   "MPA marks the latest month's figures as preliminary estimates."),
+            plausible_range=(to_mt(low), to_mt(high)))
+        figure["short_label"] = SHORT_LABELS[figure_id]
         figure["as_of_display"] = month_display(latest)     # a month, not a day
         figure["period"] = "month"
         figures.append(figure)

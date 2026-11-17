@@ -56,14 +56,21 @@ class MarketIntelligencePage(unittest.TestCase):
         self.assertIn("Trial — under review", page)
         for title in ("Prices", "Freight", "Sources"):
             self.assertIn(title, page)
-        # Figures and changes appear exactly as the payload writes them; prices are coloured from the buyer's view.
+        # Figures and changes appear exactly as the payload writes them. Direction is an arrow with the
+        # word for screen readers (no red or green); the full basis and date are in the chip's title.
         self.assertIn("USD 125.44/bbl", page)
-        self.assertIn('<span class="mb-dir dir-down">Down</span>USD 0.07/bbl · 0.06% · vs 5 October 2026 (previous published day)', page)
-        self.assertIn('<span class="mb-dir dir-up">Up</span>USD 11.48/bbl · 10.07% · vs 29 September 2026 (one week earlier)', page)
-        # Volumes get the word only, no colour.
-        self.assertIn('<span class="mb-dir">Down</span>46.29 thousand tonnes · 0.97% · vs August 2026 (previous month)', page)
-        # Every figure carries its source tag.
-        self.assertIn('as of 6 October 2026<span class="mb-tag">[S1]</span>', page)
+        self.assertIn('<span class="mb-chip" title="vs 5 October 2026 (previous published day)">', page)
+        self.assertIn('<span class="sr-only">Down</span></span><span class="mb-chip-key">1D</span>USD 0.07/bbl · 0.06%', page)
+        self.assertIn('<span class="sr-only">Up</span></span><span class="mb-chip-key">1W</span>USD 11.48/bbl · 10.07%', page)
+        self.assertNotIn('class="mb-dir dir-up"', page)
+        self.assertNotIn('class="mb-dir dir-down"', page)
+        # Bunker sales in whole tonnes (MT), with short names.
+        self.assertIn('<span class="mb-chip-key">1M</span>46,290 MT · 0.97%', page)
+        self.assertIn('<div class="mb-stat-value">4,726,390 MT</div>', page)
+        self.assertIn(">All fuels</div>", page)
+        # The shared date and source tag are printed once per card.
+        self.assertIn('6 October 2026<span class=mb-tag>[S1]</span></span>', page)
+        self.assertIn('September 2026<span class=mb-tag>[S2]</span></span>', page)
 
     def test_not_covered_section_states_its_reason(self):
         page = html(open_mi(mock.Mock(return_value=copy.deepcopy(PAYLOAD))))
@@ -116,7 +123,7 @@ class MarketIntelligencePage(unittest.TestCase):
         at = open_mi(mock.Mock(return_value=data))
         self.assertEqual(len(at.exception), 0)
         page = html(at)
-        self.assertIn('<span class="mb-dir dir-down">Down</span>USD 0.07/bbl · vs 5 October 2026 (previous published day)', page)
+        self.assertIn('<span class="mb-chip-key">1D</span>USD 0.07/bbl<span class="sr-only">', page)
         self.assertNotIn("None", page)
 
     def test_source_notes_are_shown_once(self):
@@ -214,7 +221,7 @@ class MarketIntelligenceCharts(unittest.TestCase):
         self.assertEqual(page.count('<div class="ch ch-line"'), 2)
         # Hover text is the payload's own display strings: the newest point is the figure itself.
         self.assertIn("<b>USD 125.44/bbl</b>6 October 2026", page)
-        self.assertIn("<b>4,726.39 thousand tonnes</b>September 2026", page)
+        self.assertIn("<b>4,726,390 MT</b>September 2026", page)
         self.assertEqual(page.count('<div class="ch ch-bars'), 6)          # total full size, five compact
         self.assertEqual(page.count('class="ch-bar'), 6 * 13)
 
@@ -231,20 +238,24 @@ class MarketIntelligenceCharts(unittest.TestCase):
         sec = PAYLOAD["sections"]
         news = (sec["freight"]["subsections"]["rate_direction"]["items"] + sec["sale_and_purchase"]["items"]
                 + sec["events"]["items"])
-        self.assertIn("Headlines over time", page)
-        self.assertEqual(page.count('class="tl-dot'), sum(1 for i in news if i.get("published")))
-        self.assertIn('<div class="tl-name">Sale &amp; Purchase</div>', page)
+        self.assertIn("News flow", page)
+        self.assertEqual(page.count("<li>"), sum(1 for i in news if i.get("published")))   # every headline listed
+        self.assertIn('<div class="nf-name">Sale &amp; Purchase</div>', page)
 
 
 class TimelineStacking(unittest.TestCase):
-    def test_headlines_at_the_same_time_stack_instead_of_hiding_each_other(self):
+    def test_headlines_close_in_time_merge_into_one_mark_that_lists_them_all(self):
         from modules import ui
         items = [{"headline": f"H{i}", "published": "2026-10-12T09:00:00+00:00", "link": "https://example.org/"}
-                 for i in range(3)]
+                 for i in range(3)] + [{"headline": "Early", "published": "2026-10-11T10:00:00+00:00"}]
         out = ui.news_timeline([("Events", items)], "2026-10-11T09:00:00+00:00", "2026-10-12T12:00:00+00:00")
-        for row in range(3):
-            self.assertIn(f"--row:{row}", out)
-        self.assertIn('style="--rows:2"', out)
+        self.assertEqual(out.count('class="nf-tick'), 2)
+        self.assertIn('aria-label="Events: 3 headlines"', out)
+        self.assertIn('aria-label="Events: 1 headline"', out)
+        for i in range(3):
+            self.assertIn(f'<a href="https://example.org/" target="_blank" rel="noopener noreferrer">H{i}</a>', out)
+        self.assertIn("<span>Early</span>", out)               # no link: shown, not linked
+        self.assertIn('<div class="nf-count">4</div>', out)
 
 
 class ChartBuilders(unittest.TestCase):
@@ -275,7 +286,7 @@ class ChartBuilders(unittest.TestCase):
         from modules import ui
         out = ui.news_timeline([("Events", [], "no events stories met the rules")],
                                "2026-10-11T09:00:00+00:00", "2026-10-12T12:00:00+00:00")
-        self.assertIn("<em>no events stories met the rules</em>", out)
+        self.assertIn('<span class="nf-empty">no events stories met the rules</span>', out)
 
 
 class DataInputValidation(unittest.TestCase):

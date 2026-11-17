@@ -13,12 +13,12 @@
 
 *Monthly totals from the Maritime and Port Authority of Singapore, published about three weeks after the month ends; the latest month is a preliminary estimate. Volumes, not prices.*
 
-- **Singapore bunker sales, all fuel types (BrokerBrief sum of MPA's types):** 4,726.39 thousand tonnes, for September 2026 [S2]. Down 46.29 thousand tonnes (0.97%) from August 2026 (previous month). Down 38.69 thousand tonnes (0.81%) from September 2025 (same month a year earlier).
-- **Low sulphur fuel oil (MPA type: Low Sulphur Fuel Oil):** 2,218.11 thousand tonnes, for September 2026 [S2]. Up 24.31 thousand tonnes (1.11%) from August 2026 (previous month). Down 132.37 thousand tonnes (5.63%) from September 2025 (same month a year earlier).
-- **Marine fuel oil, the high-sulphur grades (MPA type: Marine Fuel Oil):** 1,993.20 thousand tonnes, for September 2026 [S2]. Down 101.98 thousand tonnes (4.87%) from August 2026 (previous month). Up 120.25 thousand tonnes (6.42%) from September 2025 (same month a year earlier).
-- **Low sulphur marine gas oil (MPA type: Low Sulphur Marine Gas Oil):** 378.84 thousand tonnes, for September 2026 [S2]. Up 11.11 thousand tonnes (3.02%) from August 2026 (previous month). Up 5.28 thousand tonnes (1.41%) from September 2025 (same month a year earlier).
-- **Biofuel blends and B100 (BrokerBrief sum of MPA's bio-blended types and B100):** 83.21 thousand tonnes, for September 2026 [S2]. Up 25.88 thousand tonnes (45.14%) from August 2026 (previous month). Down 36.12 thousand tonnes (30.27%) from September 2025 (same month a year earlier).
-- **LNG (MPA type: LNG):** 51.51 thousand tonnes, for September 2026 [S2]. Down 7.13 thousand tonnes (12.16%) from August 2026 (previous month). Up 3.06 thousand tonnes (6.32%) from September 2025 (same month a year earlier).
+- **Singapore bunker sales, all fuel types (BrokerBrief sum of MPA's types):** 4,726,390 MT, for September 2026 [S2]. Down 46,290 MT (0.97%) from August 2026 (previous month). Down 38,690 MT (0.81%) from September 2025 (same month a year earlier).
+- **Low sulphur fuel oil (MPA type: Low Sulphur Fuel Oil):** 2,218,110 MT, for September 2026 [S2]. Up 24,310 MT (1.11%) from August 2026 (previous month). Down 132,370 MT (5.63%) from September 2025 (same month a year earlier).
+- **Marine fuel oil, the high-sulphur grades (MPA type: Marine Fuel Oil):** 1,993,200 MT, for September 2026 [S2]. Down 101,980 MT (4.87%) from August 2026 (previous month). Up 120,250 MT (6.42%) from September 2025 (same month a year earlier).
+- **Low sulphur marine gas oil (MPA type: Low Sulphur Marine Gas Oil):** 378,840 MT, for September 2026 [S2]. Up 11,110 MT (3.02%) from August 2026 (previous month). Up 5,280 MT (1.41%) from September 2025 (same month a year earlier).
+- **Biofuel blends and B100 (BrokerBrief sum of MPA's bio-blended types and B100):** 83,210 MT, for September 2026 [S2]. Up 25,880 MT (45.14%) from August 2026 (previous month). Down 36,120 MT (30.27%) from September 2025 (same month a year earlier).
+- **LNG (MPA type: LNG):** 51,510 MT, for September 2026 [S2]. Down 7,130 MT (12.16%) from August 2026 (previous month). Up 3,060 MT (6.32%) from September 2025 (same month a year earlier).
 
 ## 3. Freight
 
