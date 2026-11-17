@@ -658,7 +658,8 @@
             ]
           },
           "series_note": null,
-          "short_label": "All fuels",
+          "short_label": "All fuels (sum)",
+          "preliminary": true,
           "period": "month",
           "source_tag": "S2"
         },
@@ -786,6 +787,7 @@
           },
           "series_note": null,
           "short_label": "Low sulphur fuel oil",
+          "preliminary": true,
           "period": "month",
           "source_tag": "S2"
         },
@@ -912,7 +914,8 @@
             ]
           },
           "series_note": null,
-          "short_label": "High sulphur fuel oil",
+          "short_label": "Marine fuel oil (high sulphur)",
+          "preliminary": true,
           "period": "month",
           "source_tag": "S2"
         },
@@ -1039,7 +1042,8 @@
             ]
           },
           "series_note": null,
-          "short_label": "Low sulphur gas oil",
+          "short_label": "Low sulphur marine gas oil",
+          "preliminary": true,
           "period": "month",
           "source_tag": "S2"
         },
@@ -1166,7 +1170,8 @@
             ]
           },
           "series_note": null,
-          "short_label": "Biofuel blends",
+          "short_label": "Biofuel blends (sum)",
+          "preliminary": true,
           "period": "month",
           "source_tag": "S2"
         },
@@ -1294,6 +1299,7 @@
           },
           "series_note": null,
           "short_label": "LNG",
+          "preliminary": true,
           "period": "month",
           "source_tag": "S2"
         }
@@ -1359,7 +1365,7 @@
           ]
         },
         "port_calls": {
-          "title": "Singapore port calls (vessel counts, not rates)",
+          "title": "Singapore vessel arrivals and calls (MPA, monthly)",
           "status": "ok",
           "reason": null,
           "cadence": "monthly (MPA publishes about three weeks after month end)",
@@ -1494,6 +1500,8 @@
               "series_note": null,
               "period": "month",
               "short_label": "Vessel arrivals",
+              "preliminary": true,
+              "dataset_url": "https://data.gov.sg/datasets/d_d48c5a038904f6da3c603cd854b6c191/view",
               "source_tag": "S4"
             },
             {
@@ -1621,6 +1629,8 @@
               "series_note": null,
               "period": "month",
               "short_label": "Calls for bunkers",
+              "preliminary": true,
+              "dataset_url": "https://data.gov.sg/datasets/d_48cb38d12697d3463c8cadfb22e6c61d/view",
               "source_tag": "S4"
             },
             {
@@ -1748,6 +1758,8 @@
               "series_note": null,
               "period": "month",
               "short_label": "Calls for cargo",
+              "preliminary": true,
+              "dataset_url": "https://data.gov.sg/datasets/d_48cb38d12697d3463c8cadfb22e6c61d/view",
               "source_tag": "S4"
             }
           ]

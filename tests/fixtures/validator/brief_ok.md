@@ -11,7 +11,7 @@
 
 ## 2. Singapore bunker sales
 
-*Monthly totals from the Maritime and Port Authority of Singapore, published about three weeks after the month ends; the latest month is a preliminary estimate. Volumes, not prices.*
+*Monthly totals from the Maritime and Port Authority of Singapore, published about three weeks after the month ends. Volumes, not prices.*
 
 - **Singapore bunker sales, all fuel types (BrokerBrief sum of MPA's types):** 4,726,390 MT, for September 2026 [S2]. Down 46,290 MT (0.97%) from August 2026 (previous month). Down 38,690 MT (0.81%) from September 2025 (same month a year earlier).
 - **Low sulphur fuel oil (MPA type: Low Sulphur Fuel Oil):** 2,218,110 MT, for September 2026 [S2]. Up 24,310 MT (1.11%) from August 2026 (previous month). Down 132,370 MT (5.63%) from September 2025 (same month a year earlier).
@@ -20,9 +20,11 @@
 - **Biofuel blends and B100 (BrokerBrief sum of MPA's bio-blended types and B100):** 83,210 MT, for September 2026 [S2]. Up 25,880 MT (45.14%) from August 2026 (previous month). Down 36,120 MT (30.27%) from September 2025 (same month a year earlier).
 - **LNG (MPA type: LNG):** 51,510 MT, for September 2026 [S2]. Down 7,130 MT (12.16%) from August 2026 (previous month). Up 3,060 MT (6.32%) from September 2025 (same month a year earlier).
 
+*Note: Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.*
+
 ## 3. Freight
 
-*Weekly section.*
+*Weekly section; a part with its own cadence says so.*
 
 ### Container freight rates
 
@@ -32,11 +34,15 @@ Not covered: No container freight index can be republished: Drewry's terms forbi
 
 - **Capesize rates climb on strong Atlantic iron ore demand** (gCaptain, by Jane Example, 11 October 2026). Earnings for the largest dry bulk carriers improved over the week as more Brazilian iron ore cargoes came to market, and owners held back from fixing ahead. [Read the story](https://gcaptain.com/test-freight-direction/) [S3]
 
-### Singapore port calls (vessel counts, not rates)
+### Singapore vessel arrivals and calls (MPA, monthly)
+
+*Monthly (MPA publishes about three weeks after month end).*
 
 - **Vessel arrivals at Singapore, all types (MPA: Vessel Arrivals (\>75 GT) Total):** 11,608 arrivals, for September 2026 [S4]. Down 23 arrivals (0.20%) from August 2026 (previous month). Up 616 arrivals (5.60%) from September 2025 (same month a year earlier).
 - **Vessel calls for bunkers (MPA purpose type: Bunkers):** 3,617 calls, for September 2026 [S4]. Up 29 calls (0.81%) from August 2026 (previous month). Up 99 calls (2.81%) from September 2025 (same month a year earlier).
 - **Vessel calls for cargo (MPA purpose type: Cargo):** 4,070 calls, for September 2026 [S4]. Down 22 calls (0.54%) from August 2026 (previous month). Up 63 calls (1.57%) from September 2025 (same month a year earlier).
+
+*Note: Vessels over 75 GT, Singapore only. MPA marks the latest month's figures as preliminary estimates.*
 
 ### Ship activity (transits and port calls, not rates)
 
@@ -51,6 +57,8 @@ Not covered: No container freight index can be republished: Drewry's terms forbi
 - **Fujairah port calls, 7 days to 2 October 2026:** 47 port calls, as of 2 October 2026 [S5]. Down 11 port calls (18.97%) from 7 days to 25 September 2026 (previous 7 days).
 - **Port Hedland port calls, 7 days to 2 October 2026:** 60 port calls, as of 2 October 2026 [S5]. Down 9 port calls (13.04%) from 7 days to 25 September 2026 (previous 7 days).
 - **Houston port calls, 7 days to 2 October 2026:** 150 port calls, as of 2 October 2026 [S5]. Up 18 port calls (13.64%) from 7 days to 25 September 2026 (previous 7 days).
+
+*Note: Physical activity from AIS ship tracking, not freight rates.*
 
 ## 4. Sale & Purchase
 

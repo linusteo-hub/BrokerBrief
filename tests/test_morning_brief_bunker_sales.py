@@ -143,5 +143,5 @@ def test_tonnes_are_whole_numbers_converted_exactly_from_mpas_thousand_tonnes():
     assert total["unit"] == "MT" and total["value"] == 4_726_390 and isinstance(total["value"], int)
     assert total["plausible_range"] == [1_000_000, 10_000_000]
     assert all(isinstance(p["value"], int) for p in total["series"]["points"])
-    assert total["short_label"] == "All fuels"
+    assert total["short_label"] == "All fuels (sum)" and total["preliminary"] is True
     assert "MPA publishes thousand tonnes" in total["notes"]

@@ -539,6 +539,19 @@ def dir_icon(direction: str) -> str:
             f'<span class="sr-only">{escape(_DIR_WORD.get(direction, direction))}</span></span>')
 
 
+def _asof_chip(items: list, title: str = "") -> str:
+    """The date-and-source chip printed once per card, with a visible PRELIMINARY marker when the
+    source marks these figures as preliminary (payload flag `preliminary`)."""
+    asof, tag = _shared(items)
+    if not asof:
+        return ""
+    prelim = ('<span class="mb-prelim">PRELIMINARY</span>'
+              if any(i.get("preliminary") for i in items) else "")
+    tag_html = f'<span class="mb-tag">[{escape(tag)}]</span>' if tag else ""
+    attr = f' title="{title}"' if title else ""
+    return f'<span class="mb-asof"{attr}>{escape(asof)}{tag_html}{prelim}</span>'
+
+
 def _shared(items: list) -> tuple:
     """(as-of, tag) when every figure in the list shares them, so they are printed once per card."""
     pairs = {(str(i.get("as_of_display") or ""), str(i.get("source_tag") or "")) for i in items}
@@ -570,19 +583,27 @@ def brief_figures(items: list, *, prices: bool = False, chart: str = "") -> str:
                        else bar_chart(it["series"], it.get("label", ""), compact=bool(rows)))
         elif chart and it.get("series_note"):
             graphic = f'<div class="mb-nochart">No chart: {_s(it, "series_note")}</div>'
-        note = (str(it["notes"]), _tag(it)) if it.get("notes") else None
-        if note and note not in notes:
-            notes.append(note)
+        if it.get("notes"):
+            text, tag, link = str(it["notes"]), _tag(it), _https(it.get("dataset_url"))
+            entry = next((e for e in notes if e[0] == text), None)
+            if entry is None:
+                entry = [text, tag, []]
+                notes.append(entry)
+            if link and link not in entry[2]:
+                entry[2].append(link)
         meta = "" if shared_asof else f'<div class="mb-stat-meta">{_s(it, "as_of_display")}{_tag(it)}</div>'
         name = _s(it, "short_label") or _s(it, "label")
         rows.append(f'<div class="mb-stat{" mb-stat-lead" if not rows else ""}">'
-                    f'<div class="mb-stat-name" title="{_s(it, "label")}">{name}</div>'
+                    f'<div class="mb-stat-name" title="{_s(it, "label")}"><span aria-hidden="true">{name}</span>'
+                    f'<span class="sr-only">{_s(it, "label")}</span></div>'
                     f'<div class="mb-stat-value">{_s(it, "display")}</div>'
                     f'<div class="mb-chips">{"".join(chips)}</div>{meta}{graphic}</div>')
     about = ""
     if notes:
         about = ('<details class="mb-about"><summary>About this data</summary>'
-                 + "".join(f'<p>{escape(n)}{tag}</p>' for n, tag in notes) + '</details>')
+                 + "".join(f'<p>{escape(n)}{tag}' + "".join(
+                     f' <a href="{u}" target="_blank" rel="noopener noreferrer">Dataset{f" {k + 1}" if len(links) > 1 else ""}</a>'
+                     for k, u in enumerate(links)) + '</p>' for n, tag, links in notes) + '</details>')
     return "".join(rows) + about
 
 
@@ -607,13 +628,8 @@ def brief_section(section: dict, body: str = "") -> str:
     """A section card: title, then one chip with the date and source when every figure shares
     them (the cadence moves to its title), its state (ok / MISSING / NOT COVERED with the reason),
     then the body."""
-    asof, tag = _shared(section.get("items") or [])
     cadence = escape(section.get("cadence") or "")
-    if asof:
-        right = (f'<span class="mb-asof" title="{cadence}">{escape(asof)}'
-                 f'{f"<span class=mb-tag>[{escape(tag)}]</span>" if tag else ""}</span>')
-    else:
-        right = f'<div class="mb-cadence">{cadence}</div>'
+    right = _asof_chip(section.get("items") or [], cadence) or f'<div class="mb-cadence">{cadence}</div>'
     return (f'<div class="info-card"><div class="mb-sec-head"><div class="info-card-title">{_s(section, "title")}</div>'
             f'{right}</div>{_status_line(section)}{body}</div>')
 
@@ -621,11 +637,7 @@ def brief_section(section: dict, body: str = "") -> str:
 def brief_subsection(section: dict, body: str = "") -> str:
     """A part of a section: title (with the shared date-and-source chip when its figures share them),
     its state, then the body."""
-    asof, tag = _shared(section.get("items") or [])
-    chip = ""
-    if asof:
-        chip = (f'<span class="mb-asof">{escape(asof)}'
-                f'{f"<span class=mb-tag>[{escape(tag)}]</span>" if tag else ""}</span>')
+    chip = _asof_chip(section.get("items") or [], escape(section.get("cadence") or ""))
     return (f'<div class="mb-sub-head"><div class="mb-sub">{_s(section, "title")}</div>{chip}</div>'
             f'{_status_line(section)}{body}')
 

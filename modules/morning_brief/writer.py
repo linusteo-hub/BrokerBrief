@@ -338,11 +338,24 @@ def render_items(section: dict, accepted: dict, previous_figs: dict) -> list:
 CADENCE_NOTES = {
     "prices": "Latest available values. The source publishes daily prices once a week, so each figure shows its own date.",
     "bunker_sales": "Monthly totals from the Maritime and Port Authority of Singapore, published about three weeks after "
-                    "the month ends; the latest month is a preliminary estimate. Volumes, not prices.",
-    "freight": "Weekly section.",
+                    "the month ends. Volumes, not prices.",
+    "freight": "Weekly section; a part with its own cadence says so.",
     "sale_and_purchase": "Weekly section: deals reported in the past week, up to the brief date.",
     "events": "Stories published since the previous brief.",
 }
+
+
+def render_notes(section: dict) -> list:
+    """Each figure's note once (e.g. MPA's "preliminary", or why a comparison is missing),
+    so what the source says about its own numbers reaches the published brief."""
+    if section["status"] != "ok":
+        return []
+    notes = []
+    for item in section["items"]:
+        note = str(item.get("notes") or "").strip()
+        if "display" in item and note and note not in notes:
+            notes.append(note)
+    return [f"*Note: {esc(n)}*" for n in notes]
 
 
 def render_brief(payload: dict, accepted: dict, previous_payload: Optional[dict] = None) -> str:
@@ -362,6 +375,8 @@ def render_brief(payload: dict, accepted: dict, previous_payload: Optional[dict]
     def section(heading: str, key: str):
         out.extend([heading, "", f"*{CADENCE_NOTES[key]}*", ""])
         out.extend(render_items(s[key], accepted, previous_figs))
+        notes = render_notes(s[key])
+        out.extend([""] + notes if notes else [])
         out.append("")
 
     section("## 1. Prices", "prices")
@@ -373,7 +388,12 @@ def render_brief(payload: dict, accepted: dict, previous_payload: Optional[dict]
         out.extend(render_empty(freight) + [""])
     for sub in freight["subsections"].values():
         out.extend([f"### {esc(sub['title'])}", ""])
+        cadence = str(sub.get("cadence") or "")
+        if sub["status"] == "ok" and cadence and cadence != freight.get("cadence"):
+            out.extend([f"*{esc(cadence[0].upper() + cadence[1:])}.*", ""])
         out.extend(render_items(sub, accepted, previous_figs))
+        notes = render_notes(sub)
+        out.extend([""] + notes if notes else [])
         out.append("")
 
     section("## 4. Sale & Purchase", "sale_and_purchase")

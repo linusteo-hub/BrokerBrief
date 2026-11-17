@@ -20,11 +20,11 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from modules.morning_brief.activity import fetch_activity
-from modules.morning_brief.port_traffic import fetch_port_traffic
 from modules.morning_brief.allowlist import SourceNotAllowed, mentions_banned_source, require_allowed
 from modules.morning_brief.bunker_sales import fetch_bunker_sales
 from modules.morning_brief.figures import fmt_date
 from modules.morning_brief.news import FEEDS, fetch_news
+from modules.morning_brief.port_traffic import fetch_port_traffic
 from modules.morning_brief.prices import fetch_prices
 
 SCHEMA_VERSION = 1
@@ -78,10 +78,9 @@ def _news_failure(news: dict, label: str) -> str:
     return f"no {label} stories met the rules in the time window"
 
 
-def build_payload(*, now: datetime, prices: dict, bunker_sales: dict, activity: dict, news: dict,
-                  port_traffic: Optional[dict] = None) -> dict:
+def build_payload(*, now: datetime, prices: dict, bunker_sales: dict, port_traffic: dict, activity: dict,
+                  news: dict) -> dict:
     """Pure assembly from fetcher results (no network); see fetch_and_build()."""
-    port_traffic = port_traffic or {"items": [], "excluded": [], "error": "MPA port traffic was not fetched"}
     news_sections = news["sections"]
     freight_news = news_sections["freight"]
     subsections = {
@@ -90,7 +89,7 @@ def build_payload(*, now: datetime, prices: dict, bunker_sales: dict, activity: 
                             "items": []},
         "rate_direction": _section("Freight rate direction (from news, no figures)", "weekly", freight_news,
                                    _news_failure(news, "freight-rate"), news["counts"]["freight"]),
-        "port_calls": _section("Singapore port calls (vessel counts, not rates)",
+        "port_calls": _section("Singapore vessel arrivals and calls (MPA, monthly)",
                                "monthly (MPA publishes about three weeks after month end)", port_traffic["items"],
                                _failure_reason(port_traffic, "MPA returned no figures"), figure_counts(port_traffic)),
         "activity": _section("Ship activity (transits and port calls, not rates)", "weekly", activity["items"],

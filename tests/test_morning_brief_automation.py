@@ -311,7 +311,7 @@ def test_breaking_one_news_feed_leaves_the_section_with_the_other_publishers(mon
     from tests.test_morning_brief_payload import NOW, getter
     serve = getter()
     def get(url, params=None, timeout=None, **kw):
-        check_break(url)
+        check_break(url, kw.get("source_id"))     # shared URLs (data.gov.sg) are resolved by the named source
         return serve(url, params=params, timeout=timeout)
     monkeypatch.setenv("BROKERBRIEF_BREAK_FEED", "gcaptain")
     payload = fetch_and_build(now=NOW, eia_api_key="key", get=get)

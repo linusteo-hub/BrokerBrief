@@ -97,3 +97,43 @@ def test_a_failure_test_breaks_only_the_named_mpa_source(monkeypatch):
         raise RuntimeError("stop after the check")
     bunker_sales.fetch_bunker_sales(TODAY, get=recording_get)
     assert calls == ["mpa_bunker_sales"]
+
+
+def test_a_missing_comparison_month_is_stated_not_dropped():
+    months = {"2026-09": 3_600, "2026-08": 3_550}        # no September 2025
+    figure, _ = port_traffic.build_figure("x", "X", "X", "calls", (500, 15_000), months, TODAY)
+    assert [c["basis"] for c in figure["changes"]] == ["previous month"]
+    assert "No same month a year earlier comparison: MPA returned no figure for September 2025." in figure["notes"]
+
+
+def test_unreadable_rows_are_counted_in_the_notes():
+    rows = [{"month": "2026-09", "number_of_vessels": "11608"}, {"month": "2026-08", "number_of_vessels": "n/a"}]
+    months, skipped = port_traffic.parse_arrivals(rows)
+    assert months == {"2026-09": 11608} and skipped == 1
+    figure, _ = port_traffic.build_figure("x", "X", "X", "arrivals", (3_000, 30_000), months, TODAY, skipped=skipped)
+    assert "1 unreadable MPA row skipped." in figure["notes"]
+
+
+def test_each_figure_links_its_own_dataset_and_is_flagged_preliminary():
+    figs = by_id(port_traffic.fetch_port_traffic(TODAY, get=recorded()))
+    assert figs["sg_vessel_arrivals"]["dataset_url"].endswith("d_d48c5a038904f6da3c603cd854b6c191/view")
+    assert figs["sg_calls_bunkers"]["dataset_url"].endswith("d_48cb38d12697d3463c8cadfb22e6c61d/view")
+    assert all(f["preliminary"] for f in figs.values())
+
+
+def test_a_shared_url_without_a_named_source_is_refused():
+    from modules.morning_brief.allowlist import SourceNotAllowed, require_allowed_url
+    with pytest.raises(SourceNotAllowed, match="belongs to several sources"):
+        require_allowed_url(port_traffic.API_URL)
+    with pytest.raises(SourceNotAllowed, match="not on the morning-brief allowlist"):
+        require_allowed_url(port_traffic.API_URL, "no_such_source")
+    assert require_allowed_url(port_traffic.API_URL, "mpa_port_traffic").id == "mpa_port_traffic"
+
+
+def test_the_published_brief_states_cadence_and_preliminary_for_port_calls():
+    from modules.morning_brief.writer import render_brief
+    from tests.test_morning_brief_payload import build
+    md = render_brief(build(), {})
+    part = md[md.index("### Singapore vessel arrivals and calls (MPA, monthly)"):md.index("### Ship activity")]
+    assert "*Monthly (MPA publishes about three weeks after month end).*" in part
+    assert "preliminary estimates" in part
