@@ -326,6 +326,13 @@ def validate_payload(payload: dict) -> list:
             problems.append(Problem("no_range", "figure carries no plausible range", where))
         elif not (low_high[0] <= fig["value"] <= low_high[1]):
             problems.append(Problem("out_of_range", f"{fig['display']} is outside {low_high[0]:g}–{low_high[1]:g}", where))
+        if low_high and fig.get("series"):
+            for point in fig["series"].get("points") or []:
+                value = point.get("value")
+                if not isinstance(value, (int, float)) or not (low_high[0] <= value <= low_high[1]):
+                    problems.append(Problem("chart_out_of_range",
+                                            f"chart point {point.get('display')!r} on {point.get('date_display')!r} "
+                                            f"is outside {low_high[0]:g}–{low_high[1]:g}", where))
         as_of = date.fromisoformat(fig["as_of"])
         if source.max_age is not None and brief_date - as_of > source.max_age:
             problems.append(Problem("stale", f"dated {fig['as_of_display']}, more than {source.max_age.days} days "

@@ -43,6 +43,18 @@
     },
     {
       "tag": "S4",
+      "id": "mpa_port_traffic",
+      "name": "MPA vessel arrivals and calls (data.gov.sg)",
+      "publisher": "Maritime and Port Authority of Singapore",
+      "url": "https://data.gov.sg/datasets/d_48cb38d12697d3463c8cadfb22e6c61d/view",
+      "terms_url": "https://data.gov.sg/open-data-licence",
+      "licence": "Singapore Open Data Licence version 1.0: use, copy, distribute and adapt, commercially or not, with a conspicuous attribution notice and a link to the licence",
+      "credit": "Contains information from Vessel Arrivals (>75 GT) Total, Monthly and Vessel Calls (>75 GT), Monthly, accessed from data.gov.sg (Maritime and Port Authority of Singapore), which is made available under the terms of the Singapore Open Data Licence version 1.0, https://data.gov.sg/open-data-licence",
+      "redistributable": true,
+      "kind": "data"
+    },
+    {
+      "tag": "S5",
       "id": "imf_portwatch",
       "name": "IMF PortWatch",
       "publisher": "International Monetary Fund",
@@ -54,7 +66,7 @@
       "kind": "data"
     },
     {
-      "tag": "S5",
+      "tag": "S6",
       "id": "splash247",
       "name": "Splash247",
       "publisher": "Splash Maritime Group",
@@ -66,7 +78,7 @@
       "kind": "news"
     },
     {
-      "tag": "S6",
+      "tag": "S7",
       "id": "maritime_executive",
       "name": "The Maritime Executive",
       "publisher": "The Maritime Executive",
@@ -129,6 +141,175 @@
             10.0,
             300.0
           ],
+          "series": {
+            "label": "Daily spot price as published by EIA",
+            "points": [
+              {
+                "date": "2026-08-28",
+                "date_display": "28 August 2026",
+                "value": 89.75,
+                "display": "USD 89.75/bbl"
+              },
+              {
+                "date": "2026-09-01",
+                "date_display": "1 September 2026",
+                "value": 96.02,
+                "display": "USD 96.02/bbl"
+              },
+              {
+                "date": "2026-09-02",
+                "date_display": "2 September 2026",
+                "value": 97.59,
+                "display": "USD 97.59/bbl"
+              },
+              {
+                "date": "2026-09-03",
+                "date_display": "3 September 2026",
+                "value": 100.52,
+                "display": "USD 100.52/bbl"
+              },
+              {
+                "date": "2026-09-04",
+                "date_display": "4 September 2026",
+                "value": 102.24,
+                "display": "USD 102.24/bbl"
+              },
+              {
+                "date": "2026-09-07",
+                "date_display": "7 September 2026",
+                "value": 104.47,
+                "display": "USD 104.47/bbl"
+              },
+              {
+                "date": "2026-09-08",
+                "date_display": "8 September 2026",
+                "value": 106.12,
+                "display": "USD 106.12/bbl"
+              },
+              {
+                "date": "2026-09-09",
+                "date_display": "9 September 2026",
+                "value": 109.51,
+                "display": "USD 109.51/bbl"
+              },
+              {
+                "date": "2026-09-10",
+                "date_display": "10 September 2026",
+                "value": 120.98,
+                "display": "USD 120.98/bbl"
+              },
+              {
+                "date": "2026-09-11",
+                "date_display": "11 September 2026",
+                "value": 118.06,
+                "display": "USD 118.06/bbl"
+              },
+              {
+                "date": "2026-09-14",
+                "date_display": "14 September 2026",
+                "value": 121.25,
+                "display": "USD 121.25/bbl"
+              },
+              {
+                "date": "2026-09-15",
+                "date_display": "15 September 2026",
+                "value": 130.8,
+                "display": "USD 130.80/bbl"
+              },
+              {
+                "date": "2026-09-16",
+                "date_display": "16 September 2026",
+                "value": 127.84,
+                "display": "USD 127.84/bbl"
+              },
+              {
+                "date": "2026-09-17",
+                "date_display": "17 September 2026",
+                "value": 121.18,
+                "display": "USD 121.18/bbl"
+              },
+              {
+                "date": "2026-09-18",
+                "date_display": "18 September 2026",
+                "value": 119.66,
+                "display": "USD 119.66/bbl"
+              },
+              {
+                "date": "2026-09-21",
+                "date_display": "21 September 2026",
+                "value": 116.15,
+                "display": "USD 116.15/bbl"
+              },
+              {
+                "date": "2026-09-22",
+                "date_display": "22 September 2026",
+                "value": 114.89,
+                "display": "USD 114.89/bbl"
+              },
+              {
+                "date": "2026-09-23",
+                "date_display": "23 September 2026",
+                "value": 117.45,
+                "display": "USD 117.45/bbl"
+              },
+              {
+                "date": "2026-09-24",
+                "date_display": "24 September 2026",
+                "value": 120.92,
+                "display": "USD 120.92/bbl"
+              },
+              {
+                "date": "2026-09-25",
+                "date_display": "25 September 2026",
+                "value": 116.01,
+                "display": "USD 116.01/bbl"
+              },
+              {
+                "date": "2026-09-28",
+                "date_display": "28 September 2026",
+                "value": 119.97,
+                "display": "USD 119.97/bbl"
+              },
+              {
+                "date": "2026-09-29",
+                "date_display": "29 September 2026",
+                "value": 113.96,
+                "display": "USD 113.96/bbl"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "30 September 2026",
+                "value": 115.91,
+                "display": "USD 115.91/bbl"
+              },
+              {
+                "date": "2026-10-01",
+                "date_display": "1 October 2026",
+                "value": 114.82,
+                "display": "USD 114.82/bbl"
+              },
+              {
+                "date": "2026-10-02",
+                "date_display": "2 October 2026",
+                "value": 135.51,
+                "display": "USD 135.51/bbl"
+              },
+              {
+                "date": "2026-10-05",
+                "date_display": "5 October 2026",
+                "value": 125.51,
+                "display": "USD 125.51/bbl"
+              },
+              {
+                "date": "2026-10-06",
+                "date_display": "6 October 2026",
+                "value": 125.44,
+                "display": "USD 125.44/bbl"
+              }
+            ]
+          },
+          "series_note": null,
+          "short_label": "Brent crude",
           "source_tag": "S1"
         },
         {
@@ -170,6 +351,175 @@
             0.5,
             10.0
           ],
+          "series": {
+            "label": "Daily spot price as published by EIA",
+            "points": [
+              {
+                "date": "2026-08-28",
+                "date_display": "28 August 2026",
+                "value": 4.351,
+                "display": "USD 4.351/gal"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "31 August 2026",
+                "value": 4.491,
+                "display": "USD 4.491/gal"
+              },
+              {
+                "date": "2026-09-01",
+                "date_display": "1 September 2026",
+                "value": 4.724,
+                "display": "USD 4.724/gal"
+              },
+              {
+                "date": "2026-09-02",
+                "date_display": "2 September 2026",
+                "value": 4.666,
+                "display": "USD 4.666/gal"
+              },
+              {
+                "date": "2026-09-03",
+                "date_display": "3 September 2026",
+                "value": 4.592,
+                "display": "USD 4.592/gal"
+              },
+              {
+                "date": "2026-09-04",
+                "date_display": "4 September 2026",
+                "value": 4.549,
+                "display": "USD 4.549/gal"
+              },
+              {
+                "date": "2026-09-08",
+                "date_display": "8 September 2026",
+                "value": 4.644,
+                "display": "USD 4.644/gal"
+              },
+              {
+                "date": "2026-09-09",
+                "date_display": "9 September 2026",
+                "value": 4.85,
+                "display": "USD 4.850/gal"
+              },
+              {
+                "date": "2026-09-10",
+                "date_display": "10 September 2026",
+                "value": 5.17,
+                "display": "USD 5.170/gal"
+              },
+              {
+                "date": "2026-09-11",
+                "date_display": "11 September 2026",
+                "value": 5.048,
+                "display": "USD 5.048/gal"
+              },
+              {
+                "date": "2026-09-14",
+                "date_display": "14 September 2026",
+                "value": 5.078,
+                "display": "USD 5.078/gal"
+              },
+              {
+                "date": "2026-09-15",
+                "date_display": "15 September 2026",
+                "value": 5.338,
+                "display": "USD 5.338/gal"
+              },
+              {
+                "date": "2026-09-16",
+                "date_display": "16 September 2026",
+                "value": 5.365,
+                "display": "USD 5.365/gal"
+              },
+              {
+                "date": "2026-09-17",
+                "date_display": "17 September 2026",
+                "value": 5.174,
+                "display": "USD 5.174/gal"
+              },
+              {
+                "date": "2026-09-18",
+                "date_display": "18 September 2026",
+                "value": 5.16,
+                "display": "USD 5.160/gal"
+              },
+              {
+                "date": "2026-09-21",
+                "date_display": "21 September 2026",
+                "value": 4.977,
+                "display": "USD 4.977/gal"
+              },
+              {
+                "date": "2026-09-22",
+                "date_display": "22 September 2026",
+                "value": 5.007,
+                "display": "USD 5.007/gal"
+              },
+              {
+                "date": "2026-09-23",
+                "date_display": "23 September 2026",
+                "value": 4.962,
+                "display": "USD 4.962/gal"
+              },
+              {
+                "date": "2026-09-24",
+                "date_display": "24 September 2026",
+                "value": 4.881,
+                "display": "USD 4.881/gal"
+              },
+              {
+                "date": "2026-09-25",
+                "date_display": "25 September 2026",
+                "value": 4.949,
+                "display": "USD 4.949/gal"
+              },
+              {
+                "date": "2026-09-28",
+                "date_display": "28 September 2026",
+                "value": 4.91,
+                "display": "USD 4.910/gal"
+              },
+              {
+                "date": "2026-09-29",
+                "date_display": "29 September 2026",
+                "value": 4.999,
+                "display": "USD 4.999/gal"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "30 September 2026",
+                "value": 5.023,
+                "display": "USD 5.023/gal"
+              },
+              {
+                "date": "2026-10-01",
+                "date_display": "1 October 2026",
+                "value": 4.75,
+                "display": "USD 4.750/gal"
+              },
+              {
+                "date": "2026-10-02",
+                "date_display": "2 October 2026",
+                "value": 4.674,
+                "display": "USD 4.674/gal"
+              },
+              {
+                "date": "2026-10-05",
+                "date_display": "5 October 2026",
+                "value": 4.628,
+                "display": "USD 4.628/gal"
+              },
+              {
+                "date": "2026-10-06",
+                "date_display": "6 October 2026",
+                "value": 4.713,
+                "display": "USD 4.713/gal"
+              }
+            ]
+          },
+          "series_note": null,
+          "short_label": "New York Harbor diesel",
           "source_tag": "S1"
         }
       ]
@@ -188,19 +538,19 @@
         {
           "id": "sg_bunker_total",
           "label": "Singapore bunker sales, all fuel types (BrokerBrief sum of MPA's types)",
-          "unit": "thousand tonnes",
-          "value": 4726.39,
-          "display": "4,726.39 thousand tonnes",
+          "unit": "MT",
+          "value": 4726390,
+          "display": "4,726,390 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 4772.68,
-              "previous_display": "4,772.68 thousand tonnes",
-              "abs_change": -46.29,
-              "abs_display": "46.29 thousand tonnes",
+              "previous_value": 4772680,
+              "previous_display": "4,772,680 MT",
+              "abs_change": -46290,
+              "abs_display": "46,290 MT",
               "pct_change": -0.97,
               "pct_display": "0.97%",
               "direction": "down"
@@ -208,10 +558,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 4765.08,
-              "previous_display": "4,765.08 thousand tonnes",
-              "abs_change": -38.69,
-              "abs_display": "38.69 thousand tonnes",
+              "previous_value": 4765080,
+              "previous_display": "4,765,080 MT",
+              "abs_change": -38690,
+              "abs_display": "38,690 MT",
               "pct_change": -0.81,
               "pct_display": "0.81%",
               "direction": "down"
@@ -219,30 +569,115 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            1000.0,
-            10000.0
+            1000000,
+            10000000
           ],
+          "series": {
+            "label": "BrokerBrief sum of MPA's monthly figures",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 4765080,
+                "display": "4,765,080 MT"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 4817730,
+                "display": "4,817,730 MT"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 4820680,
+                "display": "4,820,680 MT"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 5508630,
+                "display": "5,508,630 MT"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 5228070,
+                "display": "5,228,070 MT"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 4678170,
+                "display": "4,678,170 MT"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 4766840,
+                "display": "4,766,840 MT"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 4355070,
+                "display": "4,355,070 MT"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 4553660,
+                "display": "4,553,660 MT"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 4672490,
+                "display": "4,672,490 MT"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 4740140,
+                "display": "4,740,140 MT"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 4772680,
+                "display": "4,772,680 MT"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 4726390,
+                "display": "4,726,390 MT"
+              }
+            ]
+          },
+          "series_note": null,
+          "short_label": "All fuels",
           "period": "month",
           "source_tag": "S2"
         },
         {
           "id": "sg_bunker_lsfo",
           "label": "Low sulphur fuel oil (MPA type: Low Sulphur Fuel Oil)",
-          "unit": "thousand tonnes",
-          "value": 2218.11,
-          "display": "2,218.11 thousand tonnes",
+          "unit": "MT",
+          "value": 2218110,
+          "display": "2,218,110 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 2193.8,
-              "previous_display": "2,193.80 thousand tonnes",
-              "abs_change": 24.31,
-              "abs_display": "24.31 thousand tonnes",
+              "previous_value": 2193800,
+              "previous_display": "2,193,800 MT",
+              "abs_change": 24310,
+              "abs_display": "24,310 MT",
               "pct_change": 1.11,
               "pct_display": "1.11%",
               "direction": "up"
@@ -250,10 +685,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 2350.48,
-              "previous_display": "2,350.48 thousand tonnes",
-              "abs_change": -132.37,
-              "abs_display": "132.37 thousand tonnes",
+              "previous_value": 2350480,
+              "previous_display": "2,350,480 MT",
+              "abs_change": -132370,
+              "abs_display": "132,370 MT",
               "pct_change": -5.63,
               "pct_display": "5.63%",
               "direction": "down"
@@ -261,30 +696,115 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            0.0,
-            10000.0
+            0,
+            10000000
           ],
+          "series": {
+            "label": "Monthly sales as published by MPA",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 2350480,
+                "display": "2,350,480 MT"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 2433380,
+                "display": "2,433,380 MT"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 2512380,
+                "display": "2,512,380 MT"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 2830320,
+                "display": "2,830,320 MT"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 2561230,
+                "display": "2,561,230 MT"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 2310010,
+                "display": "2,310,010 MT"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 2338690,
+                "display": "2,338,690 MT"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 2192510,
+                "display": "2,192,510 MT"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 2296760,
+                "display": "2,296,760 MT"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 2197000,
+                "display": "2,197,000 MT"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 2327900,
+                "display": "2,327,900 MT"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 2193800,
+                "display": "2,193,800 MT"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 2218110,
+                "display": "2,218,110 MT"
+              }
+            ]
+          },
+          "series_note": null,
+          "short_label": "Low sulphur fuel oil",
           "period": "month",
           "source_tag": "S2"
         },
         {
           "id": "sg_bunker_mfo",
           "label": "Marine fuel oil, the high-sulphur grades (MPA type: Marine Fuel Oil)",
-          "unit": "thousand tonnes",
-          "value": 1993.2,
-          "display": "1,993.20 thousand tonnes",
+          "unit": "MT",
+          "value": 1993200,
+          "display": "1,993,200 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 2095.18,
-              "previous_display": "2,095.18 thousand tonnes",
-              "abs_change": -101.98,
-              "abs_display": "101.98 thousand tonnes",
+              "previous_value": 2095180,
+              "previous_display": "2,095,180 MT",
+              "abs_change": -101980,
+              "abs_display": "101,980 MT",
               "pct_change": -4.87,
               "pct_display": "4.87%",
               "direction": "down"
@@ -292,10 +812,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 1872.95,
-              "previous_display": "1,872.95 thousand tonnes",
-              "abs_change": 120.25,
-              "abs_display": "120.25 thousand tonnes",
+              "previous_value": 1872950,
+              "previous_display": "1,872,950 MT",
+              "abs_change": 120250,
+              "abs_display": "120,250 MT",
               "pct_change": 6.42,
               "pct_display": "6.42%",
               "direction": "up"
@@ -303,30 +823,115 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            0.0,
-            10000.0
+            0,
+            10000000
           ],
+          "series": {
+            "label": "Monthly sales as published by MPA",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 1872950,
+                "display": "1,872,950 MT"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 1866530,
+                "display": "1,866,530 MT"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 1818670,
+                "display": "1,818,670 MT"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 2117580,
+                "display": "2,117,580 MT"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 2159670,
+                "display": "2,159,670 MT"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 1833570,
+                "display": "1,833,570 MT"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 1934220,
+                "display": "1,934,220 MT"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 1787930,
+                "display": "1,787,930 MT"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 1795830,
+                "display": "1,795,830 MT"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 2034550,
+                "display": "2,034,550 MT"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 1952900,
+                "display": "1,952,900 MT"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 2095180,
+                "display": "2,095,180 MT"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 1993200,
+                "display": "1,993,200 MT"
+              }
+            ]
+          },
+          "series_note": null,
+          "short_label": "High sulphur fuel oil",
           "period": "month",
           "source_tag": "S2"
         },
         {
           "id": "sg_bunker_lsmgo",
           "label": "Low sulphur marine gas oil (MPA type: Low Sulphur Marine Gas Oil)",
-          "unit": "thousand tonnes",
-          "value": 378.84,
-          "display": "378.84 thousand tonnes",
+          "unit": "MT",
+          "value": 378840,
+          "display": "378,840 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 367.73,
-              "previous_display": "367.73 thousand tonnes",
-              "abs_change": 11.11,
-              "abs_display": "11.11 thousand tonnes",
+              "previous_value": 367730,
+              "previous_display": "367,730 MT",
+              "abs_change": 11110,
+              "abs_display": "11,110 MT",
               "pct_change": 3.02,
               "pct_display": "3.02%",
               "direction": "up"
@@ -334,10 +939,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 373.56,
-              "previous_display": "373.56 thousand tonnes",
-              "abs_change": 5.28,
-              "abs_display": "5.28 thousand tonnes",
+              "previous_value": 373560,
+              "previous_display": "373,560 MT",
+              "abs_change": 5280,
+              "abs_display": "5,280 MT",
               "pct_change": 1.41,
               "pct_display": "1.41%",
               "direction": "up"
@@ -345,30 +950,115 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            0.0,
-            10000.0
+            0,
+            10000000
           ],
+          "series": {
+            "label": "Monthly sales as published by MPA",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 373560,
+                "display": "373,560 MT"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 392000,
+                "display": "392,000 MT"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 366410,
+                "display": "366,410 MT"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 410550,
+                "display": "410,550 MT"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 402060,
+                "display": "402,060 MT"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 371720,
+                "display": "371,720 MT"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 346870,
+                "display": "346,870 MT"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 256250,
+                "display": "256,250 MT"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 328700,
+                "display": "328,700 MT"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 343800,
+                "display": "343,800 MT"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 358870,
+                "display": "358,870 MT"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 367730,
+                "display": "367,730 MT"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 378840,
+                "display": "378,840 MT"
+              }
+            ]
+          },
+          "series_note": null,
+          "short_label": "Low sulphur gas oil",
           "period": "month",
           "source_tag": "S2"
         },
         {
           "id": "sg_bunker_bio",
           "label": "Biofuel blends and B100 (BrokerBrief sum of MPA's bio-blended types and B100)",
-          "unit": "thousand tonnes",
-          "value": 83.21,
-          "display": "83.21 thousand tonnes",
+          "unit": "MT",
+          "value": 83210,
+          "display": "83,210 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 57.33,
-              "previous_display": "57.33 thousand tonnes",
-              "abs_change": 25.88,
-              "abs_display": "25.88 thousand tonnes",
+              "previous_value": 57330,
+              "previous_display": "57,330 MT",
+              "abs_change": 25880,
+              "abs_display": "25,880 MT",
               "pct_change": 45.14,
               "pct_display": "45.14%",
               "direction": "up"
@@ -376,10 +1066,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 119.33,
-              "previous_display": "119.33 thousand tonnes",
-              "abs_change": -36.12,
-              "abs_display": "36.12 thousand tonnes",
+              "previous_value": 119330,
+              "previous_display": "119,330 MT",
+              "abs_change": -36120,
+              "abs_display": "36,120 MT",
               "pct_change": -30.27,
               "pct_display": "30.27%",
               "direction": "down"
@@ -387,30 +1077,115 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            0.0,
-            10000.0
+            0,
+            10000000
           ],
+          "series": {
+            "label": "BrokerBrief sum of MPA's monthly figures",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 119330,
+                "display": "119,330 MT"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 62970,
+                "display": "62,970 MT"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 62180,
+                "display": "62,180 MT"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 91070,
+                "display": "91,070 MT"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 60210,
+                "display": "60,210 MT"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 92720,
+                "display": "92,720 MT"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 92340,
+                "display": "92,340 MT"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 75950,
+                "display": "75,950 MT"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 61460,
+                "display": "61,460 MT"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 40300,
+                "display": "40,300 MT"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 39510,
+                "display": "39,510 MT"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 57330,
+                "display": "57,330 MT"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 83210,
+                "display": "83,210 MT"
+              }
+            ]
+          },
+          "series_note": null,
+          "short_label": "Biofuel blends",
           "period": "month",
           "source_tag": "S2"
         },
         {
           "id": "sg_bunker_lng",
           "label": "LNG (MPA type: LNG)",
-          "unit": "thousand tonnes",
-          "value": 51.51,
-          "display": "51.51 thousand tonnes",
+          "unit": "MT",
+          "value": 51510,
+          "display": "51,510 MT",
           "as_of": "2026-09-30",
           "as_of_display": "September 2026",
           "changes": [
             {
               "basis": "previous month",
               "compared_with": "August 2026",
-              "previous_value": 58.64,
-              "previous_display": "58.64 thousand tonnes",
-              "abs_change": -7.13,
-              "abs_display": "7.13 thousand tonnes",
+              "previous_value": 58640,
+              "previous_display": "58,640 MT",
+              "abs_change": -7130,
+              "abs_display": "7,130 MT",
               "pct_change": -12.16,
               "pct_display": "12.16%",
               "direction": "down"
@@ -418,10 +1193,10 @@
             {
               "basis": "same month a year earlier",
               "compared_with": "September 2025",
-              "previous_value": 48.45,
-              "previous_display": "48.45 thousand tonnes",
-              "abs_change": 3.06,
-              "abs_display": "3.06 thousand tonnes",
+              "previous_value": 48450,
+              "previous_display": "48,450 MT",
+              "abs_change": 3060,
+              "abs_display": "3,060 MT",
               "pct_change": 6.32,
               "pct_display": "6.32%",
               "direction": "up"
@@ -429,11 +1204,96 @@
           ],
           "source_id": "mpa_bunker_sales",
           "quality_tier": "LIVE_API",
-          "notes": "Monthly total. MPA marks the latest month's figures as preliminary estimates.",
+          "notes": "Monthly total, in tonnes (MPA publishes thousand tonnes). MPA marks the latest month's figures as preliminary estimates.",
           "plausible_range": [
-            0.0,
-            10000.0
+            0,
+            10000000
           ],
+          "series": {
+            "label": "Monthly sales as published by MPA",
+            "points": [
+              {
+                "date": "2025-09-30",
+                "date_display": "September 2025",
+                "value": 48450,
+                "display": "48,450 MT"
+              },
+              {
+                "date": "2025-10-31",
+                "date_display": "October 2025",
+                "value": 60600,
+                "display": "60,600 MT"
+              },
+              {
+                "date": "2025-11-30",
+                "date_display": "November 2025",
+                "value": 55040,
+                "display": "55,040 MT"
+              },
+              {
+                "date": "2025-12-31",
+                "date_display": "December 2025",
+                "value": 54570,
+                "display": "54,570 MT"
+              },
+              {
+                "date": "2026-01-31",
+                "date_display": "January 2026",
+                "value": 42590,
+                "display": "42,590 MT"
+              },
+              {
+                "date": "2026-02-28",
+                "date_display": "February 2026",
+                "value": 59010,
+                "display": "59,010 MT"
+              },
+              {
+                "date": "2026-03-31",
+                "date_display": "March 2026",
+                "value": 49020,
+                "display": "49,020 MT"
+              },
+              {
+                "date": "2026-04-30",
+                "date_display": "April 2026",
+                "value": 42430,
+                "display": "42,430 MT"
+              },
+              {
+                "date": "2026-05-31",
+                "date_display": "May 2026",
+                "value": 70270,
+                "display": "70,270 MT"
+              },
+              {
+                "date": "2026-06-30",
+                "date_display": "June 2026",
+                "value": 54970,
+                "display": "54,970 MT"
+              },
+              {
+                "date": "2026-07-31",
+                "date_display": "July 2026",
+                "value": 58690,
+                "display": "58,690 MT"
+              },
+              {
+                "date": "2026-08-31",
+                "date_display": "August 2026",
+                "value": 58640,
+                "display": "58,640 MT"
+              },
+              {
+                "date": "2026-09-30",
+                "date_display": "September 2026",
+                "value": 51510,
+                "display": "51,510 MT"
+              }
+            ]
+          },
+          "series_note": null,
+          "short_label": "LNG",
           "period": "month",
           "source_tag": "S2"
         }
@@ -445,8 +1305,8 @@
       "reason": null,
       "cadence": "weekly",
       "counts": {
-        "fetched": 13,
-        "kept": 12,
+        "fetched": 16,
+        "kept": 15,
         "dropped": {
           "banned_source": 0,
           "digit_in_freight_headline": 1,
@@ -498,6 +1358,400 @@
             }
           ]
         },
+        "port_calls": {
+          "title": "Singapore port calls (vessel counts, not rates)",
+          "status": "ok",
+          "reason": null,
+          "cadence": "monthly (MPA publishes about three weeks after month end)",
+          "counts": {
+            "fetched": 3,
+            "kept": 3,
+            "dropped": {}
+          },
+          "items": [
+            {
+              "id": "sg_vessel_arrivals",
+              "label": "Vessel arrivals at Singapore, all types (MPA: Vessel Arrivals (>75 GT) Total)",
+              "unit": "arrivals",
+              "value": 11608,
+              "display": "11,608 arrivals",
+              "as_of": "2026-09-30",
+              "as_of_display": "September 2026",
+              "changes": [
+                {
+                  "basis": "previous month",
+                  "compared_with": "August 2026",
+                  "previous_value": 11631,
+                  "previous_display": "11,631 arrivals",
+                  "abs_change": -23,
+                  "abs_display": "23 arrivals",
+                  "pct_change": -0.2,
+                  "pct_display": "0.20%",
+                  "direction": "down"
+                },
+                {
+                  "basis": "same month a year earlier",
+                  "compared_with": "September 2025",
+                  "previous_value": 10992,
+                  "previous_display": "10,992 arrivals",
+                  "abs_change": 616,
+                  "abs_display": "616 arrivals",
+                  "pct_change": 5.6,
+                  "pct_display": "5.60%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "mpa_port_traffic",
+              "quality_tier": "LIVE_API",
+              "notes": "Vessels over 75 GT, Singapore only. MPA marks the latest month's figures as preliminary estimates.",
+              "plausible_range": [
+                3000,
+                30000
+              ],
+              "series": {
+                "label": "Monthly count as published by MPA",
+                "points": [
+                  {
+                    "date": "2025-09-30",
+                    "date_display": "September 2025",
+                    "value": 10992,
+                    "display": "10,992 arrivals"
+                  },
+                  {
+                    "date": "2025-10-31",
+                    "date_display": "October 2025",
+                    "value": 11552,
+                    "display": "11,552 arrivals"
+                  },
+                  {
+                    "date": "2025-11-30",
+                    "date_display": "November 2025",
+                    "value": 11207,
+                    "display": "11,207 arrivals"
+                  },
+                  {
+                    "date": "2025-12-31",
+                    "date_display": "December 2025",
+                    "value": 11892,
+                    "display": "11,892 arrivals"
+                  },
+                  {
+                    "date": "2026-01-31",
+                    "date_display": "January 2026",
+                    "value": 12031,
+                    "display": "12,031 arrivals"
+                  },
+                  {
+                    "date": "2026-02-28",
+                    "date_display": "February 2026",
+                    "value": 10886,
+                    "display": "10,886 arrivals"
+                  },
+                  {
+                    "date": "2026-03-31",
+                    "date_display": "March 2026",
+                    "value": 11591,
+                    "display": "11,591 arrivals"
+                  },
+                  {
+                    "date": "2026-04-30",
+                    "date_display": "April 2026",
+                    "value": 10873,
+                    "display": "10,873 arrivals"
+                  },
+                  {
+                    "date": "2026-05-31",
+                    "date_display": "May 2026",
+                    "value": 11729,
+                    "display": "11,729 arrivals"
+                  },
+                  {
+                    "date": "2026-06-30",
+                    "date_display": "June 2026",
+                    "value": 11520,
+                    "display": "11,520 arrivals"
+                  },
+                  {
+                    "date": "2026-07-31",
+                    "date_display": "July 2026",
+                    "value": 11655,
+                    "display": "11,655 arrivals"
+                  },
+                  {
+                    "date": "2026-08-31",
+                    "date_display": "August 2026",
+                    "value": 11631,
+                    "display": "11,631 arrivals"
+                  },
+                  {
+                    "date": "2026-09-30",
+                    "date_display": "September 2026",
+                    "value": 11608,
+                    "display": "11,608 arrivals"
+                  }
+                ]
+              },
+              "series_note": null,
+              "period": "month",
+              "short_label": "Vessel arrivals",
+              "source_tag": "S4"
+            },
+            {
+              "id": "sg_calls_bunkers",
+              "label": "Vessel calls for bunkers (MPA purpose type: Bunkers)",
+              "unit": "calls",
+              "value": 3617,
+              "display": "3,617 calls",
+              "as_of": "2026-09-30",
+              "as_of_display": "September 2026",
+              "changes": [
+                {
+                  "basis": "previous month",
+                  "compared_with": "August 2026",
+                  "previous_value": 3588,
+                  "previous_display": "3,588 calls",
+                  "abs_change": 29,
+                  "abs_display": "29 calls",
+                  "pct_change": 0.81,
+                  "pct_display": "0.81%",
+                  "direction": "up"
+                },
+                {
+                  "basis": "same month a year earlier",
+                  "compared_with": "September 2025",
+                  "previous_value": 3518,
+                  "previous_display": "3,518 calls",
+                  "abs_change": 99,
+                  "abs_display": "99 calls",
+                  "pct_change": 2.81,
+                  "pct_display": "2.81%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "mpa_port_traffic",
+              "quality_tier": "LIVE_API",
+              "notes": "Vessels over 75 GT, Singapore only. MPA marks the latest month's figures as preliminary estimates.",
+              "plausible_range": [
+                500,
+                15000
+              ],
+              "series": {
+                "label": "Monthly count as published by MPA",
+                "points": [
+                  {
+                    "date": "2025-09-30",
+                    "date_display": "September 2025",
+                    "value": 3518,
+                    "display": "3,518 calls"
+                  },
+                  {
+                    "date": "2025-10-31",
+                    "date_display": "October 2025",
+                    "value": 3753,
+                    "display": "3,753 calls"
+                  },
+                  {
+                    "date": "2025-11-30",
+                    "date_display": "November 2025",
+                    "value": 3632,
+                    "display": "3,632 calls"
+                  },
+                  {
+                    "date": "2025-12-31",
+                    "date_display": "December 2025",
+                    "value": 3721,
+                    "display": "3,721 calls"
+                  },
+                  {
+                    "date": "2026-01-31",
+                    "date_display": "January 2026",
+                    "value": 3778,
+                    "display": "3,778 calls"
+                  },
+                  {
+                    "date": "2026-02-28",
+                    "date_display": "February 2026",
+                    "value": 3423,
+                    "display": "3,423 calls"
+                  },
+                  {
+                    "date": "2026-03-31",
+                    "date_display": "March 2026",
+                    "value": 3502,
+                    "display": "3,502 calls"
+                  },
+                  {
+                    "date": "2026-04-30",
+                    "date_display": "April 2026",
+                    "value": 3438,
+                    "display": "3,438 calls"
+                  },
+                  {
+                    "date": "2026-05-31",
+                    "date_display": "May 2026",
+                    "value": 3690,
+                    "display": "3,690 calls"
+                  },
+                  {
+                    "date": "2026-06-30",
+                    "date_display": "June 2026",
+                    "value": 3618,
+                    "display": "3,618 calls"
+                  },
+                  {
+                    "date": "2026-07-31",
+                    "date_display": "July 2026",
+                    "value": 3675,
+                    "display": "3,675 calls"
+                  },
+                  {
+                    "date": "2026-08-31",
+                    "date_display": "August 2026",
+                    "value": 3588,
+                    "display": "3,588 calls"
+                  },
+                  {
+                    "date": "2026-09-30",
+                    "date_display": "September 2026",
+                    "value": 3617,
+                    "display": "3,617 calls"
+                  }
+                ]
+              },
+              "series_note": null,
+              "period": "month",
+              "short_label": "Calls for bunkers",
+              "source_tag": "S4"
+            },
+            {
+              "id": "sg_calls_cargo",
+              "label": "Vessel calls for cargo (MPA purpose type: Cargo)",
+              "unit": "calls",
+              "value": 4070,
+              "display": "4,070 calls",
+              "as_of": "2026-09-30",
+              "as_of_display": "September 2026",
+              "changes": [
+                {
+                  "basis": "previous month",
+                  "compared_with": "August 2026",
+                  "previous_value": 4092,
+                  "previous_display": "4,092 calls",
+                  "abs_change": -22,
+                  "abs_display": "22 calls",
+                  "pct_change": -0.54,
+                  "pct_display": "0.54%",
+                  "direction": "down"
+                },
+                {
+                  "basis": "same month a year earlier",
+                  "compared_with": "September 2025",
+                  "previous_value": 4007,
+                  "previous_display": "4,007 calls",
+                  "abs_change": 63,
+                  "abs_display": "63 calls",
+                  "pct_change": 1.57,
+                  "pct_display": "1.57%",
+                  "direction": "up"
+                }
+              ],
+              "source_id": "mpa_port_traffic",
+              "quality_tier": "LIVE_API",
+              "notes": "Vessels over 75 GT, Singapore only. MPA marks the latest month's figures as preliminary estimates.",
+              "plausible_range": [
+                500,
+                15000
+              ],
+              "series": {
+                "label": "Monthly count as published by MPA",
+                "points": [
+                  {
+                    "date": "2025-09-30",
+                    "date_display": "September 2025",
+                    "value": 4007,
+                    "display": "4,007 calls"
+                  },
+                  {
+                    "date": "2025-10-31",
+                    "date_display": "October 2025",
+                    "value": 4198,
+                    "display": "4,198 calls"
+                  },
+                  {
+                    "date": "2025-11-30",
+                    "date_display": "November 2025",
+                    "value": 4134,
+                    "display": "4,134 calls"
+                  },
+                  {
+                    "date": "2025-12-31",
+                    "date_display": "December 2025",
+                    "value": 4229,
+                    "display": "4,229 calls"
+                  },
+                  {
+                    "date": "2026-01-31",
+                    "date_display": "January 2026",
+                    "value": 4314,
+                    "display": "4,314 calls"
+                  },
+                  {
+                    "date": "2026-02-28",
+                    "date_display": "February 2026",
+                    "value": 3854,
+                    "display": "3,854 calls"
+                  },
+                  {
+                    "date": "2026-03-31",
+                    "date_display": "March 2026",
+                    "value": 4094,
+                    "display": "4,094 calls"
+                  },
+                  {
+                    "date": "2026-04-30",
+                    "date_display": "April 2026",
+                    "value": 3950,
+                    "display": "3,950 calls"
+                  },
+                  {
+                    "date": "2026-05-31",
+                    "date_display": "May 2026",
+                    "value": 4239,
+                    "display": "4,239 calls"
+                  },
+                  {
+                    "date": "2026-06-30",
+                    "date_display": "June 2026",
+                    "value": 4107,
+                    "display": "4,107 calls"
+                  },
+                  {
+                    "date": "2026-07-31",
+                    "date_display": "July 2026",
+                    "value": 4206,
+                    "display": "4,206 calls"
+                  },
+                  {
+                    "date": "2026-08-31",
+                    "date_display": "August 2026",
+                    "value": 4092,
+                    "display": "4,092 calls"
+                  },
+                  {
+                    "date": "2026-09-30",
+                    "date_display": "September 2026",
+                    "value": 4070,
+                    "display": "4,070 calls"
+                  }
+                ]
+              },
+              "series_note": null,
+              "period": "month",
+              "short_label": "Calls for cargo",
+              "source_tag": "S4"
+            }
+          ]
+        },
         "activity": {
           "title": "Ship activity (transits and port calls, not rates)",
           "status": "ok",
@@ -537,7 +1791,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             },
             {
               "id": "transits_chokepoint2",
@@ -567,7 +1823,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             },
             {
               "id": "transits_chokepoint4",
@@ -597,7 +1855,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             },
             {
               "id": "transits_chokepoint5",
@@ -627,7 +1887,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             },
             {
               "id": "transits_chokepoint6",
@@ -657,7 +1919,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             },
             {
               "id": "transits_chokepoint7",
@@ -687,7 +1951,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             },
             {
               "id": "portcalls_port1201",
@@ -717,7 +1983,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             },
             {
               "id": "portcalls_port1114",
@@ -747,7 +2015,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             },
             {
               "id": "portcalls_port362",
@@ -777,7 +2047,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             },
             {
               "id": "portcalls_port955",
@@ -807,7 +2079,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             },
             {
               "id": "portcalls_port481",
@@ -837,7 +2111,9 @@
                 0,
                 10000
               ],
-              "source_tag": "S4"
+              "series": null,
+              "series_note": null,
+              "source_tag": "S5"
             }
           ]
         }
@@ -875,7 +2151,7 @@
           "section": "sale_and_purchase",
           "segment": "dry_bulk",
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         },
         {
           "id": "38ec41e21301",
@@ -892,7 +2168,7 @@
           "section": "sale_and_purchase",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         },
         {
           "id": "56d907003e1c",
@@ -909,7 +2185,7 @@
           "section": "sale_and_purchase",
           "segment": "dry_bulk",
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         }
       ]
     },
@@ -1000,7 +2276,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         },
         {
           "id": "dc19c507a379",
@@ -1017,7 +2293,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         },
         {
           "id": "a7906d5c7d2e",
@@ -1034,7 +2310,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S5"
+          "source_tag": "S6"
         },
         {
           "id": "64fa131aa297",
@@ -1051,7 +2327,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S6"
+          "source_tag": "S7"
         },
         {
           "id": "38719df7d78c",
@@ -1068,7 +2344,7 @@
           "section": "events",
           "segment": null,
           "also_reported_by": [],
-          "source_tag": "S6"
+          "source_tag": "S7"
         }
       ]
     }

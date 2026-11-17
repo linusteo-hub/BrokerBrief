@@ -184,10 +184,10 @@ def test_same_figure_as_the_previous_brief_is_labelled():
     from modules.morning_brief.validator import figures
     assert render_brief(payload(), {}).count("Same figure as in the previous brief") == 0
     markdown = render_brief(payload(), {}, previous_payload=payload())
-    assert markdown.count("Same figure as in the previous brief") == len(figures(payload())) == 19
+    assert markdown.count("Same figure as in the previous brief") == len(figures(payload())) == 22
     newer = payload()
     newer["sections"]["prices"]["items"][0]["as_of"] = "2026-10-07"     # a new Brent value since yesterday
-    assert render_brief(newer, {}, previous_payload=payload()).count("Same figure as in the previous brief") == 18
+    assert render_brief(newer, {}, previous_payload=payload()).count("Same figure as in the previous brief") == 21
 
 
 def test_feed_text_cannot_inject_markdown():
@@ -237,7 +237,7 @@ def test_write_cli_refuses_and_writes_no_brief(tmp_path):
 def test_validate_cli_catches_every_must_fail_case():
     result = run("-m", "modules.morning_brief.validate", "--cases", str(FIXTURES / "validator"))
     assert result.returncode == 0, result.stdout
-    assert "18 of 18 must-fail cases caught" in result.stdout
+    assert "19 of 19 must-fail cases caught" in result.stdout
 
 
 def test_validate_cli_fails_if_a_must_fail_case_slips_through(tmp_path):

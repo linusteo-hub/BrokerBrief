@@ -103,7 +103,7 @@ Publishing from the workflow needs the repository's Pages source set to **GitHub
 
 Run the workflow manually with **break_feed** set to one source. That source's requests fail on purpose (`BROKERBRIEF_BREAK_FEED`, read only in `modules/morning_brief/guarded_http.py`). A failure-test run is never archived or published, whatever the other boxes say, and always opens a `brief-alert-test` issue naming the broken source, so the alert path is tested too.
 
-- **A data source** (`eia_spot`, `mpa_bunker_sales`, `imf_portwatch`): its section is shown as "No verified data today" with the reason "… deliberately broken for a failure test". This is the clearest test; use `mpa_bunker_sales`.
+- **A data source** (`eia_spot`, `mpa_bunker_sales`, `mpa_port_traffic`, `imf_portwatch`): its section is shown as "No verified data today" with the reason "… deliberately broken for a failure test". This is the clearest test; use `mpa_bunker_sales`.
 - **One news feed** (`gcaptain`, `splash247`, `maritime_executive`): the news sections still show the other two publishers' stories. The broken feed is recorded in `validation.json` under `feed_errors`. A news section is marked empty only when every feed fails.
 
 Download the run's `brief-output` artifact to see the brief the test produced. Scheduled runs never set the variable, and only someone with write access can start a manual run.

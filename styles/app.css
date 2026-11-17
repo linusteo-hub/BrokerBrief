@@ -38,3 +38,6 @@
 /* ── Sidebar: rows span the full width; a little air under the brand ── */
 [data-testid="stSidebar"] [role="radiogroup"] *:has(>[data-testid="stRadioOption"]){width:100%;}
 [data-testid="stSidebar"] .sidebar-brand{margin-bottom:1rem;}
+/* The design system's ground sets position:relative on this container (fine for a plain page). In Streamlit it must stay
+   absolute: relative lets it grow to its content's height inside a clipped .stApp, and the sidebar can then never scroll. */
+[data-testid="stAppViewContainer"]{position:absolute;inset:0;}

@@ -725,18 +725,21 @@ elif page == "Market intelligence":
         activity_body = ui.brief_figures(subs.get("activity", {}).get("items") or [])
         if subs.get("activity", {}).get("items"):
             activity_body += f'<div class="field-label" style="margin-top:.6rem;">{escape(PORTWATCH_CREDIT)}</div>'
+        # Data first, then the news-based direction, then what no free source covers.
         freight_body = "".join([
-            ui.brief_subsection(subs["container_rates"]) if "container_rates" in subs else "",
+            ui.brief_subsection(subs["port_calls"], ui.brief_figures(subs["port_calls"].get("items") or [], chart="bars"))
+            if "port_calls" in subs else "",
+            ui.brief_subsection(subs["activity"], activity_body) if "activity" in subs else "",
             ui.brief_subsection(subs["rate_direction"], ui.brief_news(subs["rate_direction"].get("items") or []))
             if "rate_direction" in subs else "",
-            ui.brief_subsection(subs["activity"], activity_body) if "activity" in subs else "",
+            ui.brief_subsection(subs["container_rates"]) if "container_rates" in subs else "",
         ])
         st.markdown(ui.brief_header(payload), unsafe_allow_html=True)
         col_figs, col_news = st.columns([7, 5], gap="large")
         with col_figs:
             st.markdown(
-                ui.brief_section(sec["prices"], ui.brief_figures(sec["prices"].get("items") or [], prices=True))
-                + ui.brief_section(sec["bunker_sales"], ui.brief_figures(sec["bunker_sales"].get("items") or []))
+                ui.brief_section(sec["prices"], ui.brief_figures(sec["prices"].get("items") or [], prices=True, chart="line"))
+                + ui.brief_section(sec["bunker_sales"], ui.brief_figures(sec["bunker_sales"].get("items") or [], chart="bars"))
                 + ui.brief_section(freight, freight_body),
                 unsafe_allow_html=True)
         # A section this page does not know yet (a newer payload) is still shown, never silently dropped.
@@ -753,9 +756,20 @@ elif page == "Market intelligence":
             st.markdown(ui.warn_strip(f"Feeds that failed in this build, so their items are missing below: {listed}. "
                                       f"Retried after {FAILURE_RETRY_SECONDS // 60} minutes."),
                         unsafe_allow_html=True)
+        # Short lane names; each section's full title is on its own card below.
+        lanes = [(name, s.get("items") or [], s.get("reason") or "") for name, s in
+                 (("Rate direction", subs.get("rate_direction", {})), ("Sale & Purchase", sec["sale_and_purchase"]),
+                  ("Events", sec["events"])) if s]
+        published = [it["published"] for _, items, _ in lanes for it in items if it.get("published")]
+        timeline = ""
+        if published:
+            timeline = ('<div class="info-card"><div class="mb-sec-head"><div class="info-card-title">News flow</div>'
+                        '</div>'
+                        + ui.news_timeline(lanes, min(published, key=datetime.fromisoformat), payload["generated_at"]) + '</div>')
         with col_news:
             st.markdown(
-                ui.brief_section(sec["sale_and_purchase"], ui.brief_news(sec["sale_and_purchase"].get("items") or []))
+                timeline
+                + ui.brief_section(sec["sale_and_purchase"], ui.brief_news(sec["sale_and_purchase"].get("items") or []))
                 + ui.brief_section(sec["events"], ui.brief_news(sec["events"].get("items") or []))
                 + extra
                 + ui.brief_sources(payload.get("sources") or []),

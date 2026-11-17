@@ -35,7 +35,7 @@ def test_recorded_response_builds_every_figure():
     assert result["error"] is None and result["excluded"] == []
     assert [item["id"] for item in result["items"]] == IDS
     total = by_id(result)["sg_bunker_total"]
-    assert total["display"] == "4,726.39 thousand tonnes"
+    assert total["display"] == "4,726,390 MT"
     assert total["as_of_display"] == "September 2026" and total["period"] == "month"
     assert total["source_id"] == "mpa_bunker_sales"
 
@@ -44,23 +44,23 @@ def test_total_equals_the_sum_of_mpas_types_and_the_changes_are_precomputed():
     total = by_id(fetch())["sg_bunker_total"]
     month, year = total["changes"]
     assert (month["basis"], month["compared_with"], month["previous_display"]) == (
-        "previous month", "August 2026", "4,772.68 thousand tonnes")
+        "previous month", "August 2026", "4,772,680 MT")
     assert (month["abs_display"], month["pct_display"], month["direction"]) == (
-        "46.29 thousand tonnes", "0.97%", "down")
+        "46,290 MT", "0.97%", "down")
     assert (year["basis"], year["compared_with"], year["previous_display"], year["direction"]) == (
-        "same month a year earlier", "September 2025", "4,765.08 thousand tonnes", "down")
-    # MPA's own total series gives 4,765.09 for September 2025: summing rounded components
-    # can differ by 0.01, which is why the label says this is BrokerBrief's sum.
+        "same month a year earlier", "September 2025", "4,765,080 MT", "down")
+    # MPA's own total series gives 4,765.09 thousand tonnes for September 2025: summing rounded
+    # components can differ by 0.01 (10 MT), which is why the label says this is BrokerBrief's sum.
 
 
 def test_component_figures_use_mpas_own_types():
     figures = by_id(fetch())
-    assert figures["sg_bunker_lsfo"]["display"] == "2,218.11 thousand tonnes"
-    assert figures["sg_bunker_mfo"]["display"] == "1,993.20 thousand tonnes"
-    assert figures["sg_bunker_lsmgo"]["display"] == "378.84 thousand tonnes"
-    assert figures["sg_bunker_lng"]["display"] == "51.51 thousand tonnes"
+    assert figures["sg_bunker_lsfo"]["display"] == "2,218,110 MT"
+    assert figures["sg_bunker_mfo"]["display"] == "1,993,200 MT"
+    assert figures["sg_bunker_lsmgo"]["display"] == "378,840 MT"
+    assert figures["sg_bunker_lng"]["display"] == "51,510 MT"
     # 4.33 + 0.1 + 76.2 bio-blended + 2.58 B100; labelled as our own sum.
-    assert figures["sg_bunker_bio"]["display"] == "83.21 thousand tonnes"
+    assert figures["sg_bunker_bio"]["display"] == "83,210 MT"
     assert "BrokerBrief sum" in figures["sg_bunker_bio"]["label"]
 
 
@@ -136,3 +136,12 @@ def test_source_is_allowlisted_as_redistributable_data_with_the_licence_notice()
 def test_only_the_allowlisted_endpoint_can_be_requested():
     with pytest.raises(SourceNotAllowed):
         guarded_get("https://data.gov.sg/api/action/package_search")
+
+
+def test_tonnes_are_whole_numbers_converted_exactly_from_mpas_thousand_tonnes():
+    total = by_id(fetch())["sg_bunker_total"]
+    assert total["unit"] == "MT" and total["value"] == 4_726_390 and isinstance(total["value"], int)
+    assert total["plausible_range"] == [1_000_000, 10_000_000]
+    assert all(isinstance(p["value"], int) for p in total["series"]["points"])
+    assert total["short_label"] == "All fuels"
+    assert "MPA publishes thousand tonnes" in total["notes"]

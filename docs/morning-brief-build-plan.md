@@ -348,7 +348,7 @@ Built in `modules/morning_brief/`: `writer.py` (renderer, model call, retry and 
 
 ### Checker tests (build plan list, all present and passing)
 
-`tests/fixtures/validator/` holds 22 cases, run by the validator command (and the verify skill): a number not in the payload (caught); "1,234.5" against "1234.50" (passes after normalisation); a digit in a news summary (caught at item level and at whole-brief level); "rose" where the payload says down (caught, with and without an amount); plus unknown source tag, unknown link, number in words, copied run, unhedged interpretation, Markdown in a summary, altered headline, silent gap, stale figure, out-of-range figure, wrong title date, banned name. 18 of 18 must-fail cases are caught; the 4 good cases pass. `tests/test_morning_brief_writer.py` covers retry, withhold, fail-closed and each API failure.
+`tests/fixtures/validator/` holds 23 cases, run by the validator command (and the verify skill): a number not in the payload (caught); "1,234.5" against "1234.50" (passes after normalisation); a digit in a news summary (caught at item level and at whole-brief level); "rose" where the payload says down (caught, with and without an amount); plus unknown source tag, unknown link, number in words, copied run, unhedged interpretation, Markdown in a summary, altered headline, silent gap, stale figure, out-of-range figure, chart point out of range, wrong title date, banned name. 19 of 19 must-fail cases are caught; the 4 good cases pass. `tests/test_morning_brief_writer.py` covers retry, withhold, fail-closed and each API failure.
 
 ### Fixes from the fresh-context review of Phase 2
 
