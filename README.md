@@ -140,10 +140,10 @@ Licensed market data or paid sources are never used in the deployed app.
 
 - These results are pinned by `tests/test_demo_mode.py`. The rules, the grade-specific prices, the freshness limits and the caps are covered by `tests/test_decision_rules.py`, and the page itself by `tests/test_ui_bunkering_page.py`. Run `pytest -q` to check every figure above.
 - **Market intelligence** shows the morning brief, built live in the app by the same code and checks as the scheduled brief, with no language model:
-  - Brent and diesel prices (EIA), Singapore bunker sales (MPA), and ship activity (IMF PortWatch), each with its comparisons, date and source tag exactly as the source data gives them;
-  - sale-and-purchase and events headlines from gCaptain, Splash247 and The Maritime Executive, shown as headline, publisher, date and link only;
+  - Brent and diesel prices (EIA), Singapore bunker sales (MPA), and ship activity (IMF PortWatch), each with its date and source tag; the value and date come from the source, and the comparisons with earlier readings (for example the previous published day, or one week earlier) are calculated by BrokerBrief's code;
+  - freight-rate direction, sale-and-purchase and events headlines from gCaptain, Splash247 and The Maritime Executive, shown as headline, publisher, date and link only;
   - a section with no verified data is marked missing, or not covered (container freight rates, which no free source may republish), with the reason.
 
-  Shared by every visitor and rebuilt every 3 hours. Covered by `tests/test_ui_market_intelligence.py`.
+  Shared by every visitor and rebuilt on the first visit after it is 3 hours old; a brief built while a feed was down names the failed feed on the page and is rebuilt on the first visit after 5 minutes. Covered by `tests/test_ui_market_intelligence.py`.
 - **Data input** takes your own CSV of freight and bunker rows and turns it into a signal table, bunker spreads, and email, PDF and LinkedIn reports.
 - **Built, switched off:** the scheduled daily brief, archived and published to GitHub Pages (Decision Batch 3 switches it on).

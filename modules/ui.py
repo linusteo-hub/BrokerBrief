@@ -349,7 +349,7 @@ def _tag(item_or_source) -> str:
 def brief_header(payload: dict) -> str:
     notice = payload.get("trial_notice")
     chip = f'<span class="manual-badge" style="margin:0;">{escape(notice)}</span>' if notice else ""
-    return (f'<div class="mb-head"><div><div class="mb-date">Morning brief · {escape(payload.get("brief_date_display", ""))}</div>'
+    return (f'<div class="mb-head"><div><div class="mb-date">Morning brief · {_s(payload, "brief_date_display")}</div>'
             '<div class="mb-meta">Built from free, permitted sources only · every figure carries its source tag</div></div>'
             f'{chip}</div>')
 
@@ -363,56 +363,76 @@ def _status_line(section: dict) -> str:
     return ""
 
 
+def _s(d: dict, key: str) -> str:
+    """A payload field as escaped text; a missing or None field becomes empty, never "None" or a crash."""
+    value = d.get(key)
+    return escape(str(value)) if value is not None else ""
+
+
+def _https(url) -> str:
+    """Only https links are rendered as links; anything else (javascript:, data:, http:) is dropped."""
+    return escape(url) if isinstance(url, str) and url.startswith("https://") else ""
+
+
 def brief_figures(items: list, *, prices: bool = False) -> str:
-    """One row per figure: label, value, each comparison in words, as-of date and source tag."""
-    rows = []
+    """One row per figure: label, value, each comparison in words, as-of date and source tag.
+    The source's notes (e.g. MPA's "preliminary" warning) follow the figures, each note once."""
+    rows, notes = [], []
     for it in items:
         changes = []
         for ch in it.get("changes") or []:
-            direction = ch.get("direction", "")
+            direction = ch.get("direction") or ""
             word = _DIR_WORD.get(direction, direction.capitalize())
             cls = f'mb-dir {_PRICE_DIR_CLASS.get(direction, "")}' if prices else "mb-dir"
-            amount = "" if direction == "flat" else f'{escape(ch.get("abs_display", ""))} · {escape(ch.get("pct_display", ""))} · '
+            # pct_display is None when the previous value is 0 (no percentage exists); leave it out.
+            parts = [] if direction == "flat" else [x for x in (_s(ch, "abs_display"), _s(ch, "pct_display")) if x]
+            amount = "".join(f"{x} · " for x in parts)
             changes.append(f'<div class="mb-change"><span class="{cls}">{escape(word)}</span>{amount}'
-                           f'vs {escape(ch.get("compared_with", ""))} ({escape(ch.get("basis", ""))})</div>')
-        rows.append(f'<div class="mb-fig"><div class="mb-fig-label">{escape(it.get("label", ""))}</div>'
-                    f'<div class="mb-fig-value">{escape(it.get("display", ""))}</div>{"".join(changes)}'
-                    f'<div class="mb-fig-meta">as of {escape(it.get("as_of_display", ""))}{_tag(it)}</div></div>')
-    return "".join(rows)
+                           f'vs {_s(ch, "compared_with")} ({_s(ch, "basis")})</div>')
+        note = (str(it["notes"]), _tag(it)) if it.get("notes") else None
+        if note and note not in notes:
+            notes.append(note)
+        rows.append(f'<div class="mb-fig"><div class="mb-fig-label">{_s(it, "label")}</div>'
+                    f'<div class="mb-fig-value">{_s(it, "display")}</div>{"".join(changes)}'
+                    f'<div class="mb-fig-meta">as of {_s(it, "as_of_display")}{_tag(it)}</div></div>')
+    return "".join(rows) + "".join(f'<div class="mb-note">{escape(n)}{tag}</div>' for n, tag in notes)
 
 
 def brief_news(items: list) -> str:
-    """Headline (linked), publisher, wire agency or author when named, date, source tag. No excerpt."""
+    """Headline (linked when the link is https), publisher, wire agency or author when named, date, source tag. No excerpt."""
     rows = []
     for it in items:
-        credit = [escape(it.get("publisher", ""))]
+        credit = [_s(it, "publisher")]
         if it.get("wire_agency"):
-            credit.append(f'via {escape(it["wire_agency"])}')
+            credit.append(f'via {_s(it, "wire_agency")}')
         if it.get("author"):
-            credit.append(f'by {escape(it["author"])}')
-        if it.get("published_display"):
-            credit.append(escape(it["published_display"]))
-        rows.append(f'<div class="mb-news"><a href="{escape(it.get("link", ""))}" target="_blank" rel="noopener noreferrer">'
-                    f'{escape(it.get("headline", ""))}</a><div class="mb-news-meta">{" · ".join(credit)}{_tag(it)}</div></div>')
+            credit.append(f'by {_s(it, "author")}')
+        credit.append(_s(it, "published_display"))
+        link = _https(it.get("link"))
+        headline = (f'<a href="{link}" target="_blank" rel="noopener noreferrer">{_s(it, "headline")}</a>' if link
+                    else f'<span>{_s(it, "headline")}</span>')
+        rows.append(f'<div class="mb-news">{headline}<div class="mb-news-meta">{" · ".join(c for c in credit if c)}{_tag(it)}</div></div>')
     return "".join(rows)
 
 
 def brief_section(section: dict, body: str = "") -> str:
     """A section card: title, cadence, its state (ok / MISSING / NOT COVERED with the reason), then the body."""
-    return (f'<div class="info-card no-motion"><div class="mb-sec-head"><div class="info-card-title">{escape(section.get("title", ""))}</div>'
+    return (f'<div class="info-card no-motion"><div class="mb-sec-head"><div class="info-card-title">{_s(section, "title")}</div>'
             f'<div class="mb-cadence">{escape(section.get("cadence") or "")}</div></div>{_status_line(section)}{body}</div>')
 
 
 def brief_subsection(section: dict, body: str = "") -> str:
-    return f'<div class="mb-sub">{escape(section.get("title", ""))}</div>{_status_line(section)}{body}'
+    return f'<div class="mb-sub">{_s(section, "title")}</div>{_status_line(section)}{body}'
 
 
 def brief_sources(sources: list) -> str:
+    def links(s: dict) -> str:
+        out = [f'<a href="{u}" target="_blank" rel="noopener noreferrer">{label}</a>'
+               for label, u in (("Source", _https(s.get("url"))), ("Terms", _https(s.get("terms_url")))) if u]
+        return " · ".join(out)
     rows = "".join(
-        f'<div class="mb-src"><span class="mb-tag" style="margin:0;">[{escape(s.get("tag", ""))}]</span>'
-        f'<div><b>{escape(s.get("name", ""))}</b> · {escape(s.get("publisher", ""))}<br>'
-        f'Licence: {escape(s.get("licence", ""))}. {escape(s.get("credit", ""))} '
-        f'<a href="{escape(s.get("url", ""))}" target="_blank" rel="noopener noreferrer">Source</a> · '
-        f'<a href="{escape(s.get("terms_url", ""))}" target="_blank" rel="noopener noreferrer">Terms</a></div></div>'
+        f'<div class="mb-src"><span class="mb-tag" style="margin:0;">[{_s(s, "tag")}]</span>'
+        f'<div><b>{_s(s, "name")}</b>{" · " + _s(s, "publisher") if s.get("publisher") else ""}<br>'
+        f'Licence: {_s(s, "licence")}. {_s(s, "credit")} {links(s)}</div></div>'
         for s in sources)
     return f'<div class="info-card no-motion"><div class="info-card-title">Sources</div>{rows}</div>'

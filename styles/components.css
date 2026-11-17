@@ -290,6 +290,8 @@
 .mb-change{grid-column:1 / -1;font-family:var(--font-mono);font-size:.8rem;color:var(--muted);line-height:1.6;}
 .mb-change .mb-dir{font-weight:600;color:var(--text);margin-right:.35rem;}
 .mb-fig-meta{grid-column:1 / -1;font-family:var(--font-mono);font-size:.75rem;color:var(--muted);}
+.mb-note{font-size:.8rem;color:var(--muted);line-height:1.5;margin-top:.5rem;padding-top:.5rem;border-top:1px dashed var(--bdr);}
+.mb-news span{font-family:var(--font-head);font-weight:600;font-size:1rem;line-height:1.4;color:var(--text);}
 .mb-tag{font-family:var(--font-mono);font-weight:600;font-size:.75rem;color:var(--blue);margin-left:.35rem;}
 .mb-news{padding:.75rem 0;border-top:1px solid var(--bdr);}
 .mb-news:first-of-type{border-top:none;}

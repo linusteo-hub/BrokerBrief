@@ -5,9 +5,11 @@ Run with: streamlit run app.py
 Architecture:
   Homepage (decision entry point)
   → Bunkering Strategy module (scenario → options → constraints → scoring → confidence → workspace)
-  → Market Intelligence (repositioned dashboard, supporting role)
+  → Market intelligence (the morning brief, built live from free, permitted sources)
+  → Data input (your own CSV: signals, bunker spreads and reports)
 """
 
+import hashlib
 import os
 import time
 
@@ -131,11 +133,41 @@ def _cached_brief(eia_key: str) -> dict:
         return {"success": False, "error": message.replace(eia_key, "<redacted>") if eia_key else message}
 
 
+def _brief_ok(data: dict, eia_key: str) -> bool:
+    """A brief built while a feed was down is shown, but not kept for 3 hours: it counts
+    as a failure so the next visit after 5 minutes rebuilds it. A missing EIA key is
+    not an outage (retrying cannot fix it), so it alone does not trigger a rebuild."""
+    if not data.get("success"):
+        return False
+    return not _outages(data["payload"], eia_key)
+
+
+# A feed that answered but carried no items is shown on the page but does not trigger a
+# rebuild: refetching every source each 5 minutes would not fill an empty feed.
+_NOT_AN_OUTAGE = "feed contained no items"
+
+
+def _feed_problems(payload: dict, eia_key: str) -> dict:
+    """source id -> reason, for every feed that failed in this build. A missing EIA key
+    is reported in the Prices section itself, so it is left out here."""
+    errors = dict((payload.get("validation") or {}).get("feed_errors") or {})
+    if not eia_key:
+        errors.pop("eia_spot", None)
+    return errors
+
+
+def _outages(payload: dict, eia_key: str) -> dict:
+    return {k: v for k, v in _feed_problems(payload, eia_key).items() if v != _NOT_AN_OUTAGE}
+
+
 def _live_brief(eia_key: str) -> dict:
     def fetch() -> dict:
         return _cached_brief(eia_key)
     fetch.clear = _cached_brief.clear
-    return _live("brief", fetch, lambda d: d.get("success"))
+    # Note: a failure clears every key's cached brief. In deployment only the server key is used.
+    # Hold failures per key (hashed, so the key itself is never stored as a name).
+    name = "brief:" + hashlib.sha256(eia_key.encode()).hexdigest()[:12]
+    return _live(name, fetch, lambda d: _brief_ok(d, eia_key))
 
 
 # ── Session state ─────────────────────────────────────────────────────────────
@@ -425,8 +457,8 @@ if "Home" in page:
         '<div class="module-card module-card-active bb-reveal" style="--i:2"><div class="module-title">Evaluate bunkering strategy</div>'
         '<div class="module-desc">Should your vessel bunker now, wait until the next port, or split the stem? BrokerBrief generates the feasible strategies, scores them transparently and explains every trade-off.'
         '<br><br><strong>→ Open "Bunkering strategy" in the sidebar to begin.</strong></div></div>'
-        '<div class="module-card bb-reveal" style="--i:3"><div class="module-title">Market briefing</div>'
-        '<div class="module-desc">Today\'s market tone, freight and bunker signals, and port congestion: the intelligence layer behind every decision. '
+        '<div class="module-card bb-reveal" style="--i:3"><div class="module-title">Morning brief</div>'
+        '<div class="module-desc">The latest Brent and diesel prices, Singapore bunker sales, ship activity, and sale-and-purchase and events headlines, each with its source and date. '
         '<strong>→ Available now under "Market intelligence".</strong></div></div>'
         '<div class="module-card module-card-soon bb-reveal" style="--i:4"><div class="module-title">Supplier quote evaluation <span class="soon-badge">COMING SOON</span></div>'
         '<div class="module-desc">Is the quote you just received competitive? Compare it against market benchmarks and recent trends.</div></div>'
@@ -678,7 +710,7 @@ elif page == "Bunkering strategy":
 
 
 elif page == "Market intelligence":
-    st.markdown(ui.page_header("What moved overnight?", "Market intelligence · the morning brief, from free and permitted sources"),
+    st.markdown(ui.page_header("Where does the market stand?", "Market intelligence · the morning brief, from free and permitted sources"),
                 unsafe_allow_html=True)
     with st.spinner("Building the morning brief..."):
         brief_result = _live_brief(SERVER_EIA_KEY or st.session_state["eia_key"])
@@ -707,17 +739,32 @@ elif page == "Market intelligence":
                 + ui.brief_section(sec["bunker_sales"], ui.brief_figures(sec["bunker_sales"].get("items") or []))
                 + ui.brief_section(freight, freight_body),
                 unsafe_allow_html=True)
+        # A section this page does not know yet (a newer payload) is still shown, never silently dropped.
+        known = {"prices", "bunker_sales", "freight", "sale_and_purchase", "events"}
+        def _body(section: dict) -> str:
+            items = section.get("items") or []
+            body = ui.brief_figures(items) if any("display" in i for i in items) else ui.brief_news(items)
+            return body + "".join(ui.brief_subsection(sub, _body(sub)) for sub in (section.get("subsections") or {}).values())
+        extra = "".join(ui.brief_section(other, _body(other)) for key, other in sec.items() if key not in known)
+        problems = _feed_problems(payload, SERVER_EIA_KEY or st.session_state["eia_key"])
+        if problems:
+            names = {s.get("id"): s.get("name") for s in payload.get("sources") or []}
+            listed = "; ".join(f"{names.get(k) or k} ({v})" for k, v in problems.items())
+            st.markdown(ui.warn_strip(f"Feeds that failed in this build, so their items are missing below: {listed}. "
+                                      f"Retried after {FAILURE_RETRY_SECONDS // 60} minutes."),
+                        unsafe_allow_html=True)
         with col_news:
             st.markdown(
                 ui.brief_section(sec["sale_and_purchase"], ui.brief_news(sec["sale_and_purchase"].get("items") or []))
                 + ui.brief_section(sec["events"], ui.brief_news(sec["events"].get("items") or []))
+                + extra
                 + ui.brief_sources(payload.get("sources") or []),
                 unsafe_allow_html=True)
         built = datetime.fromisoformat(payload["generated_at"]).astimezone(timezone.utc)
         st.markdown(
-            f'<div class="data-note">Built {built.day} {built:%B %Y, %H:%M} UTC and shared by every visitor; rebuilt every '
-            f'{LIVE_TTL_SECONDS // 3600} hours. Every figure is written by code from the source data, with its comparison '
-            'and date as published; no language model is used. News is shown as headline, publisher, date and link only. '
+            f'<div class="data-note">Built {built.day} {built:%B %Y, %H:%M} UTC and shared by every visitor; it is rebuilt '
+            f'once it is {LIVE_TTL_SECONDS // 3600} hours old, or {FAILURE_RETRY_SECONDS // 60} minutes after a feed failed. Each value and its date are as '
+            "the source published them; every comparison with an earlier reading is calculated by BrokerBrief's code. No language model is used. News is shown as headline, publisher, date and link only. "
             'A section with no verified data says so, with the reason, rather than being filled in. No source, no certainty.</div>',
             unsafe_allow_html=True)
 
@@ -772,6 +819,7 @@ elif page == "Data input":
 
     # Demo rows are invented: Market Intelligence must never be generated from
     # them, so everything on this page works from real rows only.
+    df = st.session_state["df"]   # rebind: an upload on this run replaced the frame read at the top
     mi_df = real_rows(df)
     signals: SignalResult = compute_signals(mi_df)
     has_freight    = (mi_df["signal_type"] == "freight").any()

@@ -11,11 +11,13 @@ and never leak the EIA key in an error.
 import copy
 import json
 import os
+import time
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
 from unittest import mock
 
+import requests
 from streamlit.testing.v1 import AppTest
 
 from modules import portwatch
@@ -99,17 +101,111 @@ class MarketIntelligencePage(unittest.TestCase):
         self.assertIn("ERROR — The morning brief could not be built", page)
         self.assertNotIn(secret, page)
 
-    def test_without_network_the_page_still_renders(self):
-        # Unpatched: the real fetchers run, the test harness blocks the network, and the
-        # page must still render (sections marked missing, or the build error), not crash.
-        with mock.patch.object(portwatch, "fetch_port_activity", return_value=FAKE_PW):
-            at = AppTest.from_file(APP, default_timeout=60).run()
-            at.sidebar.radio[0].set_value("Market intelligence").run()
+    def test_every_section_and_subsection_title_is_shown(self):
+        page = html(open_mi(mock.Mock(return_value=copy.deepcopy(PAYLOAD))))
+        for title in ("Prices", "Singapore bunker sales", "Freight", "Sale &amp; Purchase", "Events",
+                      "Container freight rates", "Freight rate direction (from news, no figures)",
+                      "Ship activity (transits and port calls, not rates)", "Sources"):
+            self.assertIn(title, page)
+
+    def test_a_change_with_no_percentage_still_renders(self):
+        # pct_display is None when the previous value is 0; it once crashed the whole page.
+        data = copy.deepcopy(PAYLOAD)
+        change = data["sections"]["prices"]["items"][0]["changes"][0]
+        change.update(pct_display=None, pct_change=None, previous_value=0)
+        at = open_mi(mock.Mock(return_value=data))
+        self.assertEqual(len(at.exception), 0)
+        page = html(at)
+        self.assertIn('<span class="mb-dir dir-down">Down</span>USD 0.07/bbl · vs 5 October 2026 (previous published day)', page)
+        self.assertNotIn("None", page)
+
+    def test_source_notes_are_shown_once(self):
+        # MPA's "preliminary" warning belongs beside the bunker-sales figures, once, not six times.
+        page = html(open_mi(mock.Mock(return_value=copy.deepcopy(PAYLOAD))))
+        self.assertEqual(page.count("preliminary estimates"), 1)
+
+    def test_only_https_links_are_rendered(self):
+        data = copy.deepcopy(PAYLOAD)
+        item = data["sections"]["events"]["items"][0]
+        item["link"] = "javascript:alert(1)"
+        data["sources"][0]["url"] = "http://example.org/"
+        page = html(open_mi(mock.Mock(return_value=data)))
+        self.assertIn(item["headline"], page)
+        self.assertNotIn("javascript:", page)
+        self.assertNotIn('href="http://', page)
+
+    def test_an_unknown_section_is_shown_not_dropped(self):
+        data = copy.deepcopy(PAYLOAD)
+        data["sections"]["new_section"] = {"title": "Port state control", "status": "missing",
+                                           "reason": "Not built yet.", "items": []}
+        page = html(open_mi(mock.Mock(return_value=data)))
+        self.assertIn("Port state control", page)
+        self.assertIn("Not built yet.", page)
+
+    def test_a_brief_with_a_feed_error_is_rebuilt_after_five_minutes(self):
+        # A feed outage must not be served for 3 hours: it is held 5 minutes, then rebuilt.
+        data = copy.deepcopy(PAYLOAD)
+        data["validation"]["feed_errors"] = {"gcaptain": "HTTP 503"}
+        build = mock.Mock(return_value=data)
+        at = open_mi(build)
+        with mock.patch.object(payload_module, "fetch_and_build", build), \
+             mock.patch.object(portwatch, "fetch_port_activity", return_value=FAKE_PW):
+            at.run()                                                   # within 5 minutes: the held brief
+            self.assertEqual(build.call_count, 1)
+            later = time.monotonic() + 6 * 60
+            with mock.patch("time.monotonic", return_value=later):
+                at.run()
+        self.assertEqual(build.call_count, 2)
         self.assertEqual(len(at.exception), 0)
 
+    def test_a_failed_feed_is_named_on_the_page(self):
+        data = copy.deepcopy(PAYLOAD)
+        data["validation"]["feed_errors"] = {"gcaptain": "HTTP 503"}
+        page = html(open_mi(mock.Mock(return_value=data)))
+        self.assertIn("Feeds that failed in this build", page)
+        self.assertIn("gCaptain (HTTP 503)", page)
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_a_missing_eia_key_alone_does_not_trigger_rebuilds(self):
+        # Retrying cannot fix a missing key, so that brief is kept like a clean one.
+        data = copy.deepcopy(PAYLOAD)
+        data["validation"]["feed_errors"] = {"eia_spot": "no EIA API key configured (set EIA_API_KEY)"}
+        build = mock.Mock(return_value=data)
+        with mock.patch.dict(os.environ, {"EIA_API_KEY": ""}):
+            at = open_mi(build)
+            with mock.patch.object(payload_module, "fetch_and_build", build), \
+                 mock.patch.object(portwatch, "fetch_port_activity", return_value=FAKE_PW), \
+                 mock.patch("time.monotonic", return_value=time.monotonic() + 6 * 60):
+                at.run()
+        self.assertEqual(build.call_count, 1)
+        self.assertNotIn("Feeds that failed", html(at))
+
+    def test_a_clean_brief_is_kept(self):
+        build = mock.Mock(return_value=copy.deepcopy(PAYLOAD))
+        at = open_mi(build)
+        with mock.patch.object(payload_module, "fetch_and_build", build), \
+             mock.patch.object(portwatch, "fetch_port_activity", return_value=FAKE_PW), \
+             mock.patch("time.monotonic", return_value=time.monotonic() + 6 * 60):
+            at.run()
+        self.assertEqual(build.call_count, 1)
+
+    def test_offline_every_feed_is_marked_missing_not_crashed(self):
+        # The real fetchers run with a getter that cannot reach the network.
+        real = payload_module.fetch_and_build
+
+        def offline_get(*args, **kwargs):
+            raise requests.ConnectionError("network unreachable (test)")
+
+        def build(**kwargs):
+            kwargs["get"] = offline_get
+            return real(**kwargs)
+
+        with mock.patch.dict(os.environ, {"EIA_API_KEY": "TESTKEY123"}):
+            at = open_mi(build)
+        self.assertEqual(len(at.exception), 0)
+        page = html(at)
+        self.assertNotIn("TESTKEY123", page)
+        self.assertIn("MISSING", page)
+        self.assertNotIn("USD 125.44/bbl", page)
 
 
 class DataInputValidation(unittest.TestCase):
@@ -122,3 +218,7 @@ class DataInputValidation(unittest.TestCase):
         page = html(at) + " ".join(str(i.value) for i in at.info)
         self.assertIn("No market rows loaded.", page)
         self.assertNotIn("all 0 rows populated", page)
+
+
+if __name__ == "__main__":
+    unittest.main()
